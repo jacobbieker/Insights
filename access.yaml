@@ -1,0 +1,25 @@
+#Config file with access token for services, other personal information, along with is the service will be used
+facebook:
+  used: no
+  token: NULL
+twitter:
+  used: no
+  key: <key>
+  secret: <twitter>
+linkedin:
+  used: no
+  token: NULL
+github:
+  used: no
+  clientID: <ID>
+  clientSecret: <secret>
+flickr:
+  used: no
+  key: <key>
+  secret: <secrete>
+googleplus:
+  used: no
+  token: NULL
+youtube:
+  used: no
+  token: NULL

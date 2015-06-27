@@ -1,0 +1,63 @@
+#Configuration file for all the scripts that work with the SQLite database
+sqlite:
+  name: ownData
+  storage_location:
+  tables:
+    message:
+      - type: string
+      - date: date
+      - time: time
+      - sender: string
+      - reciever: string
+      - message: string
+      - length: int
+    word:
+      - word: string
+      - length: int
+      - occurences: int
+    call:
+      - date: date
+      - time: time
+      - caller: string
+      - reciever: string
+      - length: double
+      - answered: boolean
+    voicemail:
+      - date: date
+      - time: time
+      - caller: string
+      - message: string
+    email:
+      - type: string
+      - date: date
+      - time: time
+      - sender: string
+      - reciever: string
+      - message: string
+    socialmedia:
+      - type: string
+      - NumOf: int
+    contacts:
+      - name: string
+      - firstContact: date
+      - lastContact: date
+      - phoneNumbers: string
+      - countryCode: string
+      - lastNumber: string
+    locations:
+      - date: date
+      - time: time
+      - coordinates: double
+      - continent: string
+      - country: string
+      - state: string
+      - city: string
+    jobs:
+      - title: string
+      - company: string
+      - description: string
+      - startDate: date
+      - endDate: date
+      - type: string
+      - currentlyWork: boolean
+      - location: string
