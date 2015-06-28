@@ -38,7 +38,7 @@ for file in os.listdir(rootdir):
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     for message in messages:
                         #Date and Time
-                        date_and_time = message.abbr.string
+                        date_and_time = message.abbr.text
                         #TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -54,14 +54,14 @@ for file in os.listdir(rootdir):
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
 
                         #Get sender
-                        sender = message.cite.string
+                        sender = message.cite.text
 
                         #Telephone
                         gvoice_number = message.a.get('href')
                         phone_number = gvoice_number.split(':')
 
                         #SMS
-                        text = message.q.string
+                        text = message.q.text
 
                         #Get reciever:
                         if(sender != 'Me'):
@@ -91,7 +91,7 @@ for file in os.listdir(rootdir):
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     for call in calls:
                         #Date and Time
-                        date_and_time = call.abbr.string
+                        date_and_time = call.abbr.text
                         #TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -108,7 +108,7 @@ for file in os.listdir(rootdir):
 
                         #Get caller
                         if (len(call.find_all("span", { "class" : "fn"})) >=1):
-                            caller = call.find_all("span", { "class" : "fn"})[1].string
+                            caller = call.find_all("span", { "class" : "fn"})[1].text
 
                         #Telephone
                         gvoice_number = call.a.get('href')
@@ -116,7 +116,7 @@ for file in os.listdir(rootdir):
 
                         #Call length
                         if(len(call.find_all("abbr", {"class" : "duration"})) >= 1):
-                            duration = call.find_all("abbr", {"class" : "duration"})[0].string
+                            duration = call.find_all("abbr", {"class" : "duration"})[0].text
                         else:
                             duration = None
 
@@ -145,7 +145,7 @@ for file in os.listdir(rootdir):
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     for voicemail in voicemails:
                         #Date and Time
-                        date_and_time = voicemail.abbr.string
+                        date_and_time = voicemail.abbr.text
                         #TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -162,7 +162,7 @@ for file in os.listdir(rootdir):
 
                         #Get caller
                         if (len(voicemail.find_all("span", { "class" : "fn"})) >=1):
-                            caller = voicemail.find_all("span", { "class" : "fn"})[1].string
+                            caller = voicemail.find_all("span", { "class" : "fn"})[1].text
 
                         #Telephone
                         gvoice_number = voicemail.a.get('href')
@@ -170,11 +170,11 @@ for file in os.listdir(rootdir):
 
                         #Voicemail text
                         if (len(voicemail.find_all("span", { "class" : "full-text"})) >= 1):
-                            text = voicemail.find_all("span", { "class" : "full-text"})[0].string
+                            text = voicemail.find_all("span", { "class" : "full-text"})[0].text
 
                         #Voicemail length
                         if(len(voicemail.find_all("abbr", {"class" : "duration"})) >= 1):
-                            duration = voicemail.find_all("abbr", {"class" : "duration"})[0].string
+                            duration = voicemail.find_all("abbr", {"class" : "duration"})[0].text
                         json_output.write('\n')
                         json_data = {'type': 'voicemail',
                                      'time': date_string,

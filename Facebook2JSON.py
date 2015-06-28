@@ -25,7 +25,7 @@ for file in os.listdir(rootdir + "\\data\\html"):
         if (file=="messages.htm"):
             with open(rootdir + "\\data\\html" + "\\" + file, 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
-                html_file = BeautifulSoup(source.read().decode('utf8', 'ignore'))
+                html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
             ###################################################################
             #
@@ -41,17 +41,21 @@ for file in os.listdir(rootdir + "\\data\\html"):
                     output_file_name += 1
                     with open(os.path.join(rootdir + "\\output", 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
                         messages = thread.find_all("div", {"class" : "message"})
+                        #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
+                        #message
+                        message_content = thread.find_all("p")
                         #Now at the level of each message
-                        for message in messages:
+                        for index, message in enumerate(messages):
                             #print message
                             #user writing the message
-                            user = message.find("span", {"class": "user"}).string
+                            user = message.find("span", {"class": "user"}).text
 
                             #time of message
                             #Date and Time
-                            date_and_time = message.find("div", {"class": "meta"}).string
+                            date_and_time = message.find("span", {"class": "meta"}).text
                             #TODO split and convert to Date Field
                             time_components = date_and_time.split()
+                            #print time_components
                             #Converting to proper format for strptime
                             '''
                             if(int(time_components[1]) < 10):
@@ -65,8 +69,8 @@ for file in os.listdir(rootdir + "\\data\\html"):
                             '''
 
                             #The actual message
-                            print message.p
-                            text = message.p.string
+                            text = message_content[index].text
+
             ###################################################################
             #
             #              End of FB Message to JSON script
