@@ -59,11 +59,11 @@ gTakeout.extractall(DATA_PATH)
 #Facebook zip
 facebook_zip = glob.glob("facebook*.zip")
 fbZip = zipfile.ZipFile(PATH + "\\" + facebook_zip, 'r')
-fbZip.extractall(DATA_PATH)
+fbZip.extractall(DATA_PATH + "\\facebook\\")
 #LinkedIn zip
 linkedIn_zip = glob.glob("LinkedIn*.zip")
 fbZip = zipfile.ZipFile(PATH + "\\" + linkedIn_zip, 'r')
-fbZip.extractall(DATA_PATH)
+fbZip.extractall(DATA_PATH + "\\linkedin\\")
 
 '''
 Execute the other scripts to create the database and fill it
