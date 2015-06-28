@@ -37,7 +37,7 @@ for file in os.listdir(rootdir):
                 print threads[0]
                 #Now step into each message thread
                 for thread in threads:
-                    #TODO CHeck to make sure name won't be longer than 256 characters, the Windows limitation
+                    #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name = thread.string
                     print output_file_name
                     with open(os.path.join('C:\Development\personal_analysis\output', 'facebook.' + output_file_name + '.json'), 'a') as json_output:

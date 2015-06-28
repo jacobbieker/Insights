@@ -68,7 +68,7 @@ for file in os.listdir(rootdir):
                             reciever = 'Me'
                         else:
                             reciever = json_file_name[0]
-
+                        json_output.write('\n')
                         json_data = {'type': 'sms',
                                      'time': date_string,
                                      'sender': sender,
@@ -122,7 +122,7 @@ for file in os.listdir(rootdir):
 
                         #Call type: Missed, Placed, or Recieved
                         status = json_file_name[1].strip(" ")
-
+                        json_output.write('\n')
                         json_data = {'type': 'call',
                                      'status': status,
                                      'time': date_string,
@@ -175,7 +175,7 @@ for file in os.listdir(rootdir):
                         #Voicemail length
                         if(len(voicemail.find_all("abbr", {"class" : "duration"})) >= 1):
                             duration = voicemail.find_all("abbr", {"class" : "duration"})[0].string
-
+                        json_output.write('\n')
                         json_data = {'type': 'voicemail',
                                      'time': date_string,
                                      'caller': caller,
