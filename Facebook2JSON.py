@@ -37,7 +37,7 @@ for file in os.listdir(rootdir + "\\data\\html"):
                 output_file_name = 0
                 #Now step into each message thread
                 for thread in threads:
-                    json_data = []
+                    #json_data = []
                     #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
                     with open(os.path.join(rootdir + "\\output", 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
@@ -58,6 +58,7 @@ for file in os.listdir(rootdir + "\\data\\html"):
                             #time of message
                             #Date and Time
                             date_and_time = message.find("span", {"class": "meta"}).text
+
                             time_components = date_and_time.split()
                             #print time_components
                             #Converting to proper format for strptime
@@ -73,13 +74,13 @@ for file in os.listdir(rootdir + "\\data\\html"):
 
                             #The actual message
                             text = message_content[index].text
-
-                            json_data.append({'type': 'facebook message',
+                            json_output.write("\n")
+                            json_data = {'type': 'facebook message',
                                          'time': date_string,
                                          'sender': user,
                                          'recipients': list_of_recipients,
-                                         'message': text})
-                        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                                         'message': text}
+                            json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of FB Message to JSON script
