@@ -36,6 +36,7 @@ for file in os.listdir(rootdir):
             if(json_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", { "class" : "message"})
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                    json_data = []
                     for message in messages:
                         #Date and Time
                         date_and_time = message.abbr.text
@@ -68,14 +69,13 @@ for file in os.listdir(rootdir):
                             reciever = 'Me'
                         else:
                             reciever = json_file_name[0]
-                        json_output.write('\n')
-                        json_data = {'type': 'sms',
+                        json_data.append({'type': 'sms',
                                      'time': date_string,
                                      'sender': sender,
                                      'reciever': reciever,
                                      'phone number': phone_number[1],
-                                     'message': text}
-                        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                                     'message': text})
+                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of SMS to JSON script
@@ -89,6 +89,7 @@ for file in os.listdir(rootdir):
             if(json_file_name[1] == ' Missed' or json_file_name[1] == ' Recieved' or json_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", { "class" : "haudio"})
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                    json_data = []
                     for call in calls:
                         #Date and Time
                         date_and_time = call.abbr.text
@@ -122,14 +123,13 @@ for file in os.listdir(rootdir):
 
                         #Call type: Missed, Placed, or Recieved
                         status = json_file_name[1].strip(" ")
-                        json_output.write('\n')
-                        json_data = {'type': 'call',
+                        json_data.append({'type': 'call',
                                      'status': status,
                                      'time': date_string,
                                      'caller': caller,
                                      'duration': duration,
-                                     'phone number': phone_number[1]}
-                        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                                     'phone number': phone_number[1]})
+                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of Call to JSON script
@@ -143,6 +143,7 @@ for file in os.listdir(rootdir):
             if(json_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", { "class" : "haudio"})
                 with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                    json_data = []
                     for voicemail in voicemails:
                         #Date and Time
                         date_and_time = voicemail.abbr.text
@@ -175,14 +176,13 @@ for file in os.listdir(rootdir):
                         #Voicemail length
                         if(len(voicemail.find_all("abbr", {"class" : "duration"})) >= 1):
                             duration = voicemail.find_all("abbr", {"class" : "duration"})[0].text
-                        json_output.write('\n')
-                        json_data = {'type': 'voicemail',
+                        json_data.append({'type': 'voicemail',
                                      'time': date_string,
                                      'caller': caller,
                                      'duration': duration,
                                      'phone number': phone_number[1],
-                                     'message': text}
-                        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                                     'message': text})
+                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of Voicemail to JSON script

@@ -37,6 +37,9 @@ for file in os.listdir(rootdir + "\\data\\html"):
                 output_file_name = 0
                 #Now step into each message thread
                 for thread in threads:
+                    json_data = []
+                    #TODO Get the list of all paricipants in a thread from the <thread> tag
+                    list_of_recipients = []
                     #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
                     with open(os.path.join(rootdir + "\\output", 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
@@ -49,6 +52,8 @@ for file in os.listdir(rootdir + "\\data\\html"):
                             #print message
                             #user writing the message
                             user = message.find("span", {"class": "user"}).text
+                            if(user not in s for s in list_of_recipients):
+                                list_of_recipients.append(user)
 
                             #time of message
                             #Date and Time
@@ -57,20 +62,25 @@ for file in os.listdir(rootdir + "\\data\\html"):
                             time_components = date_and_time.split()
                             #print time_components
                             #Converting to proper format for strptime
-                            '''
                             if(int(time_components[1]) < 10):
                                 date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + time_components[4]
+                                              + time_components[3] + " " +time_components[5]
                             else: # NO leading 0 added
                                 date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + time_components[4]
+                                              + time_components[3] + " " +time_components[5]
                             #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-                            date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
-                            '''
+                            #Note: Different than GVoice time, different format
+                            date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
 
                             #The actual message
                             text = message_content[index].text
 
+                            json_data.append({'type': 'facebook message',
+                                         'time': date_string,
+                                         'sender': user,
+                                         'recipients': list_of_recipients,
+                                         'message': text})
+                        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of FB Message to JSON script
