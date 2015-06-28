@@ -38,8 +38,6 @@ for file in os.listdir(rootdir + "\\data\\html"):
                 #Now step into each message thread
                 for thread in threads:
                     json_data = []
-                    #TODO Get the list of all paricipants in a thread from the <thread> tag
-                    list_of_recipients = []
                     #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
                     with open(os.path.join(rootdir + "\\output", 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
@@ -47,6 +45,8 @@ for file in os.listdir(rootdir + "\\data\\html"):
                         #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
                         #message
                         message_content = thread.find_all("p")
+                        #TODO Get the list of all paricipants in a thread from the <thread> tag
+                        list_of_recipients = []
                         #Now at the level of each message
                         for index, message in enumerate(messages):
                             #print message
@@ -58,7 +58,6 @@ for file in os.listdir(rootdir + "\\data\\html"):
                             #time of message
                             #Date and Time
                             date_and_time = message.find("span", {"class": "meta"}).text
-                            #TODO split and convert to Date Field
                             time_components = date_and_time.split()
                             #print time_components
                             #Converting to proper format for strptime
