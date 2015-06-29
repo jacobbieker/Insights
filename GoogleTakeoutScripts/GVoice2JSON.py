@@ -1,9 +1,9 @@
 __author__ = 'Jacob'
 import os
-from bs4 import BeautifulSoup
 import json
-import yaml
 from datetime import datetime
+
+from bs4 import BeautifulSoup
 
 try:
     from lxml import etree
@@ -13,7 +13,7 @@ except ImportError:
 with open("constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 '''
-rootdir = "C:\Users\jacob_000\OneDrive\Personal_Projects\Takeout\Voice\Calls"
+rootdir = "C:\Users\Jacob\PycharmProjects\Insights\data\Takeout\Voice\Calls"
 
 '''
 SAMPLE INPUT:
@@ -35,7 +35,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if(json_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", { "class" : "message"})
-                with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join('C:\Users\Jacob\PycharmProjects\Insights\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for message in messages:
                         #Date and Time
@@ -88,11 +88,12 @@ for file in os.listdir(rootdir):
             ###################################################################
             if(json_file_name[1] == ' Missed' or json_file_name[1] == ' Recieved' or json_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", { "class" : "haudio"})
-                with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join('C:\Users\Jacob\PycharmProjects\Insights\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for call in calls:
                         #Date and Time
                         date_and_time = call.abbr.text
+
                         #TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -118,6 +119,7 @@ for file in os.listdir(rootdir):
                         #Call length
                         if(len(call.find_all("abbr", {"class" : "duration"})) >= 1):
                             duration = call.find_all("abbr", {"class" : "duration"})[0].text
+
                         else:
                             duration = None
 
@@ -142,11 +144,12 @@ for file in os.listdir(rootdir):
             ###################################################################
             if(json_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", { "class" : "haudio"})
-                with open(os.path.join('C:\Development\personal_analysis\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join('C:\Users\Jacob\PycharmProjects\Insights\output', 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for voicemail in voicemails:
                         #Date and Time
                         date_and_time = voicemail.abbr.text
+
                         #TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -176,6 +179,7 @@ for file in os.listdir(rootdir):
                         #Voicemail length
                         if(len(voicemail.find_all("abbr", {"class" : "duration"})) >= 1):
                             duration = voicemail.find_all("abbr", {"class" : "duration"})[0].text
+
                         json_data.append({'type': 'voicemail',
                                      'time': date_string,
                                      'caller': caller,

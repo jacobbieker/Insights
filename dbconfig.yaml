@@ -1,9 +1,9 @@
 #Configuration file for all the scripts that work with the SQLite database
 sqlite:
-  name: ownData
+  name: insights
   storage_location:
   tables:
-    message:
+    Message:
       - type: string
       - date: date
       - time: time
@@ -11,48 +11,39 @@ sqlite:
       - reciever: string
       - message: string
       - length: int
-    word:
+    Word:
       - word: string
       - length: int
       - occurences: int
-    call:
+    Call:
       - date: date
       - time: time
       - caller: string
       - reciever: string
       - length: double
       - answered: boolean
-    voicemail:
+    Voicemail:
       - date: date
       - time: time
       - caller: string
       - message: string
-    email:
-      - type: string
-      - date: date
-      - time: time
-      - sender: string
-      - reciever: string
-      - message: string
-    socialmedia:
-      - type: string
-      - NumOf: int
-    contacts:
+    Contacts:
       - name: string
       - firstContact: date
       - lastContact: date
       - phoneNumbers: string
       - countryCode: string
       - lastNumber: string
-    locations:
+    Locations:
       - date: date
       - time: time
-      - coordinates: double
+      - longitude: double
+      - latitude: double
       - continent: string
       - country: string
       - state: string
       - city: string
-    jobs:
+    Jobs:
       - title: string
       - company: string
       - description: string
