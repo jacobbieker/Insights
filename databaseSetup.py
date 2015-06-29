@@ -3,6 +3,7 @@ import os
 from peewee import *
 import yaml
 from playhouse.migrate import *
+from playhouse.sqlite_ext import SqliteExtDatabase
 
 with open("dbconfig.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
@@ -10,7 +11,7 @@ with open("dbconfig.yaml", 'r') as ymlfile:
 #remove old database if in the current directory
 os.remove(config['sqlite']['name'] + ".db")
 
-database = SqliteDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+database = SqliteExtDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
 database.connect()
 
 #Define the fields used in the database so migrate can be called and used:
@@ -76,9 +77,10 @@ migrator = SqliteMigrator(database)
 
 for table in config['sqlite']['tables']:
     for column in config['sqlite']['tables'][table]:
-        #Use migrator to add a column for each field
-        col_type = column[1]
-        col_name = column[0]
+        print column.keys()
+        #Use mcol_namator to add a column for each field
+        col_name = column.keys()[0]
+        col_type = column.values()[0]
         if col_type == 'string':
             migrate(
                 migrator.add_column(table, col_name, text_field)
@@ -89,7 +91,7 @@ for table in config['sqlite']['tables']:
             )
         elif col_type == 'date':
             migrate(
-                migrator.add_column(table, col_name, date_field)
+                migrator.add_column(table, col_name, datetime_field)
             )
         elif col_type == 'time':
             migrate(
@@ -107,3 +109,7 @@ for table in config['sqlite']['tables']:
             migrate(
                 migrator.add_column(table, col_name, boolean_field)
             )
+    #Now delete the default table
+    migrate(
+        migrator.drop_column(table, 'default')
+    )

@@ -3,38 +3,38 @@ sqlite:
   name: insights
   storage_location:
   tables:
-    Message:
-      - type: string
-      - date: date
-      - time: time
-      - sender: char
-      - reciever: char
-      - message: string
-      - length: int
-    Word:
-      - word: char
-      - length: int
-      - occurences: int
-    Call:
+    message:
+     - type: string
+     - date: date
+     - time: time
+     - sender: char
+     - reciever: char
+     - message: string
+     - length: int
+    word:
+     - word: char
+     - length: int
+     - occurences: int
+    call:
       - date: date
       - time: time
       - caller: char
       - reciever: char
       - length: double
       - answered: boolean
-    Voicemail:
+    voicemail:
       - date: date
       - time: time
       - caller: char
       - message: string
-    Contacts:
+    contacts:
       - name: char
       - firstContact: date
       - lastContact: date
       - phoneNumbers: int
       - countryCode: string
       - lastNumber: int
-    Locations:
+    locations:
       - date: date
       - time: time
       - longitude: double
@@ -43,7 +43,7 @@ sqlite:
       - country: char
       - state: char
       - city: char
-    Jobs:
+    jobs:
       - title: char
       - company: char
       - description: string
