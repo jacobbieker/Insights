@@ -3,15 +3,25 @@ import os
 from peewee import *
 import yaml
 from playhouse.migrate import *
-from playhouse.sqlite_ext import SqliteExtDatabase
 
 with open("dbconfig.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
 #remove old database if in the current directory
-os.remove(config['sqlite']['name'] + ".db")
+if os.path.isfile(config['sqlite']['name'] + '.db'):
+    os.remove(config['sqlite']['name'] + ".db")
 
-database = SqliteExtDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+#Check to see what type of database wanted, and creates the type specificed
+
+if config['sqlite']['type'] == 'extended':
+    from playhouse.sqlite_ext import SqliteExtDatabase
+    database = SqliteExtDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+elif config['sqlite']['type'] == 'apsw':
+    from playhouse.apsw_ext import APSWDatabase
+    database = APSWDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+else:
+    database = SqliteDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+
 database.connect()
 
 #Define the fields used in the database so migrate can be called and used:
