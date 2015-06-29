@@ -44,7 +44,6 @@ sqlite:
       - country: char
       - state: char
       - city: char
-      - twitterTrends: string
     jobs:
       - title: char
       - company: char

@@ -24,3 +24,6 @@ googleplus:
 youtube:
   used: no
   token: NULL
+instagram:
+  id: <clientID>
+  secret: <clientSecret>
