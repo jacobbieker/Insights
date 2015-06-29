@@ -11,7 +11,10 @@ linkedin:
   - used: no
   - token: NULL
 github:
-  - used: no
+  - used: yes
+  - username:
+  - password:
+  - twoFactor: yes
   - clientID: <ID>
   - clientSecret: <secret>
 flickr:
@@ -25,6 +28,7 @@ youtube:
   - used: no
   - token: NULL
 instagram:
+  - used: yes
   - id: <clientID>
   - secret: <clientSecret>
   - token: NULL
