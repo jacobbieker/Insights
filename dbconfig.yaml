@@ -3,49 +3,49 @@ sqlite:
   name: insights
   storage_location:
   tables:
-    Message:
-      - type: string
+    message:
+     - type: string
+     - date: date
+     - time: time
+     - sender: char
+     - reciever: char
+     - message: string
+     - length: int
+    word:
+     - word: char
+     - length: int
+     - occurences: int
+    call:
       - date: date
       - time: time
-      - sender: string
-      - reciever: string
-      - message: string
-      - length: int
-    Word:
-      - word: string
-      - length: int
-      - occurences: int
-    Call:
-      - date: date
-      - time: time
-      - caller: string
-      - reciever: string
+      - caller: char
+      - reciever: char
       - length: double
       - answered: boolean
-    Voicemail:
+    voicemail:
       - date: date
       - time: time
-      - caller: string
+      - caller: char
       - message: string
-    Contacts:
-      - name: string
+    contacts:
+      - name: char
       - firstContact: date
       - lastContact: date
-      - phoneNumbers: string
+      - phoneNumbers: int
       - countryCode: string
-      - lastNumber: string
-    Locations:
+      - lastNumber: int
+    locations:
       - date: date
       - time: time
       - longitude: double
       - latitude: double
-      - continent: string
-      - country: string
-      - state: string
-      - city: string
-    Jobs:
-      - title: string
-      - company: string
+      - continent: char
+      - country: char
+      - state: char
+      - city: char
+    jobs:
+      - title: char
+      - company: char
       - description: string
       - startDate: date
       - endDate: date
