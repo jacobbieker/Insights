@@ -59,6 +59,9 @@ class Locations(BaseModel):
 class Jobs(BaseModel):
     default = datetime_field
 
+class SocialMedia(BaseModel):
+    default = datetime_field
+
 def create_tables():
     Message.create_table()
     Locations.create_table()
@@ -67,6 +70,7 @@ def create_tables():
     Word.create_table()
     Jobs.create_table()
     Contacts.create_table()
+    SocialMedia.create_table()
 
 create_tables()
 

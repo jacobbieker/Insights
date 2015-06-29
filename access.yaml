@@ -3,9 +3,10 @@ facebook:
   used: no
   token: NULL
 twitter:
-  used: no
+  used: yes
   key: <key>
   secret: <twitter>
+  accessToken: NULL
 linkedin:
   used: no
   token: NULL
