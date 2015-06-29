@@ -1,4 +1,5 @@
 __author__ = 'Jacob Bieker'
+from github3 import *
 import github3
 import os
 import peewee
@@ -17,7 +18,6 @@ with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
 username = access_config['github']['username']
-password = access_config['github']['password']
 
 if access_config['github']['twoFactor']:
     auth = github3.login(username=username, password=password,
