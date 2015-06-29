@@ -7,45 +7,45 @@ sqlite:
       - type: string
       - date: date
       - time: time
-      - sender: string
-      - reciever: string
+      - sender: char
+      - reciever: char
       - message: string
       - length: int
     Word:
-      - word: string
+      - word: char
       - length: int
       - occurences: int
     Call:
       - date: date
       - time: time
-      - caller: string
-      - reciever: string
+      - caller: char
+      - reciever: char
       - length: double
       - answered: boolean
     Voicemail:
       - date: date
       - time: time
-      - caller: string
+      - caller: char
       - message: string
     Contacts:
-      - name: string
+      - name: char
       - firstContact: date
       - lastContact: date
-      - phoneNumbers: string
+      - phoneNumbers: int
       - countryCode: string
-      - lastNumber: string
+      - lastNumber: int
     Locations:
       - date: date
       - time: time
       - longitude: double
       - latitude: double
-      - continent: string
-      - country: string
-      - state: string
-      - city: string
+      - continent: char
+      - country: char
+      - state: char
+      - city: char
     Jobs:
-      - title: string
-      - company: string
+      - title: char
+      - company: char
       - description: string
       - startDate: date
       - endDate: date

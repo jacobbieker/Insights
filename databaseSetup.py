@@ -21,6 +21,7 @@ char_field = CharField(null=True)
 text_field = TextField(null=True)
 int_field = IntegerField(null=True)
 double_field = DoubleField(null=True)
+boolean_field = BooleanField(null=True)
 
 #Create base database
 class BaseModel(Model):
@@ -74,5 +75,35 @@ Now programmatically add columns to the tables
 migrator = SqliteMigrator(database)
 
 for table in config['sqlite']['tables']:
-    for column in table:
-        print column
+    for column in config['sqlite']['tables'][table]:
+        #Use migrator to add a column for each field
+        col_type = column[1]
+        col_name = column[0]
+        if col_type == 'string':
+            migrate(
+                migrator.add_column(table, col_name, text_field)
+            )
+        elif col_type == 'char':
+            migrate(
+                migrator.add_column(table, col_name, char_field)
+            )
+        elif col_type == 'date':
+            migrate(
+                migrator.add_column(table, col_name, date_field)
+            )
+        elif col_type == 'time':
+            migrate(
+                migrator.add_column(table, col_name, time_field)
+            )
+        elif col_type == 'int':
+            migrate(
+                migrator.add_column(table, col_name, int_field)
+            )
+        elif col_type == 'double':
+            migrate(
+                migrator.add_column(table, col_name, double_field)
+            )
+        elif col_type == 'boolean':
+            migrate(
+                migrator.add_column(table, col_name, boolean_field)
+            )
