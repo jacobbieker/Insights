@@ -7,22 +7,22 @@ from playhouse.migrate import *
 with open("dbconfig.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
+DB_NAME = config['sqlite']['name'] + '.db'
 #remove old database if in the current directory
 if os.path.isfile(config['sqlite']['name'] + '.db'):
-    os.remove(config['sqlite']['name'] + ".db")
-
-#Check to see what type of database wanted, and creates the type specificed
-
-if config['sqlite']['type'] == 'extended':
-    from playhouse.sqlite_ext import SqliteExtDatabase
-    database = SqliteExtDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
-elif config['sqlite']['type'] == 'apsw':
-    from playhouse.apsw_ext import APSWDatabase
-    database = APSWDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+    DB_NAME.connect()
 else:
-    database = SqliteDatabase(config['sqlite']['name'] + ".db", threadlocals=True)
+    #Check to see what type of database wanted, and creates the type specificed
+    if config['sqlite']['type'] == 'extended':
+        from playhouse.sqlite_ext import SqliteExtDatabase
+        database = SqliteExtDatabase(DB_NAME, threadlocals=True)
+    elif config['sqlite']['type'] == 'apsw':
+        from playhouse.apsw_ext import APSWDatabase
+        database = APSWDatabase(DB_NAME, threadlocals=True)
+    else:
+        database = SqliteDatabase(DB_NAME, threadlocals=True)
 
-database.connect()
+    database.connect()
 
 #Define the fields used in the database so migrate can be called and used:
 date_field = DateField(null=True)
@@ -38,9 +38,6 @@ boolean_field = BooleanField(null=True)
 class BaseModel(Model):
     class Meta:
         database = database
-
-for table in config['sqlite']['tables']:
-    print(table)
 
 '''
 Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
@@ -82,6 +79,7 @@ def create_tables():
     Contacts.create_table()
     SocialMedia.create_table()
 
+#TODO Check if certain tables exist and do not create them if they do
 create_tables()
 
 '''
