@@ -1,9 +1,9 @@
 __author__ = 'Jacob'
 import os
-from bs4 import BeautifulSoup
 import json
-import yaml
 from datetime import datetime
+
+from bs4 import BeautifulSoup
 
 try:
     from lxml import etree

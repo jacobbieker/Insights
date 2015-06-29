@@ -1,7 +1,6 @@
 __author__ = 'Jacob'
 import csv
 import os
-import yaml
 import json
 
 '''

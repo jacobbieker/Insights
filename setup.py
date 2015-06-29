@@ -4,8 +4,10 @@ This file unzips downloaded files, gets data, and sets up file structure for use
 __author__ = 'Jacob'
 import os
 import glob
-import yaml
 import zipfile
+
+import yaml
+
 
 #read config data on database
 with open("dbconfig.yaml", 'r') as ymlfile:
@@ -74,6 +76,7 @@ execfile(GOOGLE_SCRIPTS + "\\GVoice2JSON.py")
 execfile(GOOGLE_SCRIPTS + "\\Gmail2JSON.py")
 execfile(GOOGLE_SCRIPTS + "\\GmailJSON2SQLite.py")
 execfile(GOOGLE_SCRIPTS + "\\Location2SQLite.py")
+#Run script with command line arguments
 
 #Then on other zipped files
 execfile("Facebook2JSON.py")

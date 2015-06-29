@@ -1,8 +1,5 @@
 __author__ = 'Jacob'
-import Gmail2JSON
 from peewee import *
-import os
-import json
 import yaml
 
 with open("constants.yaml", 'r') as ymlfile:
