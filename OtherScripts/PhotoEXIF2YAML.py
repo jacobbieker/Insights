@@ -16,7 +16,7 @@ for photo in photos:
     with open(photo, 'rb') as image:
         #Return EXIF tags
         metadata = exifread.process_file(image)
-        with open(os.path.join('C:\Development\Insights\output', 'picture.exif.' + file_name[0]  + '.txt'), 'w') as json_output:
+        with open(os.path.join('C:\Development\Insights\output', 'picture.exif.' + file_name[0]  + '.yml'), 'w') as json_output:
             for tag in metadata.keys():
                 if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'EXIF MakerNote'):
                     json_output.write("\n%s: %s" % (tag, metadata[tag]))
