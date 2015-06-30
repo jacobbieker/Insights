@@ -65,6 +65,11 @@ for status in tweepy.Cursor(api.friends_timeline).items(200):
 #             Start of Trends Processing
 #
 ###################################################################
+oregon_whoeid = 2347596
+us_whoeid = 	23424977
+word_whoeid = 1
+
+#Get trends for each of those and save to file
 ###################################################################
 #
 #             End of Trends Processing

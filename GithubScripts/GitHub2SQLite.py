@@ -5,6 +5,7 @@ import os
 import peewee
 import yaml
 
+#Functions for use later
 def my_two_factor_function():
     code = ''
     while not code:

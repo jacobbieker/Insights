@@ -35,3 +35,5 @@ instagram:
   - token: NULL
   - redirect: <redirect URI>
   - scope: basic
+photos:
+  - location: C:\Users\jacob_000\OneDrive\EOS Pictures
