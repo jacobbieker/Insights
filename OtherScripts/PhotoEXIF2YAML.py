@@ -6,7 +6,8 @@ import json
 import yaml
 from glob import glob
 
-
+#TODO Add support for multiple locations
+#TODO CHeck for filename conflicts and rename if necessary
 location = 'C:\Users\jacob_000\OneDrive\EOS Pictures'
 
 photos = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.JPG'))]
@@ -16,7 +17,7 @@ for photo in photos:
     with open(photo, 'rb') as image:
         #Return EXIF tags
         metadata = exifread.process_file(image)
-        with open(os.path.join('C:\Development\Insights\output', 'picture.exif.' + file_name[0]  + '.yml'), 'w') as json_output:
+        with open(os.path.join('C:\Development\Insights\output', 'photo.exif.' + file_name[0]  + '.yml'), 'w') as json_output:
             for tag in metadata.keys():
                 if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'EXIF MakerNote'):
                     json_output.write("\n%s: %s" % (tag, metadata[tag]))
