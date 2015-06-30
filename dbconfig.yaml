@@ -60,3 +60,19 @@ sqlite:
       - message: string
       - tags: string
       - urls: string
+    photos:
+      - name: char
+      - date: date
+      - time: time
+      - location: string
+      - shutter: string
+      - iso: int
+      - shotFormat: string
+      - aperture: string
+      - manufacturer: char
+      - cameraModel: char
+      - exposurePriority: string
+      - exposureMode: string
+      - flash: boolean
+      - lensModel: string
+      - focalLength: double

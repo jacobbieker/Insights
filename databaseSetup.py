@@ -69,6 +69,9 @@ else:
     class SocialMedia(BaseModel):
         default = datetime_field
 
+    class Photos(BaseModel):
+        default = datetime_field
+
     def create_tables():
         Message.create_table()
         Locations.create_table()
@@ -78,6 +81,7 @@ else:
         Jobs.create_table()
         Contacts.create_table()
         SocialMedia.create_table()
+        Photos.create_table()
 
     #TODO Check if certain tables exist and do not create them if they do
     create_tables()
