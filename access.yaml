@@ -21,6 +21,7 @@ github:
   - clientSecret: <secret>
 flickr:
   - used: no
+  - permissions: read
   - key: <key>
   - secret: <secrete>
 googleplus:
