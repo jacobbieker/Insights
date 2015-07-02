@@ -26,12 +26,13 @@ with open("access.yaml", 'r') as access:
 username = access_config['github']['username']
 
 if access_config['github']['twoFactor']:
-    auth = github3.login(username=username, password=password,
+    login_user = github3.login(username=username, password=password,
                   two_factor_callback=my_two_factor_function)
 else:
-    auth = github3.login(username=username, password=password)
+    login_user = github3.login(username=username, password=password)
 
 #Saves token and ID for later use
 with open("access.yaml", 'w') as access:
-    access_config['github']['token'] = auth.token
+    access_config['github']['token'] = login_user.token
+    access_config['github']['authID'] = login_user.id
     access.write(yaml.dump(access_config, default_flow_style=False))
