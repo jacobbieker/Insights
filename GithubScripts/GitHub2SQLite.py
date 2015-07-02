@@ -30,3 +30,8 @@ if access_config['github']['twoFactor']:
                   two_factor_callback=my_two_factor_function)
 else:
     auth = github3.login(username=username, password=password)
+
+#Saves token and ID for later use
+with open("access.yaml", 'w') as access:
+    access_config['github']['token'] = auth.token
+    access.write(yaml.dump(access_config, default_flow_style=False))
