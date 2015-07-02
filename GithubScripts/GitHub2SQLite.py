@@ -14,6 +14,11 @@ def my_two_factor_function():
         code = raw_input('Enter 2FA code: ')
     return code
 
+#Not ideal, but gets it done for now
+password = ''
+while not password:
+    password = raw_input('Password for GitHub: ')
+
 #Authentication with Instagram
 with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
