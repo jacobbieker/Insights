@@ -19,7 +19,7 @@ password = ''
 while not password:
     password = raw_input('Password for GitHub: ')
 
-#Authentication with Instagram
+#Authentication
 with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
