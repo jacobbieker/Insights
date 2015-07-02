@@ -79,7 +79,7 @@ execfile(GOOGLE_SCRIPTS + "\\Location2SQLite.py")
 #Run script with command line arguments
 
 #Then on other zipped files
-execfile("Facebook2JSON.py")
+execfile("FacebookMessaging2JSON.py")
 execfile("LinkedIn2JSON.py")
 
 #Then on downloading data

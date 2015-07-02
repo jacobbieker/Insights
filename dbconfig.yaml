@@ -1,6 +1,7 @@
 #Configuration file for all the scripts that work with the SQLite database
 sqlite:
   name: insights
+  dbType: extended #Choices are: sqlite, extended, apsw
   storage_location:
   tables:
     message:
@@ -52,3 +53,26 @@ sqlite:
       - type: string
       - currentlyWork: boolean
       - location: string
+    socialmedia: #Used for current news, etc. around other events, such as twitter posts at a specific time
+      - type: char
+      - date: date
+      - time: time
+      - message: string
+      - tags: string
+      - urls: string
+    photos:
+      - name: char
+      - date: date
+      - time: time
+      - location: string
+      - shutter: string
+      - iso: int
+      - shotFormat: string
+      - aperture: string
+      - manufacturer: char
+      - cameraModel: char
+      - exposurePriority: string
+      - exposureMode: string
+      - flash: boolean
+      - lensModel: string
+      - focalLength: double
