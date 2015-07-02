@@ -27,8 +27,11 @@ redirect_uri = api.get_authorize_login_url(scope = scope)
 print ("Visit this page and authorize access in your browser: "+ redirect_uri)
 code = (str(input("Paste in code in query string after redirect: ").strip()))
 
-#TODO Write access token to config file for later use
 access_token = api.exchange_code_for_access_token(code)
+
+with open("access.yaml", 'w') as access:
+    access_config['instagram']['token'] = access_token
+    access.write(yaml.dump(access_config, default_flow_style=False))
 
 api = InstagramAPI(access_token=access_token, client_secret=client_secret)
 recent_media, next_ = api.user_recent_media(user_id="userid", count=10)

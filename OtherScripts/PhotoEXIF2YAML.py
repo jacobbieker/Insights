@@ -7,6 +7,7 @@ import yaml
 from glob import glob
 from rawkit.raw import Raw
 from rawkit.metadata import Metadata
+import libraw
 
 #TODO Add support for multiple locations
 #TODO Check for filename conflicts and rename if necessary
@@ -40,10 +41,10 @@ for photo in photos:
 #             Start of .CR2 Processing
 #
 ###################################################################
-canon_raws = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.JPG'))]
+canon_raws = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.CR2'))]
 
 for raw_file in canon_raws:
-    file_name = os.path.splitext(os.path.basename(photo))
+    file_name = os.path.splitext(os.path.basename(raw_file))
     with Raw(filename=raw_file) as raw:
         raw_output = Metadata
         with open(os.path.join('C:\Development\Insights\output', 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
