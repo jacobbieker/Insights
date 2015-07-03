@@ -1,4 +1,4 @@
-__author__ = 'Jacob'
+__author__ = 'Jacob Bieker'
 import os
 import yaml
 import flickrapi
@@ -32,4 +32,10 @@ if not flickr.token_valid(perms=permissions):
     verifier = unicode(raw_input('Verifier code: '))
 
     # Trade the request token for an access token
-    flickr.get_access_token(verifier)
+    token = flickr.get_access_token(verifier)
+
+print token
+
+#Go through photos
+for photo in flickr.walk_photosets(extras='description,date_upload,date_taken,original_format,last_update,tags,views,media,geo'):
+    print photo.get('title')

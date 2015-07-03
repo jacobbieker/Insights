@@ -24,7 +24,7 @@ github:
   - clientID: <ID>
   - clientSecret: <secret>
 flickr:
-  - used: no
+  - used: yes
   - permissions: read
   - key: <key>
   - secret: <secrete>
