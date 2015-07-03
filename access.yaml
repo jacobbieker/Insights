@@ -2,6 +2,10 @@
 facebook:
   - used: no
   - token: NULL
+  - clientID: NULL
+  - redirect: https://www.facebook.com/connect/login_success.html
+  #Scopes requested to get information on the user of the script, more info at FB developer site
+  - scopes: public_profile,user_friends,email,user_education_history,user_events,user_groups,user_likes,user_managed_groups,user_photos,user_posts,user_status,user_tagged_places,user_videos,read_stream
 twitter:
   - used: yes
   - key: <key>
