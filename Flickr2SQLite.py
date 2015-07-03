@@ -12,6 +12,7 @@ with open("access.yaml", 'r') as access:
 key = access_config['flickr']['key']
 secret = access_config['flickr']['secret']
 permissions = access_config['flickr']['permissions']
+extras = access_config['flickr']['extras']
 
 #Get response as unparsed JSON to store
 flickr = flickrapi.FlickrAPI(key, secret, format='json')
@@ -33,9 +34,8 @@ if not flickr.token_valid(perms=permissions):
 
     # Trade the request token for an access token
     token = flickr.get_access_token(verifier)
-
-print token
+    print token
 
 #Go through photos
-for photo in flickr.walk_photosets(extras='description,date_upload,date_taken,original_format,last_update,tags,views,media,geo'):
+for photo in flickr.walk_photosets(extras=extras):
     print photo.get('title')

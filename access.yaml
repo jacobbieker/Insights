@@ -26,6 +26,8 @@ github:
 flickr:
   - used: yes
   - permissions: read
+  #The extra info to return in the requests to Flickr
+  - extras: description,date_upload,date_taken,original_format,last_update,tags,views,media,geo
   - key: <key>
   - secret: <secrete>
 googleplus:
