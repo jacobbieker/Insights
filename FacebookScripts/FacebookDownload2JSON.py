@@ -28,7 +28,7 @@ def album2JSON(location, album_name):
     Great picture of your mom!!<div class="meta">Tuesday, 23 June 2015 at 23:01 PDT</div></div><div class="comment">
     <span class="user">NAME</span>Sweet kayak!<div class="meta">Thursday, 25 June 2015 at 23:26 PDT</div></div></div></div>
     '''
-    with open(link, 'r') as album:
+    with open(location, 'r') as album:
         html_album = BeautifulSoup(album.read().decode('utf-8', 'ignore'))
         content_album = html_album.find("div", {"class": "contents"})
         photos = content_album.find_all("div", {"class": "block"})
@@ -72,6 +72,7 @@ def album2JSON(location, album_name):
                     photo_comment_time = comment.find("div", {"class": "meta"}).text
                     json_output.write(",\n")
                     json_data = {'type': 'facebook album photo',
+                                 'album': album_name,
                                  'time': date_string,
                                  'taken': photo_taken,
                                  'camera': camera_make,
@@ -85,7 +86,48 @@ def album2JSON(location, album_name):
                                  'comment': photo_comment}
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
+def thread2JSON(output_name, thread):
+    with open(os.path.join(setup.OUT_PATH, 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
+        messages = thread.find_all("div", {"class" : "message"})
+        #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
+        #message
+        message_content = thread.find_all("p")
+        #TODO Get the list of all paricipants in a thread from the <thread> tag
+        list_of_recipients = []
+        #Now at the level of each message
+        for index, message in enumerate(messages):
+            #print message
+            #user writing the message
+            user = message.find("span", {"class": "user"}).text
+            if(user not in s for s in list_of_recipients):
+                list_of_recipients.append(user)
 
+            #time of message
+            #Date and Time
+            date_and_time = message.find("span", {"class": "meta"}).text
+
+            time_components = date_and_time.split()
+            #print time_components
+            #Converting to proper format for strptime
+            if(int(time_components[1]) < 10):
+                date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
+                              + time_components[3] + " " +time_components[5]
+            else: # NO leading 0 added
+                date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
+                              + time_components[3] + " " +time_components[5]
+            #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+            #Note: Different than GVoice time, different format
+            date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
+
+            #The actual message
+            text = message_content[index].text
+            json_output.write("\n")
+            json_data = {'type': 'facebook message',
+                         'time': date_string,
+                         'sender': user,
+                         'recipients': list_of_recipients,
+                         'message': text}
+            json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 '''
 <div class="thread"> = a new message group/conversation and names of participants
 <div class="message"><div class="message_header"><span class="user"> = Before each person and their response in a thread
@@ -112,47 +154,7 @@ for file in os.listdir(setup.DATA_PATH + "\\html"):
                     #json_data = []
                     #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
-                    with open(os.path.join(setup.OUT_PATH, 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
-                        messages = thread.find_all("div", {"class" : "message"})
-                        #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
-                        #message
-                        message_content = thread.find_all("p")
-                        #TODO Get the list of all paricipants in a thread from the <thread> tag
-                        list_of_recipients = []
-                        #Now at the level of each message
-                        for index, message in enumerate(messages):
-                            #print message
-                            #user writing the message
-                            user = message.find("span", {"class": "user"}).text
-                            if(user not in s for s in list_of_recipients):
-                                list_of_recipients.append(user)
-
-                            #time of message
-                            #Date and Time
-                            date_and_time = message.find("span", {"class": "meta"}).text
-
-                            time_components = date_and_time.split()
-                            #print time_components
-                            #Converting to proper format for strptime
-                            if(int(time_components[1]) < 10):
-                                date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + " " +time_components[5]
-                            else: # NO leading 0 added
-                                date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + " " +time_components[5]
-                            #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-                            #Note: Different than GVoice time, different format
-                            date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
-
-                            #The actual message
-                            text = message_content[index].text
-                            json_output.write("\n")
-                            json_data = {'type': 'facebook message',
-                                         'time': date_string,
-                                         'sender': user,
-                                         'recipients': list_of_recipients,
-                                         'message': text}
-                            json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                    thread2JSON(output_file_name, thread)
             ###################################################################
             #
             #              End of FB Message to JSON script
@@ -176,37 +178,14 @@ for file in os.listdir(setup.DATA_PATH + "\\html"):
 
                     for album in albums:
                         #json_data = []
-                        output_file_name += 1
-                        with open(os.path.join(rootdir + "\\output", 'facebook.album.' + str(output_file_name) + '.json'), 'a') as json_output:
-                            #Get all links, which includes location of an album index.htm
-                            links = album.find_all("a", href=True)
-                            for link in links['href']:
-                                if link == '*index.htm':
-                                    album_location = link
-                                    album_name = link.text
-                                    #Now has the location of the album
-                                    album2JSON(album_location, album_name)
-
-                                    #Date and Time
-                                    date_and_times = album.find_all("span", {"class": "meta"}).text
-                                    album_date_and_time = date_and_times[0]
-                                    time_components = album_date_and_time.split()
-                                    #Converting to proper format for strptime
-                                    if(int(time_components[1]) < 10):
-                                        date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                                                      + time_components[3] + " " +time_components[5]
-                                    else: # NO leading 0 added
-                                        date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                                                      + time_components[3] + " " +time_components[5]
-                                    #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-                                    #Note: Different than GVoice time, different format
-                                    date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
-
-                                    json_output.write(",\n")
-                                    json_data = {'type': 'facebook album',
-                                                 'name': album_name,
-                                                 'time': date_string}
-                                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                        #Get all links, which includes location of an album index.htm
+                        links = album.find_all("a", href=True)
+                        for link in links['href']:
+                            if link == '*index.htm':
+                                album_location = link
+                                album_name = link.text
+                                #Now has the location of the album
+                                album2JSON(album_location, album_name)
             ###################################################################
             #
             #              End of FB Photos to JSON script
