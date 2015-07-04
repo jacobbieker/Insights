@@ -93,7 +93,7 @@ def album2JSON(location, album_name):
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 def thread2JSON(output_name, thread):
-    with open(os.path.join(setup.OUT_PATH, 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
+    with open(os.path.join(setup.OUT_PATH, 'facebook.messaging.' + str(output_name) + '.json'), 'a') as json_output:
         messages = thread.find_all("div", {"class" : "message"})
         #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
         #message
@@ -122,13 +122,13 @@ def thread2JSON(output_name, thread):
                          'message': text}
             json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
-def wall_post2JSON(wall_post):
+def wall_post2JSON(wall_post, output_name):
     #Expects a beautifulSoup that includes the following setup, parses to JSON
     '''
     <p><div class="meta">Thursday, 10 November 2011 at 20:41 PST</div>NAME wrote on your timeline.<div class="comment">http://dictionary.reference.com/browse/dragon
     check the pronunciation</div></p>
     '''
-
+    with open(os.path.join(setup.OUT_PATH, 'facebook.wall.' + str(output_name) +'.json'), 'a'):
 
 '''
 <div class="thread"> = a new message group/conversation and names of participants
