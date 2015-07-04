@@ -8,6 +8,7 @@ from datetime import datetime
 import exifread
 from exifread import *
 from glob import glob
+import setup
 
 '''
 with open("constants.yaml", 'r') as ymlfile:
@@ -17,7 +18,7 @@ with open("constants.yaml", 'r') as ymlfile:
 rootdir = os.curdir
 
 # Go through album and extract all the information on the photos inside and return a dictionary
-def album2JSON(location):
+def album2JSON(location, album_name):
     '''
     Example Album in photos.htm
     <div class="block"><img src="../../photos/1118349984846132/1118350128179451.jpg" /><div><div class="meta">Tuesday, 23 June 2015 at 20:52 PDT</div>
@@ -31,29 +32,58 @@ def album2JSON(location):
         html_album = BeautifulSoup(album.read().decode('utf-8', 'ignore'))
         content_album = html_album.find("div", {"class": "contents"})
         photos = content_album.find_all("div", {"class": "block"})
+        output_file_name = 0
         for photo in photos:
-            #Work down into the attributes of each photo
-            photo_date_and_times = photo.find_all("div", {"class" : "meta"})
-            #First one is always the pictures:
-            photo_date_and_time = photo_date_and_times[0]
+            output_file_name += 1
+            with open(os.path.join(setup.OUT_PATH, "facebook." + str(album_name) + ".photo." + str(output_file_name) + ".json"), 'a') as json_output:
+                #Work down into the attributes of each photo
+                photo_date_and_times = photo.find_all("div", {"class" : "meta"})
+                #First one is always the pictures:
+                photo_date_and_time = photo_date_and_times[0]
 
-            #Get metadata
-            photo_metadata = photo.find('table', {"class": "meta"})
-            photo_taken = photo.find('td').text
-            camera_make = photo.find('td').text
-            photo_orientation = photo.find('td').text
-            photo_exposure = photo.find('td').text
-            f_stop = photo.find('td').text
-            photo_iso = photo.find('td').text
-            focal_length = photo.find('td').text
+                time_components = photo_date_and_time.split()
+                #Converting to proper format for strptime
+                if(int(time_components[1]) < 10):
+                    date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
+                                  + time_components[3] + " " +time_components[5]
+                else: # NO leading 0 added
+                    date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
+                                  + time_components[3] + " " +time_components[5]
+                #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+                #Note: Different than GVoice time, different format
+                date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
 
-            #Get comments
-            photo_comments = photo.find_all("div", {"class": "comment"})
-            for comment in photo_comments:
-                photo_commenter = comment.find("span", {"class": "user"}).text
-                #TODO Check this to make sure it finds the right text
-                photo_comment = comment.text
-                photo_comment_time = comment.find("div", {"class": "meta"}).text
+                #Get metadata
+                photo_metadata = photo.find('table', {"class": "meta"})
+                photo_taken = photo.find('td').text
+                camera_make = photo.find('td').text
+                photo_orientation = photo.find('td').text
+                photo_exposure = photo.find('td').text
+                f_stop = photo.find('td').text
+                photo_iso = photo.find('td').text
+                focal_length = photo.find('td').text
+
+                #Get comments
+                photo_comments = photo.find_all("div", {"class": "comment"})
+                for comment in photo_comments:
+                    photo_commenter = comment.find("span", {"class": "user"}).text
+                    #TODO Check this to make sure it finds the right text
+                    photo_comment = comment.text
+                    photo_comment_time = comment.find("div", {"class": "meta"}).text
+                    json_output.write(",\n")
+                    json_data = {'type': 'facebook album photo',
+                                 'time': date_string,
+                                 'taken': photo_taken,
+                                 'camera': camera_make,
+                                 'orientation': photo_orientation,
+                                 'exposure': photo_exposure,
+                                 'f-stop': f_stop,
+                                 'iso': photo_iso,
+                                 'focal length': focal_length,
+                                 'commenter': photo_commenter,
+                                 'comment time': photo_date_and_time,
+                                 'comment': photo_comment}
+                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 
 '''
@@ -62,11 +92,10 @@ def album2JSON(location):
 <span class="meta"> After above, tells the time for each message
 <p> is the actual message after all the above <p> is between messages and not part of an actual message div
 '''
-for file in os.listdir(rootdir + "\\data\\html"):
+for file in os.listdir(setup.DATA_PATH + "\\html"):
     if(file.endswith(".htm")):
-        #TODO Add more than messages
         if (file=="messages.htm"):
-            with open(rootdir + "\\data\\html" + "\\" + file, 'r') as source:
+            with open(setup.DATA_PATH + "\\html" + "\\" + file, 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
@@ -83,7 +112,7 @@ for file in os.listdir(rootdir + "\\data\\html"):
                     #json_data = []
                     #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
-                    with open(os.path.join(rootdir + "\\output", 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
+                    with open(os.path.join(setup.OUT_PATH, 'facebook.messaging.' + str(output_file_name) + '.json'), 'a') as json_output:
                         messages = thread.find_all("div", {"class" : "message"})
                         #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
                         #message
@@ -135,7 +164,7 @@ for file in os.listdir(rootdir + "\\data\\html"):
             #
             ###################################################################
             if (file=="photos.htm"):
-                with open(rootdir + "\\data\\html" + "\\" + file, 'r') as source:
+                with open(setup.DATA_PATH +"\\html" + "\\" + file, 'r') as source:
                     file_name = os.path.splitext(os.path.basename(file))
                     html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                     content = html_file.find("div", {"class" : "contents"})
@@ -148,30 +177,36 @@ for file in os.listdir(rootdir + "\\data\\html"):
                     for album in albums:
                         #json_data = []
                         output_file_name += 1
-                        with open(os.path.join(rootdir + "\\output", 'facebook.photos.' + str(output_file_name) + '.json'), 'a') as json_output:
+                        with open(os.path.join(rootdir + "\\output", 'facebook.album.' + str(output_file_name) + '.json'), 'a') as json_output:
                             #Get all links, which includes location of an album index.htm
                             links = album.find_all("a", href=True)
                             for link in links['href']:
                                 if link == '*index.htm':
                                     album_location = link
+                                    album_name = link.text
                                     #Now has the location of the album
-                                    json_data = album2JSON(link)
+                                    album2JSON(album_location, album_name)
 
-                            #Date and Time
-                            date_and_times = album.find_all("span", {"class": "meta"}).text
-                            album_date_and_time = date_and_times[0]
-                            time_components = album_date_and_time.split()
-                            #Converting to proper format for strptime
-                            if(int(time_components[1]) < 10):
-                                date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + " " +time_components[5]
-                            else: # NO leading 0 added
-                                date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                                              + time_components[3] + " " +time_components[5]
-                            #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-                            #Note: Different than GVoice time, different format
-                            date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
+                                    #Date and Time
+                                    date_and_times = album.find_all("span", {"class": "meta"}).text
+                                    album_date_and_time = date_and_times[0]
+                                    time_components = album_date_and_time.split()
+                                    #Converting to proper format for strptime
+                                    if(int(time_components[1]) < 10):
+                                        date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
+                                                      + time_components[3] + " " +time_components[5]
+                                    else: # NO leading 0 added
+                                        date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
+                                                      + time_components[3] + " " +time_components[5]
+                                    #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+                                    #Note: Different than GVoice time, different format
+                                    date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
 
+                                    json_output.write(",\n")
+                                    json_data = {'type': 'facebook album',
+                                                 'name': album_name,
+                                                 'time': date_string}
+                                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
             ###################################################################
             #
             #              End of FB Photos to JSON script
