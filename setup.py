@@ -33,7 +33,7 @@ constants = {
     'googleScripts': GOOGLE_SCRIPTS
 }
 with open('constants.yaml', 'w') as f:
-  yaml.dump(constants, f, default_flow_style=False)
+    yaml.dump(constants, f, default_flow_style=False)
 
 #Create output directory if necessary for output
 if not (os.path.exists("output")):

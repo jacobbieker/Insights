@@ -17,6 +17,22 @@ with open("constants.yaml", 'r') as ymlfile:
 
 rootdir = os.curdir
 
+#Date and Time, Facebook Format
+def get_date_and_time(time_string):
+    time_components = time_string.split()
+    #print time_components
+    #Converting to proper format for strptime
+    if(int(time_components[1]) < 10):
+        date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
+                      + time_components[3] + " " +time_components[5]
+    else: # NO leading 0 added
+        date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
+                      + time_components[3] + " " +time_components[5]
+    #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+    #Note: Different than GVoice time, different format
+    date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
+    return date_string
+
 # Go through album and extract all the information on the photos inside and return a dictionary
 def album2JSON(location, album_name):
     '''
@@ -41,17 +57,7 @@ def album2JSON(location, album_name):
                 #First one is always the pictures:
                 photo_date_and_time = photo_date_and_times[0]
 
-                time_components = photo_date_and_time.split()
-                #Converting to proper format for strptime
-                if(int(time_components[1]) < 10):
-                    date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                                  + time_components[3] + " " +time_components[5]
-                else: # NO leading 0 added
-                    date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                                  + time_components[3] + " " +time_components[5]
-                #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-                #Note: Different than GVoice time, different format
-                date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
+                date_string = get_date_and_time(photo_date_and_time)
 
                 #Get metadata
                 photo_metadata = photo.find('table', {"class": "meta"})
@@ -69,7 +75,7 @@ def album2JSON(location, album_name):
                     photo_commenter = comment.find("span", {"class": "user"}).text
                     #TODO Check this to make sure it finds the right text
                     photo_comment = comment.text
-                    photo_comment_time = comment.find("div", {"class": "meta"}).text
+                    photo_comment_time = get_date_and_time(comment.find("div", {"class": "meta"}).text)
                     json_output.write(",\n")
                     json_data = {'type': 'facebook album photo',
                                  'album': album_name,
@@ -82,7 +88,7 @@ def album2JSON(location, album_name):
                                  'iso': photo_iso,
                                  'focal length': focal_length,
                                  'commenter': photo_commenter,
-                                 'comment time': photo_date_and_time,
+                                 'comment time': photo_comment_time,
                                  'comment': photo_comment}
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
@@ -102,32 +108,28 @@ def thread2JSON(output_name, thread):
             if(user not in s for s in list_of_recipients):
                 list_of_recipients.append(user)
 
-            #time of message
-            #Date and Time
             date_and_time = message.find("span", {"class": "meta"}).text
-
-            time_components = date_and_time.split()
-            #print time_components
-            #Converting to proper format for strptime
-            if(int(time_components[1]) < 10):
-                date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                              + time_components[3] + " " +time_components[5]
-            else: # NO leading 0 added
-                date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                              + time_components[3] + " " +time_components[5]
-            #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-            #Note: Different than GVoice time, different format
-            date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
+            date_string = get_date_and_time(date_and_time)
 
             #The actual message
             text = message_content[index].text
-            json_output.write("\n")
+            if (output_name != 1):
+                json_output.write(",\n")
             json_data = {'type': 'facebook message',
                          'time': date_string,
                          'sender': user,
                          'recipients': list_of_recipients,
                          'message': text}
             json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+
+def wall_post2JSON(wall_post):
+    #Expects a beautifulSoup that includes the following setup, parses to JSON
+    '''
+    <p><div class="meta">Thursday, 10 November 2011 at 20:41 PST</div>NAME wrote on your timeline.<div class="comment">http://dictionary.reference.com/browse/dragon
+    check the pronunciation</div></p>
+    '''
+
+
 '''
 <div class="thread"> = a new message group/conversation and names of participants
 <div class="message"><div class="message_header"><span class="user"> = Before each person and their response in a thread
