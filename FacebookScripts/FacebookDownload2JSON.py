@@ -273,6 +273,13 @@ for file in os.listdir(setup.DATA_PATH + "\\html"):
             #              Start of FB Wall to JSON script
             #
             ###################################################################
+            if (file=="wall.htm"):
+                with open(os.path.join(setup.DATA_PATH, "html", file), 'r') as source:
+                    file_name = os.path.splitext(os.path.basename(file))
+                    html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                    content = html_file.find("div", {"class" : "contents"})
+                    for wall_post in content.find_all("p"):
+                        wall_post2JSON(wall_post, "wall")
             ###################################################################
             #
             #              End of FB Wall to JSON script
