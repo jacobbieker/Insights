@@ -40,7 +40,7 @@ if not (os.path.exists("output")):
     os.makedirs("output")
 else: #Clean up output file by deleting anything in the folder, if it exists
     for file in os.listdir(OUT_PATH):
-        os.remove(OUT_PATH + "\\" + file)
+        os.remove(os.path.join(OUT_PATH, file))
 
 #TODO check each service and all if the service is used, in a generic way
 '''
@@ -56,16 +56,16 @@ for service in access_config:
 # Unzip data archives for use in scripts
 #Google Takout
 takout_file = glob.glob("takout*.zip")
-gTakeout = zipfile.ZipFile(PATH + "\\" + takout_file, 'r')
+gTakeout = zipfile.ZipFile(os.path.join(PATH, takout_file), 'r')
 gTakeout.extractall(DATA_PATH)
 #Facebook zip
 facebook_zip = glob.glob("facebook*.zip")
-fbZip = zipfile.ZipFile(PATH + "\\" + facebook_zip, 'r')
-fbZip.extractall(DATA_PATH + "\\facebook\\")
+fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
+fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
 #LinkedIn zip
 linkedIn_zip = glob.glob("LinkedIn*.zip")
-fbZip = zipfile.ZipFile(PATH + "\\" + linkedIn_zip, 'r')
-fbZip.extractall(DATA_PATH + "\\linkedin\\")
+fbZip = zipfile.ZipFile(os.path.join(PATH, linkedIn_zip), 'r')
+fbZip.extractall(os.path.join(DATA_PATH, "linkedin"))
 
 '''
 Execute the other scripts to create the database and fill it
