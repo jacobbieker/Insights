@@ -4,6 +4,7 @@ import yaml
 import flickrapi
 import json
 import webbrowser
+import setup
 
 #Authentication
 with open("access.yaml", 'r') as access:

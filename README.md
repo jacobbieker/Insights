@@ -9,6 +9,9 @@ peewee >= 2.6.0
 To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives and place them in the same folder as 
 these scripts. Then run setup.py. 
 
+#Contributions
+Fork and pull request away! Any help is appreciated.
+
 # Known Issues
 Currently, setup.py does not work, you have to run scripts individually, and modify the paths to the archives yourself
 as well. That is one of the priorities at the moment.
