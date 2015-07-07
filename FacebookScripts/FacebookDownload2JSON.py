@@ -129,7 +129,7 @@ def wall_post2JSON(wall_post, output_name):
     <p><div class="meta">Thursday, 10 November 2011 at 20:41 PST</div>NAME wrote on your timeline.<div class="comment">http://dictionary.reference.com/browse/dragon
     check the pronunciation</div></p>
     '''
-    with open(os.path.join(setup.OUT_PATH, 'facebook.wall.' + str(output_name) +'.json'), 'a'):
+    with open(os.path.join(setup.OUT_PATH, 'facebook.wall.' + str(output_name) +'.json'), 'a') as json_output:
         date_string = get_date_and_time(wall_post.find("div", {"class": "meta"}).text)
         writers = wall_post.text # get text between date_string and </p>
 
@@ -153,6 +153,8 @@ def wall_post2JSON(wall_post, output_name):
         else:
             other_person = ""
 
+        post = ""
+        event_type = ""
         #Check for ones with wildcard
         life_event = writers.search(re_life_event)
         changed_event = writers.search(re_changed_event)
@@ -161,11 +163,33 @@ def wall_post2JSON(wall_post, output_name):
         photo = writers.search(re_photo)
 
         if life_event:
-
+            words = life_event.group().split(" ")
+            type_of_event = words[4, ]
+            event_type = "life event"
+        elif changed_event:
+            words = changed_event.group().split(" ")
+            type_of_event = words[1, ]
+            event_type = "changed profile"
+        elif edited_event:
+            words = edited_event.group().split(" ")
+            type_of_event = words[1, ]
+            event_type = "edited profile"
+        elif change_relationship:
+            words = change_relationship.group().split(" ")
+            type_of_event = words[3, ]
+            event_type = "changed relationship"
+        elif photo:
+            words = photo.group().split(" ")
+            type_of_event = words[7, ]
+            event_type = "photo added"
+            post = wall_post.find("div", {"class": "comment"})
+        else:
+            type_of_event = ""
 
         #Now check the true/false event types
         if writers.search(re_post):
             event_type = "wall post"
+            post = wall_post.find("div", {"class": "comment"})
         elif writers.search(re_friends):
             event_type = "friendship"
         elif writers.search(re_status):
@@ -173,7 +197,13 @@ def wall_post2JSON(wall_post, output_name):
         elif writers.search(re_new_relationship):
             event_type = "start relationship"
 
-        post = wall_post.find("div", {"class": "comment"})
+        json_output.write(",\n")
+        json_data = {'type': 'facebook ' + event_type,
+                     'time': date_string,
+                     'other person': other_person,
+                     'type of event': type_of_event,
+                     'post': post}
+        json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 '''
 <div class="thread"> = a new message group/conversation and names of participants
