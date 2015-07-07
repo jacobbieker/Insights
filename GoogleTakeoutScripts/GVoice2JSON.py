@@ -27,6 +27,7 @@ for file in os.listdir(rootdir):
             file_name = os.path.splitext(os.path.basename(file))
             json_file_name = file_name[0].split(" -")
             html_file = BeautifulSoup(source.read().decode('utf8', 'ignore'))
+            conversation_number = 1#Track conversation number, for continuity
             ###################################################################
             #
             #              Start of SMS to JSON script
@@ -70,11 +71,13 @@ for file in os.listdir(rootdir):
                             reciever = json_file_name[0]
                         json_data.append({'type': 'sms',
                                      'time': date_string,
+                                     'conversation': conversation_number,
                                      'sender': sender,
                                      'reciever': reciever,
                                      'phone number': phone_number[1],
                                      'message': text})
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+            conversation_number += 1 #increase, as each HTML file with Text is one conversation
             ###################################################################
             #
             #              End of SMS to JSON script

@@ -16,20 +16,20 @@ with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
 #Constant current directory used by rest of the scripts:
-PATH = os.curdir
-OUT_PATH = PATH + "\output"
-DATA_PATH = PATH + "\data"
+PATH = os.path.abspath("./")
+OUT_PATH = os.path.join(PATH,"output")
+DATA_PATH = os.path.join(PATH,"data")
 DB_NAME = config['sqlite']['name'] + '.db'
-GOOGLE_SCRIPTS = PATH + '\GoogleTakeoutScripts'
+GOOGLE_SCRIPTS = os.path.join(PATH,"GoogleTakeoutScripts")
 
 
 #Create config.yaml to be used for other scripts, so that they don't import setup.py
 constants = {
-    'path': PATH + '\\',
+    'path': PATH,
     'dataDir': DATA_PATH,
     'outputDir': OUT_PATH,
     'database': DB_NAME,
-    'databaseLoc': PATH + '\\' + DB_NAME,
+    'databaseLoc': os.path.join(PATH, DB_NAME),
     'googleScripts': GOOGLE_SCRIPTS
 }
 with open('constants.yaml', 'w') as f:
