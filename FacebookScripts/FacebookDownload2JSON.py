@@ -35,6 +35,61 @@ def get_date_and_time(time_string):
     return date_string
 
 # Go through album and extract all the information on the photos inside and return a dictionary
+def synced_photo2JSON(synced_photo):
+    '''
+    Example Album in photos.htm
+    <div class="block"><img src="../../photos/1118349984846132/1118350128179451.jpg" /><div><div class="meta">Tuesday, 23 June 2015 at 20:52 PDT</div>
+    <table class="meta"><tr><th>Taken</th><td>1434916977</td></tr><tr><th>Camera Make</th><td></td></tr><tr><th>Orientation</th><td>1</td></tr>
+    <tr><th>Exposure</th><td>1/125</td></tr><tr><th>F-Stop</th><td>14/1</td></tr><tr><th>ISO Speed</th><td>400</td></tr><tr><th>Focal length</th>
+    <td>28/1</td></tr><tr><th>Upload IP Address</th><td>ADDRESS</td></tr></table><div class="comment"><span class="user">NAME</span>
+    Great picture of your mom!!<div class="meta">Tuesday, 23 June 2015 at 23:01 PDT</div></div><div class="comment">
+    <span class="user">NAME</span>Sweet kayak!<div class="meta">Thursday, 25 June 2015 at 23:26 PDT</div></div></div></div>
+    '''
+    photos = synced_photo.find_all("div", {"class": "block"})
+    output_file_name = 0
+    for photo in photos:
+        output_file_name += 1
+        with open(os.path.join(setup.OUT_PATH, "facebook.synced.photo." + str(output_file_name) + ".json"), 'a') as json_output:
+            #Work down into the attributes of each photo
+            photo_date_and_times = photo.find_all("div", {"class" : "meta"})
+            #First one is always the pictures:
+            photo_date_and_time = photo_date_and_times[0]
+
+            date_string = get_date_and_time(photo_date_and_time)
+
+            #Get metadata
+            photo_metadata = photo.find('table', {"class": "meta"})
+            photo_taken = photo.find('td').text
+            camera_make = photo.find('td').text
+            photo_orientation = photo.find('td').text
+            photo_exposure = photo.find('td').text
+            f_stop = photo.find('td').text
+            photo_iso = photo.find('td').text
+            focal_length = photo.find('td').text
+
+            #Get comments
+            photo_comments = photo.find_all("div", {"class": "comment"})
+            for comment in photo_comments:
+                photo_commenter = comment.find("span", {"class": "user"}).text
+                #TODO Check this to make sure it finds the right text
+                photo_comment = comment.text
+                photo_comment_time = get_date_and_time(comment.find("div", {"class": "meta"}).text)
+                json_output.write(",\n")
+                json_data = {'type': 'facebook synced photo',
+                             'time': date_string,
+                             'taken': photo_taken,
+                             'camera': camera_make,
+                             'orientation': photo_orientation,
+                             'exposure': photo_exposure,
+                             'f-stop': f_stop,
+                             'iso': photo_iso,
+                             'focal length': focal_length,
+                             'commenter': photo_commenter,
+                             'comment time': photo_comment_time,
+                             'comment': photo_comment}
+                json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+
+# Go through album and extract all the information on the photos inside and return a dictionary
 def album2JSON(location, album_name):
     '''
     Example Album in photos.htm
@@ -214,7 +269,7 @@ def wall_post2JSON(wall_post, output_name):
 for file in os.listdir(setup.DATA_PATH + "\\html"):
     if(file.endswith(".htm")):
         if (file=="messages.htm"):
-            with open(setup.DATA_PATH + "\\html" + "\\" + file, 'r') as source:
+            with open(os.path.join(setup.DATA_PATH, "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
@@ -243,7 +298,7 @@ for file in os.listdir(setup.DATA_PATH + "\\html"):
             #
             ###################################################################
             if (file=="photos.htm"):
-                with open(setup.DATA_PATH +"\\html" + "\\" + file, 'r') as source:
+                with open(os.path.join(setup.DATA_PATH, "html",file), 'r') as source:
                     file_name = os.path.splitext(os.path.basename(file))
                     html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                     content = html_file.find("div", {"class" : "contents"})
@@ -266,6 +321,22 @@ for file in os.listdir(setup.DATA_PATH + "\\html"):
             ###################################################################
             #
             #              End of FB Photos to JSON script
+            #
+            ###################################################################
+            ###################################################################
+            #
+            #              Start of FB Synced Photos to JSON script
+            #
+            ###################################################################
+            if (file=="synced_photos.htm"):
+                with open(os.path.join(setup.DATA_PATH,"html",file), 'r') as source:
+                    file_name = os.path.splitext(os.path.basename(file))
+                    html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                    content = html_file.find("div", {"class" : "contents"})
+                    synced_photo2JSON(content)
+            ###################################################################
+            #
+            #              End of FB Synced Photos to JSON script
             #
             ###################################################################
             ###################################################################
