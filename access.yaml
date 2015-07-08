@@ -50,3 +50,5 @@ instagram:
 local:
   - photos: no
   - photoLocations:
+    - 'location 1'
+    - 'location 2'

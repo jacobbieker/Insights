@@ -9,9 +9,11 @@ from rawkit.raw import Raw
 from rawkit.metadata import Metadata
 import libraw
 
-#TODO Add support for multiple locations
 #TODO Check for filename conflicts and rename if necessary
-locations = 'C:\Users\jacob_000\OneDrive\EOS Pictures'
+
+with open("access.yaml", 'r') as access:
+    access_config = yaml.load(access)
+locations = access_config['local']['photoLocations']
 
 #Go through each location:
 for location in locations:
