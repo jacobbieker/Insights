@@ -1,13 +1,9 @@
 __author__ = 'Jacob'
-import csv
 import os
 import yaml
 import json
 from bs4 import BeautifulSoup
 from datetime import datetime
-import exifread
-from exifread import *
-from glob import glob
 import setup
 import re
 
