@@ -1,7 +1,7 @@
 '''
 This file unzips downloaded files, gets data, and sets up file structure for use by the rest of the scripts
 '''
-__author__ = 'Jacob'
+__author__ = 'Jacob Bieker'
 import os
 import glob
 import zipfile
