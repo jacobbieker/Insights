@@ -16,8 +16,6 @@ with open("constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 '''
 
-rootdir = os.curdir
-
 #Date and Time, Facebook Format
 def get_date_and_time(time_string):
     time_components = time_string.split()
