@@ -63,15 +63,17 @@ for service in access_config:
         elif service == 'facebook':
             if service['local']:
                 # Facebook zip
-                facebook_zip = glob.glob("facebook*.zip")
-                fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
-                fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
+                facebook_zips = glob.glob("facebook*.zip")
+                for facebook_zip in facebook_zips:
+                    fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
+                    fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
         elif service == 'linkedin':
             if service['local']:
                 # LinkedIn zip
-                linkedIn_zip = glob.glob("LinkedIn*.zip")
-                fbZip = zipfile.ZipFile(os.path.join(PATH, linkedIn_zip), 'r')
-                fbZip.extractall(os.path.join(DATA_PATH, "linkedin"))
+                linkedIn_zips = glob.glob("LinkedIn*.zip")
+                for linkedIn_zip in linkedIn_zips:
+                    linkedInZip = zipfile.ZipFile(os.path.join(PATH, linkedIn_zip), 'r')
+                    linkedInZip.extractall(os.path.join(DATA_PATH, "linkedin"))
 
 ########################################################################################
 #                        END BASIC SETUP                                               #
