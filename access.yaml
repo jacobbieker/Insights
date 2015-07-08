@@ -1,6 +1,6 @@
 #Config file with access token for services, other personal information, along with is the service will be used
 facebook:
-  - used: yes
+  - used: no
   - local: yes
   - token: NULL
   - clientID: NULL
@@ -8,15 +8,15 @@ facebook:
   #Scopes requested to get information on the user of the script, more info at FB developer site
   - scopes: public_profile,user_friends,email,user_education_history,user_events,user_groups,user_likes,user_managed_groups,user_photos,user_posts,user_status,user_tagged_places,user_videos,read_stream
 twitter:
-  - used: yes
+  - used: no
   - key: <key>
   - secret: <twitter>
   - accessToken: NULL
 linkedin:
-  - used: yes
+  - used: no
   - token: NULL
 github:
-  - used: yes
+  - used: no
   - username:
   - scopes:
   - twoFactor: no
@@ -25,7 +25,7 @@ github:
   - clientID: <ID>
   - clientSecret: <secret>
 flickr:
-  - used: yes
+  - used: no
   - permissions: read
   #The extra info to return in the requests to Flickr
   - extras: description,date_upload,date_taken,original_format,last_update,tags,views,media,geo
@@ -41,12 +41,12 @@ youtube:
   - used: no
   - token: NULL
 instagram:
-  - used: yes
+  - used: no
   - id: <clientID>
   - secret: <clientSecret>
   - token: NULL
   - redirect: <redirect URI>
   - scope: basic
 local:
-  - photos: yes
-  - location: C:\Users\jacob_000\OneDrive\EOS Pictures
+  - photos: no
+  - photoLocations:

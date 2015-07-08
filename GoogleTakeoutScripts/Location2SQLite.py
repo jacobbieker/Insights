@@ -1,4 +1,4 @@
-__author__ = 'Jacob'
+__author__ = 'Jacob Bieker'
 
 import json
 import os
