@@ -22,6 +22,10 @@ OUT_PATH = os.path.join(PATH,"output")
 DATA_PATH = os.path.join(PATH,"data")
 DB_NAME = config['sqlite']['name'] + '.db'
 GOOGLE_SCRIPTS = os.path.join(PATH,"GoogleTakeoutScripts")
+FACEBOOK_SCRIPTS = os.path.join(PATH, "FacebookScripts")
+TWITTER_SCRIPTS = os.path.join(PATH, "TwitterScripts")
+INSTAGRAM_SCRIPTS = os.path.join(PATH, "InstagramScripts")
+OTHER_SCRIPTS = os.path.join(PATH, "OtherScripts")
 
 
 #Create config.yaml to be used for other scripts, so that they don't import setup.py
@@ -77,16 +81,25 @@ Execute the other scripts to create the database and fill it
 # Try creating database
 execfile("databaseSetup.py")
 #execute the ones that work on Google Takeout data first
-execfile(GOOGLE_SCRIPTS + "\\GVoice2JSON.py")
-execfile(GOOGLE_SCRIPTS + "\\Gmail2JSON.py")
-execfile(GOOGLE_SCRIPTS + "\\GmailJSON2SQLite.py")
-execfile(GOOGLE_SCRIPTS + "\\Location2SQLite.py")
+if access_config['google']['used']:
+    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2JSON.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2JSON.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "GmailJSON2SQLite.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "Location2SQLite.py"))
 #Run script with command line arguments
 
 #Then on other zipped files
-execfile("FacebookDownload2JSON.py")
-execfile("LinkedIn2JSON.py")
+if access_config['facebook']['used']:
+    execfile(os.path.join(FACEBOOK_SCRIPTS, "FacebookDownload2JSON.py"))
 
-#Then on downloading data
-execfile("Flickr2SQLite.py")
-execfile("Twitter2SQLite.py")
+if access_config['linkedin']['used']:
+    execfile("LinkedIn2JSON.py")
+
+if access_config['twitter']['used']:
+    execfile(os.path.join(TWITTER_SCRIPTS, "Twitter2SQLite.py"))
+
+if access_config['flickr']['used']:
+    execfile("Flickr2SQLite.py")
+
+if access_config['instagram']['used']:
+    execfile(os.path.join(INSTAGRAM_SCRIPTS, "Instagram2SQLite.py"))

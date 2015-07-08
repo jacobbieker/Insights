@@ -13,7 +13,7 @@ twitter:
   - secret: <twitter>
   - accessToken: NULL
 linkedin:
-  - used: no
+  - used: yes
   - token: NULL
 github:
   - used: yes
