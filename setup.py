@@ -103,3 +103,6 @@ if access_config['flickr']['used']:
 
 if access_config['instagram']['used']:
     execfile(os.path.join(INSTAGRAM_SCRIPTS, "Instagram2SQLite.py"))
+
+if access_config['local']['photos']:
+    execfile(os.path.join(OTHER_SCRIPTS, "PhotoEXIF2YAML.py"))
