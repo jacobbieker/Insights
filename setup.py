@@ -49,7 +49,6 @@ else:  # Clean up output file by deleting anything in the folder, if it exists
     for file in os.listdir(OUT_PATH):
         os.remove(os.path.join(OUT_PATH, file))
 
-# TODO check each service and all if the service is used, in a generic way
 # Check which services are used and only load those access token
 for service in access_config:
     if (service['used']):
