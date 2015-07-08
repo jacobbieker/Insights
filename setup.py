@@ -5,6 +5,7 @@ __author__ = 'Jacob Bieker'
 import os
 import glob
 import zipfile
+import subprocess
 
 import yaml
 
@@ -43,33 +44,37 @@ else: #Clean up output file by deleting anything in the folder, if it exists
         os.remove(os.path.join(OUT_PATH, file))
 
 #TODO check each service and all if the service is used, in a generic way
-'''
 #Check which services are used and only load those access token
 for service in access_config:
     if(service['used']):
+        if service == 'google':
+            if service['local']:
+                #Google Takout
+                takout_files = glob.glob("takeout*.zip")
+                for takeout_file in takout_files:
+                    gTakeout = zipfile.ZipFile(os.path.join(PATH, takeout_file), 'r')
+                    gTakeout.extractall(DATA_PATH)
+        elif service == 'facebook':
+            if service['local']:
+                #Facebook zip
+                facebook_zip = glob.glob("facebook*.zip")
+                fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
+                fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
+        elif service == 'linkedin':
+            if service['local']:
+                #LinkedIn zip
+                linkedIn_zip = glob.glob("LinkedIn*.zip")
+                fbZip = zipfile.ZipFile(os.path.join(PATH, linkedIn_zip), 'r')
+                fbZip.extractall(os.path.join(DATA_PATH, "linkedin"))
 
-'''
 ########################################################################################
 #                        END BASIC SETUP                                               #
 ########################################################################################
-
-# Unzip data archives for use in scripts
-#Google Takout
-takout_file = glob.glob("takout*.zip")
-gTakeout = zipfile.ZipFile(os.path.join(PATH, takout_file), 'r')
-gTakeout.extractall(DATA_PATH)
-#Facebook zip
-facebook_zip = glob.glob("facebook*.zip")
-fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
-fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
-#LinkedIn zip
-linkedIn_zip = glob.glob("LinkedIn*.zip")
-fbZip = zipfile.ZipFile(os.path.join(PATH, linkedIn_zip), 'r')
-fbZip.extractall(os.path.join(DATA_PATH, "linkedin"))
-
 '''
 Execute the other scripts to create the database and fill it
 '''
+
+# Try creating database
 execfile("databaseSetup.py")
 #execute the ones that work on Google Takeout data first
 execfile(GOOGLE_SCRIPTS + "\\GVoice2JSON.py")

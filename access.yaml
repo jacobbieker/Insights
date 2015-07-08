@@ -1,6 +1,7 @@
 #Config file with access token for services, other personal information, along with is the service will be used
 facebook:
-  - used: no
+  - used: yes
+  - local: yes
   - token: NULL
   - clientID: NULL
   - redirect: https://www.facebook.com/connect/login_success.html
@@ -33,6 +34,9 @@ flickr:
 googleplus:
   - used: no
   - token: NULL
+google:
+  - used: yes
+  - local: yes
 youtube:
   - used: no
   - token: NULL
