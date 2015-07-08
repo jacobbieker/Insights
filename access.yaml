@@ -31,9 +31,6 @@ flickr:
   - extras: description,date_upload,date_taken,original_format,last_update,tags,views,media,geo
   - key: <key>
   - secret: <secrete>
-googleplus:
-  - used: no
-  - token: NULL
 google:
   - used: yes
   - local: yes
