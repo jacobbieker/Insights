@@ -3,7 +3,7 @@ A set of Python and R scripts to organize and analyze data from various sources 
 easy to access and manipulate. 
 
 # Dependencies
-peewee >= 2.6.0
+peewee >= 2.6.0, rawkit, readexif, python-instagram, tweepy, facebook, github3
 
 # Use
 To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives and place them in the same folder as 

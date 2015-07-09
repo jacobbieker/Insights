@@ -5,74 +5,77 @@ sqlite:
   storage_location:
   tables:
     message:
-     - type: string
-     - date: date
-     - time: time
-     - sender: char
-     - reciever: char
-     - message: string
-     - length: int
+     type: string
+     date: date
+     time: time
+     sender: char
+     reciever: char
+     message: string
+     length: int
     word:
-     - word: char
-     - length: int
-     - occurences: int
+     word: char
+     length: int
+     occurences: int
     call:
-      - date: date
-      - time: time
-      - caller: char
-      - reciever: char
-      - length: double
-      - answered: boolean
+     date: date
+     time: time
+     caller: char
+     reciever: char
+     length: double
+     answered: boolean
     voicemail:
-      - date: date
-      - time: time
-      - caller: char
-      - message: string
+     date: date
+     time: time
+     caller: char
+     message: string
     contacts:
-      - name: char
-      - firstContact: date
-      - lastContact: date
-      - phoneNumbers: int
-      - countryCode: string
-      - lastNumber: int
+     name: char
+     firstContact: date
+     lastContact: date
+     lastMessage: string
+     phoneNumbers: int
+     countryCode: string
+     lastNumber: int
     locations:
-      - date: date
-      - time: time
-      - longitude: double
-      - latitude: double
-      - continent: char
-      - country: char
-      - state: char
-      - city: char
+     date: date
+     time: time
+     longitude: double
+     latitude: double
+     continent: char
+     country: char
+     state: char
+     city: char
     jobs:
-      - title: char
-      - company: char
-      - description: string
-      - startDate: date
-      - endDate: date
-      - type: string
-      - currentlyWork: boolean
-      - location: string
+     title: char
+     company: char
+     description: string
+     startDate: date
+     endDate: date
+     type: string
+     currentlyWork: boolean
+     location: string
     socialmedia: #Used for current news, etc. around other events, such as twitter posts at a specific time
-      - type: char
-      - date: date
-      - time: time
-      - message: string
-      - tags: string
-      - urls: string
+     type: char
+     date: date
+     time: time
+     message: string
+     tags: string
+     urls: string
     photos:
-      - name: char
-      - date: date
-      - time: time
-      - location: string
-      - shutter: string
-      - iso: int
-      - shotFormat: string
-      - aperture: string
-      - manufacturer: char
-      - cameraModel: char
-      - exposurePriority: string
-      - exposureMode: string
-      - flash: boolean
-      - lensModel: string
-      - focalLength: double
+     name: char
+     date: date
+     time: time
+     location: string
+     shutter: string
+     iso: int
+     shotFormat: string
+     aperture: string
+     manufacturer: char
+     cameraModel: char
+     exposurePriority: string
+     exposureMode: string
+     flash: boolean
+     lensModel: string
+     focalLength: double
+     service: string
+     dateUpload: date

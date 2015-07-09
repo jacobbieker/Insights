@@ -7,16 +7,17 @@ from playhouse.migrate import *
 with open("dbconfig.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
-DB_NAME = config['sqlite']['name'] + '.db'
+DB_NAME = config.get('sqlite').get('name') + '.db'
 #remove old database if in the current directory
 if os.path.isfile(DB_NAME):
-    DB_NAME.connect()
+    database = SqliteDatabase(DB_NAME)
+    database.connect()
 else:
     #Check to see what type of database wanted, and creates the type specificed
-    if config['sqlite']['type'] == 'extended':
+    if config.get('sqlite').get('type') == 'extended':
         from playhouse.sqlite_ext import SqliteExtDatabase
         database = SqliteExtDatabase(DB_NAME, threadlocals=True)
-    elif config['sqlite']['type'] == 'apsw':
+    elif config.get('sqlite').get('type') == 'apsw':
         from playhouse.apsw_ext import APSWDatabase
         database = APSWDatabase(DB_NAME, threadlocals=True)
     else:
@@ -91,8 +92,8 @@ else:
     '''
     migrator = SqliteMigrator(database)
 
-    for table in config['sqlite']['tables']:
-        for column in config['sqlite']['tables'][table]:
+    for table in config.get('sqlite').get('tables'):
+        for column in config.get('sqlite').get('tables').get(table):
             print column.keys()
             #Use mcol_namator to add a column for each field
             col_name = column.keys()[0]
