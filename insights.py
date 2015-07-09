@@ -51,23 +51,24 @@ else:  # Clean up output file by deleting anything in the folder, if it exists
 
 # Check which services are used and only load those access token
 for service in access_config:
-    if (service['used']):
+    print access_config.get(service)
+    if (access_config.get(service).get('used')):
         if service == 'google':
-            if service['local']:
+            if access_config.get(service).get('local'):
                 # Google Takeout
                 takout_files = glob.glob("takeout*.zip")
                 for takeout_file in takout_files:
                     gTakeout = zipfile.ZipFile(os.path.join(PATH, takeout_file), 'r')
                     gTakeout.extractall(DATA_PATH)
         elif service == 'facebook':
-            if service['local']:
+            if access_config.get(service).get('local'):
                 # Facebook zip
                 facebook_zips = glob.glob("facebook*.zip")
                 for facebook_zip in facebook_zips:
                     fbZip = zipfile.ZipFile(os.path.join(PATH, facebook_zip), 'r')
                     fbZip.extractall(os.path.join(DATA_PATH, "facebook"))
         elif service == 'linkedin':
-            if service['local']:
+            if access_config.get(service).get('local'):
                 # LinkedIn zip
                 linkedIn_zips = glob.glob("LinkedIn*.zip")
                 for linkedIn_zip in linkedIn_zips:
@@ -85,27 +86,27 @@ Execute the other scripts to create the database and fill it
 execfile("databaseSetup.py")
 
 # execute the ones that work on Google Takeout data first
-if access_config['google']['used']:
+if access_config.get('google').get('used'):
     execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2JSON.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2JSON.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "GmailJSON2SQLite.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "Location2SQLite.py"))
 
 # Then on other zipped files
-if access_config['facebook']['used']:
+if access_config.get('facebook').get('used'):
     execfile(os.path.join(FACEBOOK_SCRIPTS, "FacebookDownload2JSON.py"))
 
-if access_config['linkedin']['used']:
+if access_config.get('linkedin').get('used'):
     execfile("LinkedIn2JSON.py")
 
-if access_config['twitter']['used']:
+if access_config.get('twitter').get('used'):
     execfile(os.path.join(TWITTER_SCRIPTS, "Twitter2SQLite.py"))
 
-if access_config['flickr']['used']:
+if access_config.get('flickr').get('used'):
     execfile("Flickr2SQLite.py")
 
-if access_config['instagram']['used']:
+if access_config.get('instagram').get('used'):
     execfile(os.path.join(INSTAGRAM_SCRIPTS, "Instagram2SQLite.py"))
 
-if access_config['local']['photos']:
+if access_config.get('local').get('used'):
     execfile(os.path.join(OTHER_SCRIPTS, "PhotoEXIF2YAML.py"))
