@@ -3,7 +3,7 @@ import os
 import yaml
 import json
 from datetime import datetime
-import setup
+import insights
 
 '''
 with open("constants.yaml", 'r') as ymlfile:

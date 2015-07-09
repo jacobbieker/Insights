@@ -3,7 +3,7 @@ import exifread
 from exifread import *
 import os
 import json
-import setup
+import insights
 import yaml
 from glob import glob
 from rawkit.raw import Raw
@@ -30,7 +30,7 @@ for location in locations:
         with open(photo, 'rb') as image:
             #Return EXIF tags
             metadata = exifread.process_file(image)
-            with open(os.path.join(setup.OUT_PATH, 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
+            with open(os.path.join(insights.OUT_PATH, 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in metadata.keys():
@@ -52,7 +52,7 @@ for location in locations:
         file_name = os.path.splitext(os.path.basename(raw_file))
         with Raw(filename=raw_file) as raw:
             raw_output = Metadata
-            with open(os.path.join(setup.OUT_PATH, 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
+            with open(os.path.join(insights.OUT_PATH, 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in raw_output._fields:

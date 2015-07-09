@@ -1,7 +1,7 @@
 __author__ = 'Jacob'
 import os
 import json
-import setup
+import insights
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -10,7 +10,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-rootdir = os.path.join(setup.DATA_PATH, "Takeout", "Voice", "Calls")
+rootdir = os.path.join(insights.DATA_PATH, "Takeout", "Voice", "Calls")
 
 '''
 SAMPLE INPUT:
@@ -33,7 +33,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (json_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", {"class": "message"})
-                with open(os.path.join(setup.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for message in messages:
                         # Date and Time
@@ -89,7 +89,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (json_file_name[1] == ' Missed' or json_file_name[1] == ' Recieved' or json_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(setup.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for call in calls:
                         # Date and Time
@@ -146,7 +146,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (json_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(setup.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
+                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
                     json_data = []
                     for voicemail in voicemails:
                         # Date and Time

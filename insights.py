@@ -26,7 +26,7 @@ INSTAGRAM_SCRIPTS = os.path.join(PATH, "InstagramScripts")
 OTHER_SCRIPTS = os.path.join(PATH, "OtherScripts")
 
 
-# Create config.yaml to be used for other scripts, so that they don't import setup.py
+# Create config.yaml to be used for other scripts, so that they don't import insights.py
 constants = {
     'path': PATH,
     'dataDir': DATA_PATH,
