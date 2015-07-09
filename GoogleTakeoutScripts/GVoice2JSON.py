@@ -39,7 +39,7 @@ GMT</abbr>:
 <q>goodnight:) sweet dreams my darling:)</q></div>
 '''
 conversation_number = 1  # Track conversation number, for continuity
-for file in os.listdir(rootdir):k
+for file in os.listdir(rootdir):
     if file.endswith(".html"):
         with open(os.path.join(rootdir, file), 'r') as source:
             file_name = os.path.splitext(os.path.basename(file))
