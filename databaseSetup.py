@@ -90,7 +90,12 @@ else:
     class Photos(BaseModel):
         default = datetime_field
 
+    class Calendars(BaseModel):
+        default = datetime_field
+
+
     def create_tables():
+        Calendars.create_table()
         Message.create_table()
         Locations.create_table()
         Call.create_table()

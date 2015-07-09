@@ -79,3 +79,14 @@ sqlite:
         focalLength: double
         service: string
         dateUpload: date
+    calendar:
+        startDate: date
+        startTime: time
+        finishDate: date
+        finishTime: time
+        type: char
+        whichCalender: char
+        description: string
+        name: string
+        duration: double
+        isTask: boolean
