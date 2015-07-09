@@ -12,10 +12,10 @@ with open("access.yaml", 'r') as access:
 
 #TODO Need to add Facebook login to get Oauth token
 
-token = access_config['facebook']['token']
-client_id = access_config['facebook']['clientID']
-redirect_uri = access_config['facebook']['redirect']
-scopes = access_config['facebook']['scopes']
+token = access_config.get('facebook').get('token')
+client_id = access_config.get('facebook').get('clientID')
+redirect_uri = access_config.get('facebook').get('redirect')
+scopes = access_config.get('facebook').get('scopes')
 login_url = 'https://www.facebook.com/dialog/oauth?client_id={'+\
             str(client_id)+'}&redirect_uri={'+\
             str(redirect_uri)+\

@@ -12,8 +12,8 @@ import yaml
 with open("constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-MBOX = os.path.join(constants['dataDir'], 'Mail', 'All mail Including Spam and Trash.mbox')
-OUT_FILE = os.path.join(constants['outputDir'], "gmail.json")
+MBOX = os.path.join(constants.get('dataDir'), 'Mail', 'All mail Including Spam and Trash.mbox')
+OUT_FILE = os.path.join(constants.get('outputDir'), "gmail.json")
 
 def cleanContent(msg):
 

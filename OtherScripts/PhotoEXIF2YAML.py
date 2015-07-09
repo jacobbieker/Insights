@@ -14,7 +14,7 @@ import libraw
 
 with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
-locations = access_config['local']['photoLocations']
+locations = access_config.get('local').get('photoLocations')
 
 #Go through each location:
 for location in locations:

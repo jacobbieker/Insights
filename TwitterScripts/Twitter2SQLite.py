@@ -13,7 +13,7 @@ with open("access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
 
-auth = tweepy.OAuthHandler(access_config['twitter']['key'], access_config['twitter']['secret'])
+auth = tweepy.OAuthHandler(access_config.get('twitter').get('key'), access_config.get('twitter').get('secret'))
 
 #Redirect user to authenticate with Twitter before continuing
 try:
