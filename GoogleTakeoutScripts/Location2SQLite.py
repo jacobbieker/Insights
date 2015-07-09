@@ -27,6 +27,6 @@ from geopy.geocoders import Nominatim
 rootdir = os.path.join(insights.DATA_PATH, "Takeout", "Location")
 geolocator = Nominatim()
 
-with open(os.path.join(rootdir, "Location.json"), 'r') as source:
+with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     data = json.dump(source)
-    print data
+    #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7

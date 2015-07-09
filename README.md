@@ -4,6 +4,7 @@ easy to access and manipulate.
 
 # Dependencies
 peewee >= 2.6.0, rawkit, readexif, python-instagram, tweepy, facebook, github3
+Only tested on Python 2.7
 
 # Use
 To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives and place them in the same folder as 
