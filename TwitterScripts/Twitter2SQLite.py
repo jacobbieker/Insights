@@ -26,7 +26,7 @@ import json
 import yaml
 
 #Authentication with Twitter
-with open("access.yaml", 'r') as access:
+with open("../access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
 

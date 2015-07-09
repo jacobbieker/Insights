@@ -25,7 +25,7 @@ from instagram.bind import InstagramAPIError
 import yaml
 
 #Authentication with Instagram
-with open("access.yaml", 'r') as access:
+with open("../access.yaml", 'r') as access:
     access_config = yaml.load(access)
 
 #Based on the get_access_token.py on Instagram's Github
@@ -46,7 +46,7 @@ code = (str(input("Paste in code in query string after redirect: ").strip()))
 
 access_token = api.exchange_code_for_access_token(code)
 
-with open("access.yaml", 'w') as access:
+with open("../access.yaml", 'w') as access:
     access_config.get('instagram').get('token').set(access_token)
     access.write(yaml.dump(access_config, default_flow_style=False))
 

@@ -21,10 +21,13 @@ import json
 import os
 from datetime import datetime
 from peewee import *
-import insights
+import yaml
 from geopy.geocoders import Nominatim
 
-rootdir = os.path.join(insights.DATA_PATH, "Takeout", "Location")
+with open("../constants.yaml", 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location")
 geolocator = Nominatim()
 
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:

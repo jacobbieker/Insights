@@ -18,5 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 __author__ = 'Jacob Bieker'
 import os
 import json
+import yaml
 from peewee import *
-import insights
+
+with open("../constants.yaml", 'r') as ymlfile:
+    constants = yaml.load(ymlfile)

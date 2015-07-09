@@ -19,13 +19,13 @@ __author__ = 'Jacob'
 from peewee import *
 import yaml
 
-with open("constants.yaml", 'r') as ymlfile:
+with open("../constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-DATABASE_NAME = constants['database']
-DATABASE_LOC = constants['path']
+DATABASE_NAME = constants.get('database')
+DATABASE_LOC = constants.get('path')
 
-database = SqliteDatabase(constants['databaseLoc'], threadlocals=True)
+database = SqliteDatabase(constants.get('databaseLoc'), threadlocals=True)
 database.connect()
 
 #with open(Gmail2JSON.OUT_FILE, 'r'):
