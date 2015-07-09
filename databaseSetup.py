@@ -1,3 +1,6 @@
+'''
+Copyright
+'''
 __author__ = 'Jacob'
 import os
 from peewee import *
