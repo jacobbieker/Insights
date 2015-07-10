@@ -44,7 +44,10 @@ sqlite:
         continent: char
         country: char
         state: char
+        zip: int
         city: char
+        street: string
+        name: string
     jobs:
         title: char
         company: char

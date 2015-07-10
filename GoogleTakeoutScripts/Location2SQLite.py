@@ -19,17 +19,43 @@ __author__ = 'Jacob Bieker'
 
 import json
 import os
+import time
 from datetime import datetime
-from peewee import *
+import peewee
+from databaseSetup import Loca
 import yaml
+import databaseSetup
 from geopy.geocoders import Nominatim
 
 with open("../constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location")
+#Connect to database
+database = SqliteDatabase(constants.get('databaseLoc'))
+database.connect()
+tables = database.get_tables()
+print tables
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 geolocator = Nominatim()
+locationCache = {}
 
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
-    data = json.dump(source)
+    data = json.load(source)
+    locations = data.get('locations')
+    for location in locations:
+        time_stamp = location.get('timestampMS')
+        longitude = location.get('longitudeE7')/10000000.0
+        latitude = location.get('latitudeE7')/10000000.0
+        point = str(latitude) + ", " + str(longitude)
+        if locationCache.has_key(point):
+            address = locationCache.get(point)
+        else:
+            #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
+            time.sleep(2)
+            address = geolocator.reverse(point)
+            locationCache[point] = address
+        print address
+        databaseSetup.database_insert("Locations", "latitude=" + str(latitude) + "")
+
     #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7
