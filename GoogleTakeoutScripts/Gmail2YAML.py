@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 import yaml
 
-with open("constants.yaml", 'r') as ymlfile:
+with open("../constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 MBOX = os.path.join(constants.get('dataDir'), 'Takeout', 'Mail', 'All mail Including Spam and Trash.mbox')
@@ -23,6 +23,7 @@ def cleanContent(msg):
     # Bail on unknown encodings if errors happen in BeautifulSoup.
     try:
         soup = BeautifulSoup(msg)
+        print soup
     except:
         return ''
     return ''.join(soup.findAll(text=True))
@@ -71,8 +72,8 @@ def jsonifyMessage(msg):
     # Finally, convert date from asctime to milliseconds since epoch using the
     # $date descriptor so it imports "natively" as an ISODate object in MongoDB
     then = parse(json_msg['Date'])
-    millis = int(time.mktime(then.timetuple())*1000 + then.microsecond/1000)
-    json_msg['Date'] = {'$date' : millis}
+    #millis = int(time.mktime(then.timetuple())*1000 + then.microsecond/1000)
+    #json_msg['Date'] = {'$date' : millis}
 
     return json_msg
 

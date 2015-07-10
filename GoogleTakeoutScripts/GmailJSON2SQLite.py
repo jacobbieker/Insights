@@ -30,3 +30,4 @@ database.connect()
 
 #with open(Gmail2JSON.OUT_FILE, 'r'):
     #TODO Get into database
+
