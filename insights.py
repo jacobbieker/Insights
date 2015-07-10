@@ -35,7 +35,7 @@ with open("access.yaml", 'r') as access:
 PATH = os.path.abspath("./")
 OUT_PATH = os.path.join(PATH, "output")
 DATA_PATH = os.path.join(PATH, "data")
-DB_NAME = config['sqlite']['name'] + '.db'
+DB_NAME = config.get('sqlite').get('name') + '.db'
 GOOGLE_SCRIPTS = os.path.join(PATH, "GoogleTakeoutScripts")
 FACEBOOK_SCRIPTS = os.path.join(PATH, "FacebookScripts")
 TWITTER_SCRIPTS = os.path.join(PATH, "TwitterScripts")

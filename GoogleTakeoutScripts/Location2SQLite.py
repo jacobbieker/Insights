@@ -21,11 +21,16 @@ import json
 import os
 import time
 from datetime import datetime
-import peewee
+from peewee import *
 from databaseSetup import Locations
 import yaml
 import databaseSetup
 from geopy.geocoders import Nominatim
+
+def address_to_parts(address):
+    parts = address.split(", ")
+    print parts
+    print len(parts)
 
 with open("../constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
@@ -56,6 +61,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             address = geolocator.reverse(point)
             locationCache[point] = address
         print address
+        address_to_parts(address)
         Locations.create(time=time_stamp, longitude=longitude, latitude=latitude)
 
     #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7
