@@ -17,6 +17,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 '''
 __author__ = 'Jacob'
 import os
+import datetime
 import peewee
 import yaml
 from playhouse.migrate import *
@@ -29,6 +30,7 @@ text_field = TextField(null=True)
 int_field = IntegerField(null=True)
 double_field = DoubleField(null=True)
 boolean_field = BooleanField(null=True)
+timestamp_field = DateTimeField(default=datetime.datetime.now)
 
 #Create base database
 class BaseModel(peewee.Model):
@@ -49,11 +51,13 @@ class Message(BaseModel):
     reciever = char_field
     message = text_field
     length = int_field
+    timestamp = timestamp_field
 
 class Word(BaseModel):
     word = char_field
     length = int_field
     occurences = int_field
+    timestamp = timestamp_field
 
 class Call(BaseModel):
     date = datetime_field
@@ -62,12 +66,14 @@ class Call(BaseModel):
     reciever = char_field
     length = double_field
     answered = boolean_field
+    timestamp = timestamp_field
 
 class Voicemail(BaseModel):
     date = datetime_field
     time = time_field
     caller = char_field
     message = text_field
+    timestamp = timestamp_field
 
 class Contacts(BaseModel):
     name = char_field
@@ -77,6 +83,7 @@ class Contacts(BaseModel):
     phone_numbers = int_field
     country_code = text_field
     last_number = int_field
+    timestamp = timestamp_field
 
 class Locations(BaseModel):
     date = datetime_field
@@ -90,6 +97,8 @@ class Locations(BaseModel):
     city = char_field
     street = text_field
     name = text_field
+    number_of_times = int_field
+    timestamp = timestamp_field
 
 class Jobs(BaseModel):
     title = char_field
@@ -100,6 +109,7 @@ class Jobs(BaseModel):
     type = text_field
     currently_working = boolean_field
     location = text_field
+    timestamp = timestamp_field
 
 class SocialMedia(BaseModel):
     type = char_field
@@ -108,6 +118,7 @@ class SocialMedia(BaseModel):
     message = text_field
     tags = text_field
     urls = text_field
+    timestamp = timestamp_field
 
 class Photos(BaseModel):
     name = char_field
@@ -127,6 +138,7 @@ class Photos(BaseModel):
     focal_length = double_field
     service = text_field
     date_uploaded = datetime_field
+    timestamp = timestamp_field
 
 class Calendars(BaseModel):
     start_date = datetime_field
@@ -139,6 +151,7 @@ class Calendars(BaseModel):
     name = text_field
     duration = double_field
     is_task = boolean_field
+    timestamp = timestamp_field
 
 if __name__ == "__main__":
     with open("dbconfig.yaml", 'r') as ymlfile:

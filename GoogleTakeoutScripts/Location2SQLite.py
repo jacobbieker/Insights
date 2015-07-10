@@ -22,7 +22,7 @@ import os
 import time
 from datetime import datetime
 import peewee
-from databaseSetup import Loca
+from databaseSetup import Locations
 import yaml
 import databaseSetup
 from geopy.geocoders import Nominatim
@@ -56,6 +56,6 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             address = geolocator.reverse(point)
             locationCache[point] = address
         print address
-        databaseSetup.database_insert("Locations", "latitude=" + str(latitude) + "")
+        Locations.insert(longitude=longitude, latitude=latitude)
 
     #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7
