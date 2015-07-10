@@ -52,10 +52,10 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             address = locationCache.get(point)
         else:
             #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-            time.sleep(2)
+            time.sleep(5)
             address = geolocator.reverse(point)
             locationCache[point] = address
         print address
-        Locations.insert(longitude=longitude, latitude=latitude)
+        Locations.create(time=time_stamp, longitude=longitude, latitude=latitude)
 
     #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7

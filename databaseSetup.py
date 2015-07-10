@@ -97,7 +97,6 @@ class Locations(BaseModel):
     city = char_field
     street = text_field
     name = text_field
-    number_of_times = int_field
     timestamp = timestamp_field
 
 class Jobs(BaseModel):
