@@ -20,147 +20,158 @@ import os
 import peewee
 import yaml
 from playhouse.migrate import *
-def database_insert(table, string_of_rest_of_command):
+#Define the fields used in the database so migrate can be called and used:
+date_field = DateField(null=True)
+time_field = TimeField(null=True)
+datetime_field = DateTimeField(null=True)
+char_field = CharField(null=True)
+text_field = TextField(null=True)
+int_field = IntegerField(null=True)
+double_field = DoubleField(null=True)
+boolean_field = BooleanField(null=True)
+
+#Create base database
+class BaseModel(peewee.Model):
+    class Meta:
+        database = database
+
+'''
+Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
+config, and then add a column using the database migration tools programmically. Limitation: have to create atleast one
+column per table by default
+'''
+
+class Message(BaseModel):
+    type = text_field
+    date = datetime_field
+    time = time_field
+    sender = char_field
+    reciever = char_field
+    message = text_field
+    length = int_field
+
+class Word(BaseModel):
+    word = char_field
+    length = int_field
+    occurences = int_field
+
+class Call(BaseModel):
+    date = datetime_field
+    time = time_field
+    caller = char_field
+    reciever = char_field
+    length = double_field
+    answered = boolean_field
+
+class Voicemail(BaseModel):
+    date = datetime_field
+    time = time_field
+    caller = char_field
+    message = text_field
+
+class Contacts(BaseModel):
+    name = char_field
+    first_contact = datetime_field
+    last_contact = datetime_field
+    last_message = text_field
+    phone_numbers = int_field
+    country_code = text_field
+    last_number = int_field
+
+class Locations(BaseModel):
+    date = datetime_field
+    time = time_field
+    longitude = double_field
+    latitude = double_field
+    continent = char_field
+    country = char_field
+    state = char_field
+    zip = int_field
+    city = char_field
+    street = text_field
+    name = text_field
+
+class Jobs(BaseModel):
+    title = char_field
+    company = char_field
+    description = text_field
+    start_date = datetime_field
+    end_date = datetime_field
+    type = text_field
+    currently_working = boolean_field
+    location = text_field
+
+class SocialMedia(BaseModel):
+    type = char_field
+    date = datetime_field
+    time = time_field
+    message = text_field
+    tags = text_field
+    urls = text_field
+
+class Photos(BaseModel):
+    name = char_field
+    date = datetime_field
+    time = time_field
+    location = text_field
+    shutter = text_field
+    iso = int_field
+    shot_format = text_field
+    aperture = text_field
+    manufacturer = char_field
+    camera_model = char_field
+    exposure_priority = text_field
+    exposure_mode = text_field
+    flash = boolean_field
+    lens_model = text_field
+    focal_length = double_field
+    service = text_field
+    date_uploaded = datetime_field
+
+class Calendars(BaseModel):
+    start_date = datetime_field
+    start_time = time_field
+    end_date = datetime_field
+    end_time = time_field
+    type = char_field
+    which_calender = char_field
+    description = text_field
+    name = text_field
+    duration = double_field
+    is_task = boolean_field
+
+if __name__ == "__main__":
     with open("dbconfig.yaml", 'r') as ymlfile:
         config = yaml.load(ymlfile)
 
     DB_NAME = config.get('sqlite').get('name') + '.db'
-    database = SqliteDatabase(DB_NAME)
-    database.connect()
-
-    query = table.insert(string_of_rest_of_command)
-    query.execute()
-
-
-    if __name__ == "__main__":
-        with open("dbconfig.yaml", 'r') as ymlfile:
-            config = yaml.load(ymlfile)
-
-        DB_NAME = config.get('sqlite').get('name') + '.db'
-        #remove old database if in the current directory
-        if os.path.isfile(DB_NAME):
-            database = SqliteDatabase(DB_NAME)
-            database.connect()
+    #remove old database if in the current directory
+    if os.path.isfile(DB_NAME):
+        database = SqliteDatabase(DB_NAME)
+        database.connect()
+    else:
+        #Check to see what type of database wanted, and creates the type specificed
+        if config.get('sqlite').get('type') == 'extended':
+            from playhouse.sqlite_ext import SqliteExtDatabase
+            database = SqliteExtDatabase(DB_NAME, threadlocals=True)
+        elif config.get('sqlite').get('type') == 'apsw':
+            from playhouse.apsw_ext import APSWDatabase
+            database = APSWDatabase(DB_NAME, threadlocals=True)
         else:
-            #Check to see what type of database wanted, and creates the type specificed
-            if config.get('sqlite').get('type') == 'extended':
-                from playhouse.sqlite_ext import SqliteExtDatabase
-                database = SqliteExtDatabase(DB_NAME, threadlocals=True)
-            elif config.get('sqlite').get('type') == 'apsw':
-                from playhouse.apsw_ext import APSWDatabase
-                database = APSWDatabase(DB_NAME, threadlocals=True)
-            else:
-                database = SqliteDatabase(DB_NAME, threadlocals=True)
+            database = SqliteDatabase(DB_NAME, threadlocals=True)
 
-            database.connect()
+        database.connect()
 
-            #Define the fields used in the database so migrate can be called and used:
-            date_field = DateField(null=True)
-            time_field = TimeField(null=True)
-            datetime_field = DateTimeField(null=True)
-            char_field = CharField(null=True)
-            text_field = TextField(null=True)
-            int_field = IntegerField(null=True)
-            double_field = DoubleField(null=True)
-            boolean_field = BooleanField(null=True)
+        def create_tables():
+            Calendars.create_table()
+            Message.create_table()
+            Locations.create_table()
+            Call.create_table()
+            Voicemail.create_table()
+            Word.create_table()
+            Jobs.create_table()
+            Contacts.create_table()
+            SocialMedia.create_table()
+            Photos.create_table()
 
-            #Create base database
-            class BaseModel(peewee.Model):
-                class Meta:
-                    database = database
-
-            '''
-            Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
-            config, and then add a column using the database migration tools programmically. Limitation: have to create atleast one
-            column per table by default
-            '''
-
-            class Message(BaseModel):
-                default = datetime_field
-
-            class Word(BaseModel):
-                default = datetime_field
-
-            class Call(BaseModel):
-                default = datetime_field
-
-            class Voicemail(BaseModel):
-                default = datetime_field
-
-            class Contacts(BaseModel):
-                default = datetime_field
-
-            class Locations(BaseModel):
-                default = datetime_field
-
-            class Jobs(BaseModel):
-                default = datetime_field
-
-            class SocialMedia(BaseModel):
-                default = datetime_field
-
-            class Photos(BaseModel):
-                default = datetime_field
-
-            class Calendars(BaseModel):
-                default = datetime_field
-
-
-            def create_tables():
-                Calendars.create_table()
-                Message.create_table()
-                Locations.create_table()
-                Call.create_table()
-                Voicemail.create_table()
-                Word.create_table()
-                Jobs.create_table()
-                Contacts.create_table()
-                SocialMedia.create_table()
-                Photos.create_table()
-
-            #TODO Check if certain tables exist and do not create them if they do
-            create_tables()
-
-            '''
-            Now programmatically add columns to the tables
-            '''
-            migrator = SqliteMigrator(database)
-
-            for table in config.get('sqlite').get('tables'):
-                for column in config.get('sqlite').get('tables').get(table):
-                    print column.keys()
-                    #Use mcol_namator to add a column for each field
-                    col_name = column.keys()[0]
-                    col_type = column.values()[0]
-                    if col_type == 'string':
-                        migrate(
-                            migrator.add_column(table, col_name, text_field)
-                        )
-                    elif col_type == 'char':
-                        migrate(
-                            migrator.add_column(table, col_name, char_field)
-                        )
-                    elif col_type == 'date':
-                        migrate(
-                            migrator.add_column(table, col_name, datetime_field)
-                        )
-                    elif col_type == 'time':
-                        migrate(
-                            migrator.add_column(table, col_name, time_field)
-                        )
-                    elif col_type == 'int':
-                        migrate(
-                            migrator.add_column(table, col_name, int_field)
-                        )
-                    elif col_type == 'double':
-                        migrate(
-                            migrator.add_column(table, col_name, double_field)
-                        )
-                    elif col_type == 'boolean':
-                        migrate(
-                            migrator.add_column(table, col_name, boolean_field)
-                        )
-                #Now delete the default table
-                migrate(
-                    migrator.drop_column(table, 'default')
-            )
+        create_tables()
