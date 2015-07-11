@@ -21,5 +21,5 @@ import json
 import yaml
 from peewee import *
 
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)

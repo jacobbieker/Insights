@@ -26,7 +26,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Voice", "Calls")

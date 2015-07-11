@@ -28,10 +28,10 @@ import libraw
 
 #TODO Check for filename conflicts and rename if necessary
 
-with open("../access.yaml", 'r') as access:
+with open(os.path.join("..","access.yaml"), 'r') as access:
     access_config = yaml.load(access)
 locations = access_config.get('local').get('photoLocations')
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 #Go through each location:
 for location in locations:

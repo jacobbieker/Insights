@@ -22,8 +22,7 @@ import json
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 #Date and Time, Facebook Format

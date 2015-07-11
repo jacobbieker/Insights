@@ -21,6 +21,13 @@ import datetime
 import peewee
 import yaml
 from playhouse.migrate import *
+
+with open("dbconfig.yaml", 'r') as ymlfile:
+    config = yaml.load(ymlfile)
+
+DB_NAME = config.get('sqlite').get('name') + '.db'
+
+
 #Define the fields used in the database so migrate can be called and used:
 date_field = DateField(null=True)
 time_field = TimeField(null=True)
@@ -35,7 +42,7 @@ timestamp_field = DateTimeField(default=datetime.datetime.now)
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = database
+        database = SqliteDatabase(DB_NAME).connect()
 
 '''
 Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in

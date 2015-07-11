@@ -18,8 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 __author__ = 'Jacob'
 from peewee import *
 import yaml
+import os
 
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 DATABASE_NAME = constants.get('database')

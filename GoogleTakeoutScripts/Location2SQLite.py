@@ -32,7 +32,7 @@ def address_to_parts(address):
     print parts
     print len(parts)
 
-with open("../constants.yaml", 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 #Connect to database
