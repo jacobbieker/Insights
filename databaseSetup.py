@@ -22,7 +22,8 @@ import peewee
 import yaml
 from playhouse.migrate import *
 
-with open("dbconfig.yaml", 'r') as ymlfile:
+#Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+with open(os.path.join("..","dbconfig.yaml"), 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
 DB_NAME = config.get('sqlite').get('name') + '.db'
