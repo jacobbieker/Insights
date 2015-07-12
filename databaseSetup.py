@@ -23,10 +23,10 @@ import yaml
 from playhouse.migrate import *
 
 #Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-with open(os.path.join("..","dbconfig.yaml"), 'r') as ymlfile:
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     config = yaml.load(ymlfile)
 
-DB_NAME = config.get('sqlite').get('name') + '.db'
+DB_NAME = config.get('databaseLoc')
 
 
 #Define the fields used in the database so migrate can be called and used:

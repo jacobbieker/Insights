@@ -24,17 +24,28 @@ from datetime import datetime
 from peewee import *
 from databaseSetup import Locations
 import yaml
-from geopy.geocoders import Nominatim
+from geopy.geocoders import Nominatim, googlev3
 
 def address_to_parts(address):
     parts = str(address).split(", ")
     print parts
 
+#Find the continent based off the coordinates, more consistent than going off the name
+def continent_finder(latitude, longitude):
+    #get the list of country data
+    for country_data in location_data.get('countries').get('country'):
+        print country_data
+
 with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
+#Open continents.yaml to get location data
+with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
+    location_data = yaml.load(loc_data)
+
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 geolocator = Nominatim()
+google_geolocator = googlev3.Geocoder()
 locationCache = {}
 
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
@@ -42,6 +53,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     locations = data.get('locations')
     for location in locations:
         time_stamp = location.get('timestampMS')
+        converted_time_stamp = datetime.datetime.fromtimestamp(time_stamp/1000.0)
         longitude = location.get('longitudeE7')/10000000.0
         latitude = location.get('latitudeE7')/10000000.0
         point = str(latitude) + ", " + str(longitude)
@@ -50,7 +62,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
             time.sleep(5)
-            address = geolocator.reverse(point)
+            address = google_geolocator.reverse(point)
             locationCache[point] = address
         print address
         parts = address_to_parts(address)
@@ -69,13 +81,10 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             building = parts[amount - 8]
             number = ""
+        continent_finder(latitude, longitude)
 
-        #Based off own data, two options
-        if country == "United States of America" or "Canada" or "Mexico":
-            continent = "North America"
-        else:
-            continent = "Europe"
-
-        Locations.insert(time=time_stamp, longitude=longitude, latitude=latitude).execute()
+        Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+                         continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
+                         name=building).execute()
 
     #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7
