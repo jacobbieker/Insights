@@ -29,20 +29,23 @@ import unidecode
 
 def address_to_parts(address):
     parts = str(address).split(", ")
-    print parts
+    return parts
 
 #Find the continent based off the coordinates, more consistent than going off the name
 def continent_finder(latitude, longitude):
     #get the list of country data
     for country_data in location_data.get('countries').get('country'):
-        print country_data
+        if country_data.get('north') > latitude > country_data.get('south'):
+            if country_data.get('east') > longitude > country_data.get('west'):
+                return country_data.get('continentName')
+    return "Continent Not Found"
 
 with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 #Open continents.yaml to get location data
 with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
-
+    location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 geolocator = Nominatim()
@@ -53,7 +56,9 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     data = json.load(source)
     locations = data.get('locations')
     for location in locations:
-        time_stamp = location.get('timestampMS')
+        print location
+        time_stamp = location.get('timestampMs')
+        print time_stamp
         converted_time_stamp = datetime.fromtimestamp(float(time_stamp)/1000.0)
         longitude = location.get('longitudeE7')/10000000.0
         latitude = location.get('latitudeE7')/10000000.0
@@ -63,7 +68,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
             time.sleep(5)
-            address = google_geolocator.reverse(point)
+            address = geolocator.reverse(point)
             locationCache[point] = address
         print address
         parts = address_to_parts(address)
@@ -82,7 +87,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             building = parts[amount - 8]
             number = ""
-        continent_finder(latitude, longitude)
+        continent = continent_finder(latitude, longitude)
 
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                          continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
