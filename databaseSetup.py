@@ -50,12 +50,6 @@ if __name__ == "__main__":
         class Meta:
             database = database
 
-    '''
-    Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
-    config, and then add a column using the database migration tools programmically. Limitation: have to create atleast one
-    column per table by default
-    '''
-
     class Message(BaseModel):
         type = TextField(null=True)
         date = DateTimeField(null=True)
@@ -177,7 +171,7 @@ if __name__ == "__main__":
 
 #Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
-    with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
         config = yaml.load(ymlfile)
 else:
     with open("constants.yaml", 'r') as ymlfile:
@@ -187,12 +181,6 @@ else:
 class BaseModel(peewee.Model):
     class Meta:
         database = SqliteDatabase(config.get('databaseLoc')).connect()
-
-'''
-Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
-config, and then add a column using the database migration tools programmically. Limitation: have to create atleast one
-column per table by default
-'''
 
 class Message(BaseModel):
     type = TextField(null=True)

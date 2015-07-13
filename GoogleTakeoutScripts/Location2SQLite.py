@@ -21,11 +21,10 @@ import json
 import os
 import time
 from datetime import datetime
-from peewee import *
 from databaseSetup import Locations
+import databaseSetup
 import yaml
 from geopy.geocoders import Nominatim, googlev3
-import unidecode
 
 def address_to_parts(address):
     parts = str(address).split(", ")
