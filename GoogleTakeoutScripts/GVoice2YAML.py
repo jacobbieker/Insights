@@ -1,7 +1,23 @@
+'''
+Copyright (C) 2015  Jacob Bieker, jacob@bieker.us, www.jacobbieker.com
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+'''
 __author__ = 'Jacob'
 import os
-import json
-import insights
+import yaml
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -10,7 +26,10 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-rootdir = os.path.join(insights.DATA_PATH, "Takeout", "Voice", "Calls")
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Voice", "Calls")
 
 '''
 SAMPLE INPUT:
@@ -19,22 +38,22 @@ GMT</abbr>:
 <cite class="sender vcard"><a class="tel" href="tel:+15038547254"><span class="fn">+15038547254</span></a></cite>:
 <q>goodnight:) sweet dreams my darling:)</q></div>
 '''
+conversation_number = 1  # Track conversation number, for continuity
 for file in os.listdir(rootdir):
     if file.endswith(".html"):
         with open(os.path.join(rootdir, file), 'r') as source:
             file_name = os.path.splitext(os.path.basename(file))
-            json_file_name = file_name[0].split(" -")
+            yaml_file_name = file_name[0].split(" -")
             html_file = BeautifulSoup(source.read().decode('utf8', 'ignore'))
-            conversation_number = 1  # Track conversation number, for continuity
             ###################################################################
             #
-            #              Start of SMS to JSON script
+            #              Start of SMS to yaml script
             #
             ###################################################################
-            if (json_file_name[1] == ' Text'):
+            if (yaml_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", {"class": "message"})
-                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
-                    json_data = []
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                    yaml_data = []
                     for message in messages:
                         # Date and Time
                         date_and_time = message.abbr.text
@@ -50,7 +69,7 @@ for file in os.listdir(rootdir):
                         else:  # NO leading 0 added
                             date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
                                           + time_components[3] + time_components[4]
-                        # Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+                        # Not using this at the moment, since datetime cannot be serialized to yaml, use date_string instead
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
 
                         # Get sender
@@ -67,30 +86,30 @@ for file in os.listdir(rootdir):
                         if (sender != 'Me'):
                             reciever = 'Me'
                         else:
-                            reciever = json_file_name[0]
-                        json_data.append({'type': 'sms',
+                            reciever = yaml_file_name[0]
+                        yaml_data.append({'type': 'sms',
                                           'time': date_string,
                                           'conversation': conversation_number,
                                           'sender': sender,
                                           'reciever': reciever,
                                           'phone number': phone_number[1],
                                           'message': text})
-                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                    yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
             conversation_number += 1  # increase, as each HTML file with Text is one conversation
             ###################################################################
             #
-            #              End of SMS to JSON script
+            #              End of SMS to yaml script
             #
             ###################################################################
             ###################################################################
             #
-            #              Start of Call to JSON script
+            #              Start of Call to yaml script
             #
             ###################################################################
-            if (json_file_name[1] == ' Missed' or json_file_name[1] == ' Recieved' or json_file_name[1] == ' Placed'):
+            if (yaml_file_name[1] == ' Missed' or yaml_file_name[1] == ' Recieved' or yaml_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
-                    json_data = []
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                    yaml_data = []
                     for call in calls:
                         # Date and Time
                         date_and_time = call.abbr.text
@@ -107,7 +126,7 @@ for file in os.listdir(rootdir):
                         else:  # NO leading 0 added
                             date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
                                           + time_components[3] + time_components[4]
-                        # Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+                        # Not using this at the moment, since datetime cannot be serialized to yaml, use date_string instead
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
 
                         # Get caller
@@ -126,28 +145,28 @@ for file in os.listdir(rootdir):
                             duration = None
 
                         # Call type: Missed, Placed, or Recieved
-                        status = json_file_name[1].strip(" ")
-                        json_data.append({'type': 'call',
+                        status = yaml_file_name[1].strip(" ")
+                        yaml_data.append({'type': 'call',
                                           'status': status,
                                           'time': date_string,
                                           'caller': caller,
                                           'duration': duration,
                                           'phone number': phone_number[1]})
-                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                    yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
             ###################################################################
             #
-            #              End of Call to JSON script
+            #              End of Call to yaml script
             #
             ###################################################################
             ###################################################################
             #
-            #              Start of Voicemail to JSON script
+            #              Start of Voicemail to yaml script
             #
             ###################################################################
-            if (json_file_name[1] == ' Voicemail'):
+            if (yaml_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(insights.OUT_PATH, 'gvoice.' + json_file_name[0] + '.json'), 'a') as json_output:
-                    json_data = []
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                    yaml_data = []
                     for voicemail in voicemails:
                         # Date and Time
                         date_and_time = voicemail.abbr.text
@@ -164,7 +183,7 @@ for file in os.listdir(rootdir):
                         else:  # NO leading 0 added
                             date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
                                           + time_components[3] + time_components[4]
-                        # Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+                        # Not using this at the moment, since datetime cannot be serialized to yaml, use date_string instead
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
 
                         # Get caller
@@ -183,15 +202,15 @@ for file in os.listdir(rootdir):
                         if (len(voicemail.find_all("abbr", {"class": "duration"})) >= 1):
                             duration = voicemail.find_all("abbr", {"class": "duration"})[0].text
 
-                        json_data.append({'type': 'voicemail',
+                        yaml_data.append({'type': 'voicemail',
                                           'time': date_string,
                                           'caller': caller,
                                           'duration': duration,
                                           'phone number': phone_number[1],
                                           'message': text})
-                    json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+                    yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
                     ###################################################################
                     #
-                    #              End of Voicemail to JSON script
+                    #              End of Voicemail to yaml script
                     #
                     ###################################################################

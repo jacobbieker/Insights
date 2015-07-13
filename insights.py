@@ -1,4 +1,21 @@
 '''
+Copyright (C) 2015  Jacob Bieker, jacob@bieker.us, www.jacobbieker.com
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+'''
+'''
 This file unzips downloaded files, gets data, and sets up file structure for use by the rest of the scripts
 '''
 __author__ = 'Jacob Bieker'
@@ -18,7 +35,7 @@ with open("access.yaml", 'r') as access:
 PATH = os.path.abspath("./")
 OUT_PATH = os.path.join(PATH, "output")
 DATA_PATH = os.path.join(PATH, "data")
-DB_NAME = config['sqlite']['name'] + '.db'
+DB_NAME = config.get('sqlite').get('name') + '.db'
 GOOGLE_SCRIPTS = os.path.join(PATH, "GoogleTakeoutScripts")
 FACEBOOK_SCRIPTS = os.path.join(PATH, "FacebookScripts")
 TWITTER_SCRIPTS = os.path.join(PATH, "TwitterScripts")
@@ -87,8 +104,8 @@ execfile("databaseSetup.py")
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
-    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2JSON.py"))
-    execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2JSON.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2YAML.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2YAML.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "GmailJSON2SQLite.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "Location2SQLite.py"))
 
