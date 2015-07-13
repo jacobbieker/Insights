@@ -25,6 +25,7 @@ from peewee import *
 from databaseSetup import Locations
 import yaml
 from geopy.geocoders import Nominatim, googlev3
+import unidecode
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -41,8 +42,10 @@ with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
 
 #Open continents.yaml to get location data
 with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
-    location_data = yaml.load(loc_data)
-    yaml.load(loc_data, Loader='utf16')
+    #Remove accents from data so that it parses
+    with open(os.path.join("..", "mod_countries.yaml"), "w") as mod_loc:
+        for line in loc_data:
+            mod_loc.write(unidecode.unidecode(line))
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 geolocator = Nominatim()
@@ -54,7 +57,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     locations = data.get('locations')
     for location in locations:
         time_stamp = location.get('timestampMS')
-        converted_time_stamp = datetime.datetime.fromtimestamp(time_stamp/1000.0)
+        converted_time_stamp = datetime.fromtimestamp(float(time_stamp)/1000.0)
         longitude = location.get('longitudeE7')/10000000.0
         latitude = location.get('latitudeE7')/10000000.0
         point = str(latitude) + ", " + str(longitude)
