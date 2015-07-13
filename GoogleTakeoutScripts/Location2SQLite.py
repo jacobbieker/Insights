@@ -42,6 +42,7 @@ with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
 #Open continents.yaml to get location data
 with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
+    yaml.load(loc_data, Loader='utf16')
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 geolocator = Nominatim()
