@@ -31,6 +31,29 @@ def address_to_parts(address):
     parts = str(address).split(", ")
     return parts
 
+'''
+Functions that convert the individual responses into a common format to be put in database
+'''
+def nominatim_parser(nominatim_response):
+    #Break up return into parts
+    amount = len(nominatim_response)
+    country = nominatim_response[amount - 1]
+    zipcode = nominatim_response[amount - 2]
+    state = nominatim_response[amount - 3]
+    county = nominatim_response[amount - 4]
+    city = nominatim_response[amount - 5]
+    area = nominatim_response[amount - 6]
+    street = nominatim_response[amount - 7]
+    if amount > 8:
+        number = nominatim_response[amount - 8]
+        building = nominatim_response[amount - 9]
+    else:
+        building = nominatim_response[amount - 8]
+        number = ""
+
+def opencage_parser(opencage_response):
+
+
 #Find the continent based off the coordinates, more consistent than going off the name
 def continent_finder(latitude, longitude):
     #get the list of country data
@@ -75,22 +98,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         print address[0]
         parts = address_to_parts(address)
         '''
-        Nomatium Response decoder
-        #Break up return into parts
-        amount = len(parts)
-        country = parts[amount - 1]
-        zipcode = parts[amount - 2]
-        state = parts[amount - 3]
-        county = parts[amount - 4]
-        city = parts[amount - 5]
-        area = parts[amount - 6]
-        street = parts[amount -7]
-        if amount > 8:
-            number = parts[amount - 8]
-            building = parts[amount - 9]
-        else:
-            building = parts[amount - 8]
-            number = ""
+
         continent = continent_finder(latitude, longitude)
         '''
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
