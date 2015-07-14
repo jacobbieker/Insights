@@ -65,6 +65,15 @@ def opencage_parser(opencage_response, longitude, latitude):
     :param opencage_response:
     :return:
     '''
+    opencage_data = opencage_response.get("components")
+    building = opencage_data.get("building")
+    city = opencage_data.get("city")
+    country = opencage_data.get("country")
+    county = opencage_data.get("county")
+    street = opencage_data.get("pedestrian")
+    zipcode = opencage_data.get("postcode")
+    state = opencage_data.get("state")
+    area = opencage_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider = "OpenCage"
     return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
@@ -78,8 +87,29 @@ def googleV3_parser(google_response, longitude, latitude):
     :param latitude:
     :return:
     '''
+    google_data = google_response.get("address_components")
+    for piece in google_data:
+        type_of_data = piece.get("types")[0]
+        name = piece.get("long_name")
+        if type_of_data == "route":
+           street = name
+        elif type_of_data == "neighborhood":
+            area = name
+        elif type_of_data == "locality":
+            city = name
+        elif type_of_data == "administrative_area_level_2":
+            county = name
+        elif type_of_data == "administrative_area_level_1":
+            state = name
+        elif type_of_data == "country":
+            country = name
+        elif type_of_data == "postal_code":
+            zipcode = name
+        elif type_of_data == "street_number":
+            building = name
     continent = continent_finder(latitude, longitude)
     provider = "Google"
+
     return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                             name=building, provider=provider)
@@ -102,7 +132,7 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-opencage_geolocator = OpenCage(api_key="***REMOVED***")
+opencage_geolocator = OpenCage(api_key="")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 locationCache = {}
