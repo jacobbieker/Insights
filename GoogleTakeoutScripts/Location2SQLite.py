@@ -35,7 +35,7 @@ def address_to_parts(address):
 '''
 Functions that convert the individual responses into a common format to be put in database
 '''
-def nominatim_parser(nominatim_response):
+def nominatim_parser(nominatim_response, longitude, latitude):
     #Break up return into parts
     amount = len(nominatim_response)
     country = nominatim_response[amount - 1]
@@ -51,8 +51,14 @@ def nominatim_parser(nominatim_response):
     else:
         building = nominatim_response[amount - 8]
         number = ""
+    continent = continent_finder(latitude, longitude)
+    provider = "Nominatim"
 
-def opencage_parser(opencage_response):
+    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
+                            name=building, provider=provider)
+
+def opencage_parser(opencage_response, longitude, latitude):
     '''
     Assumes that response is like Southwest Montgomery Street, Portland OR 97209, United States of America
     :param opencage_response:
@@ -64,9 +70,18 @@ def opencage_parser(opencage_response):
     state = city_parts[1]
     zipcode = city_parts[2]
     country = opencage_response[2]
+    continent = continent_finder(latitude, longitude)
+    provider = "OpenCage"
+    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
+                            provider=provider)
 
-def googleV3_parser(google_response):
-    return "google"
+def googleV3_parser(google_response, longitude, latitude):
+    continent = continent_finder(latitude, longitude)
+    provider = "Google"
+    #return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+     #                       continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
+      #                      name=building, provider=provider)
 
 
 #Find the continent based off the coordinates, more consistent than going off the name
@@ -111,32 +126,30 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             try:
                 #Try OpenCage first
                 time.sleep(2)
-                address = opencage_geolocator.reverse(point)
+                address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
                 locationCache[point_string] = address, provider
+                print address
+                opencage_parser(address, longitude, latitude).execute()
             except GeocoderQuotaExceeded or GeocoderTimedOut:
                 try:
                     #Try GoogleV3 next
                     time.sleep(3)
-                    address = google_geolocator.reverse(point)
+                    address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     locationCache[point_string] = address, provider
+                    print address
+                    googleV3_parser(address, longitude, latitude)
                 except GeocoderQuotaExceeded or GeocoderTimedOut:
                     try:
                         #Try Nominatum last
                         #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
                         time.sleep(5)
-                        address = nominatim_geolocator.reverse(point)
+                        address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         locationCache[point_string] = address, provider
+                        print address
+                        nominatim_parser(address, longitude, latitude).execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
                         exit() #Exits if it cannot get all the location data
-
-        print address[0]
-        parts = address_to_parts(address)
-        continent = continent_finder(latitude, longitude)
-
-        Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
-                         continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                         name=building, provider=provider).execute()
