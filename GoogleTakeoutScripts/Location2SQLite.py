@@ -105,28 +105,33 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         point = Point(latitude=latitude, longitude=longitude)
         #Check if already exist
         if locationCache.has_key(point_string):
-            address = locationCache.get(point_string)
+            address = locationCache.get(point_string)[0]
+            provider = locationCache.get(point_string)[1]
         else:
             try:
                 #Try OpenCage first
                 time.sleep(2)
                 address = opencage_geolocator.reverse(point)
-                locationCache[point_string] = address
+                provider = "OpenCage"
+                locationCache[point_string] = address, provider
             except GeocoderQuotaExceeded or GeocoderTimedOut:
                 try:
                     #Try GoogleV3 next
                     time.sleep(3)
                     address = google_geolocator.reverse(point)
-                    locationCache[point_string] = address
+                    provider = "Google"
+                    locationCache[point_string] = address, provider
                 except GeocoderQuotaExceeded or GeocoderTimedOut:
                     try:
                         #Try Nominatum last
                         #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
                         time.sleep(5)
                         address = nominatim_geolocator.reverse(point)
-                        locationCache[point_string] = address
+                        provider = "Nominatim"
+                        locationCache[point_string] = address, provider
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
+                        exit() #Exits if it cannot get all the location data
 
         print address[0]
         parts = address_to_parts(address)
@@ -134,4 +139,4 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
 
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                          continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                         name=building).execute()
+                         name=building, provider=provider).execute()

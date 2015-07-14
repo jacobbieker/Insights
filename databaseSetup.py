@@ -243,6 +243,8 @@ class Locations(BaseModel):
     city = CharField(null=True)
     street = TextField(null=True)
     name = TextField(null=True)
+    provider = CharField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Jobs(BaseModel):
     title = CharField(null=True)
