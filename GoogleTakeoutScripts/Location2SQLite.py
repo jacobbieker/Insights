@@ -64,6 +64,9 @@ def opencage_parser(opencage_response):
     zipcode = city_parts[2]
     country = opencage_response[2]
 
+def googleV3_parser(google_response):
+    return "google"
+
 
 #Find the continent based off the coordinates, more consistent than going off the name
 def continent_finder(latitude, longitude):
