@@ -52,6 +52,17 @@ def nominatim_parser(nominatim_response):
         number = ""
 
 def opencage_parser(opencage_response):
+    '''
+    Assumes that response is like Southwest Montgomery Street, Portland OR 97209, United States of America
+    :param opencage_response:
+    :return:
+    '''
+    street = opencage_response[0]
+    city_parts = opencage_response[1].split(" ")
+    city = city_parts[0]
+    state = city_parts[1]
+    zipcode = city_parts[2]
+    country = opencage_response[2]
 
 
 #Find the continent based off the coordinates, more consistent than going off the name
