@@ -22,9 +22,9 @@ import os
 import time
 from datetime import datetime
 from databaseSetup import Locations
-import databaseSetup
 import yaml
-from geopy.geocoders import Nominatim, GoogleV3, OpenCage, OpenMapQuest
+import json
+from geopy.geocoders import Nominatim, GoogleV3, OpenCage
 from geopy.point import Point
 from geopy.exc import *
 
@@ -44,21 +44,6 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     :param latitude:
     :return:
     '''
-    #Break up return into parts
-    amount = len(nominatim_response)
-    country = nominatim_response[amount - 1]
-    zipcode = nominatim_response[amount - 2]
-    state = nominatim_response[amount - 3]
-    county = nominatim_response[amount - 4]
-    city = nominatim_response[amount - 5]
-    area = nominatim_response[amount - 6]
-    street = nominatim_response[amount - 7]
-    if amount > 8:
-        number = nominatim_response[amount - 8]
-        building = nominatim_response[amount - 9]
-    else:
-        building = nominatim_response[amount - 8]
-        number = ""
     continent = continent_finder(latitude, longitude)
     provider = "Nominatim"
 
@@ -72,12 +57,6 @@ def opencage_parser(opencage_response, longitude, latitude):
     :param opencage_response:
     :return:
     '''
-    street = opencage_response[0]
-    city_parts = opencage_response[1].split(" ")
-    city = city_parts[0]
-    state = city_parts[1]
-    zipcode = city_parts[2]
-    country = opencage_response[2]
     continent = continent_finder(latitude, longitude)
     provider = "OpenCage"
     return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
@@ -93,9 +72,9 @@ def googleV3_parser(google_response, longitude, latitude):
     '''
     continent = continent_finder(latitude, longitude)
     provider = "Google"
-    #return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
-     #                       continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-      #                      name=building, provider=provider)
+    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
+                            name=building, provider=provider)
 
 
 #Find the continent based off the coordinates, more consistent than going off the name
@@ -143,6 +122,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
                 locationCache[point_string] = address.raw, provider
+                print address.raw
                 opencage_parser(address.raw, longitude, latitude).execute()
             except GeocoderQuotaExceeded or GeocoderTimedOut:
                 try:
