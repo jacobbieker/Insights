@@ -24,7 +24,8 @@ from datetime import datetime
 from databaseSetup import Locations
 import databaseSetup
 import yaml
-from geopy.geocoders import Nominatim, googlev3, opencage, openmapquest
+from geopy.geocoders import Nominatim, googlev3, OpenCage, OpenMapQuest
+from geopy.point import Point
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -47,7 +48,7 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-geolocator =
+geolocator = OpenCage(api_key="")
 google_geolocator = googlev3.Geocoder()
 locationCache = {}
 
@@ -62,15 +63,18 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         longitude = location.get('longitudeE7')/10000000.0
         latitude = location.get('latitudeE7')/10000000.0
         point = str(latitude) + ", " + str(longitude)
+        point1 = Point(latitude=latitude, longitude=longitude)
         if locationCache.has_key(point):
             address = locationCache.get(point)
         else:
             #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-            time.sleep(5)
-            address = geolocator.reverse(point)
+            time.sleep(1)
+            address = geolocator.reverse(point1)
             locationCache[point] = address
-        print address
+        print address[0]
         parts = address_to_parts(address)
+        '''
+        Nomatium Response decoder
         #Break up return into parts
         amount = len(parts)
         country = parts[amount - 1]
@@ -87,7 +91,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             building = parts[amount - 8]
             number = ""
         continent = continent_finder(latitude, longitude)
-
+        '''
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                          continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                          name=building).execute()
