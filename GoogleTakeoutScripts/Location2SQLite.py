@@ -26,6 +26,7 @@ import databaseSetup
 import yaml
 from geopy.geocoders import Nominatim, googlev3, OpenCage, OpenMapQuest
 from geopy.point import Point
+from geopy.exc import *
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -100,21 +101,37 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         converted_time_stamp = datetime.fromtimestamp(float(time_stamp)/1000.0)
         longitude = location.get('longitudeE7')/10000000.0
         latitude = location.get('latitudeE7')/10000000.0
-        point = str(latitude) + ", " + str(longitude)
-        point1 = Point(latitude=latitude, longitude=longitude)
-        if locationCache.has_key(point):
-            address = locationCache.get(point)
+        point_string = str(latitude) + ", " + str(longitude)
+        point = Point(latitude=latitude, longitude=longitude)
+        #Check if already exist
+        if locationCache.has_key(point_string):
+            address = locationCache.get(point_string)
         else:
-            #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-            time.sleep(1)
-            address = opencage_geolocator.reverse(point1)
-            locationCache[point] = address
+            try:
+                #Try OpenCage first
+                time.sleep(2)
+                address = opencage_geolocator.reverse(point)
+                locationCache[point_string] = address
+            except GeocoderQuotaExceeded or GeocoderTimedOut:
+                try:
+                    #Try GoogleV3 next
+                    time.sleep(3)
+                    address = google_geolocator.reverse(point)
+                    locationCache[point_string] = address
+                except GeocoderQuotaExceeded or GeocoderTimedOut:
+                    try:
+                        #Try Nominatum last
+                        #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
+                        time.sleep(5)
+                        address = nominatim_geolocator.reverse(point)
+                        locationCache[point_string] = address
+                    except GeocoderQuotaExceeded or GeocoderTimedOut:
+                        print "Could not access geocoders for location: " + point_string
+
         print address[0]
         parts = address_to_parts(address)
-        '''
-
         continent = continent_finder(latitude, longitude)
-        '''
+
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                          continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                          name=building).execute()
