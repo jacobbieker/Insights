@@ -24,7 +24,7 @@ from datetime import datetime
 from databaseSetup import Locations
 import databaseSetup
 import yaml
-from geopy.geocoders import Nominatim, googlev3
+from geopy.geocoders import Nominatim, googlev3, opencage, openmapquest
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -47,7 +47,7 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-geolocator = Nominatim()
+geolocator =
 google_geolocator = googlev3.Geocoder()
 locationCache = {}
 
@@ -91,5 +91,3 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                          continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                          name=building).execute()
-
-    #TODO GO through each json object below locations, taking timestampMS, latitudeE7, longitudeE7

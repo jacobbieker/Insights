@@ -169,6 +169,7 @@ if __name__ == "__main__":
     SocialMedia.create_table()
     Photos.create_table()
 
+    database.close()
 #Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
     with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
@@ -177,10 +178,16 @@ else:
     with open("constants.yaml", 'r') as ymlfile:
         config = yaml.load(ymlfile)
 
+'''
+As of right now, this should create a database in each folder the script is run, to then combine them later
+Peewee seems to have a problem with connecting to a database that is not in the current folder
+'''
+
+database = SqliteDatabase(config.get('database'))
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = SqliteDatabase(config.get('databaseLoc')).connect()
+        database = database
 
 class Message(BaseModel):
     type = TextField(null=True)
