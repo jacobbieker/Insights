@@ -129,7 +129,7 @@ countries:
       continent: NA
     -
       countryCode: AX
-      countryName: Åland
+      countryName: Aland
       north: 60.488861
       south: 59.90675
       east: 21.011862
@@ -228,7 +228,7 @@ countries:
       continent: AF
     -
       countryCode: BL
-      countryName: Saint Barthélemy
+      countryName: Saint Barthelemy
       north: 17.928808791949283
       south: 17.878183227405575
       east: -62.788983372985854
@@ -1686,7 +1686,7 @@ countries:
       continent: AS
     -
       countryCode: RE
-      countryName: Réunion
+      countryName: Reunion
       north: -20.868391324576944
       south: -21.383747301469107
       east: 55.838193901930026
@@ -1875,7 +1875,7 @@ countries:
       continent: AF
     -
       countryCode: ST
-      countryName: São Tomé and Príncipe
+      countryName: Sao Tome and Principe
       north: 1.701323
       south: 0.024766
       east: 7.466374
@@ -2379,7 +2379,7 @@ countries:
       continent: NA
     -
       countryCode: AX
-      countryName: Åland
+      countryName: Aland
       north: 60.488861
       south: 59.90675
       east: 21.011862
@@ -2478,7 +2478,7 @@ countries:
       continent: AF
     -
       countryCode: BL
-      countryName: Saint Barthélemy
+      countryName: Saint Barthelemy
       north: 17.928808791949283
       south: 17.878183227405575
       east: -62.788983372985854
@@ -3936,7 +3936,7 @@ countries:
       continent: AS
     -
       countryCode: RE
-      countryName: Réunion
+      countryName: Reunion
       north: -20.868391324576944
       south: -21.383747301469107
       east: 55.838193901930026
@@ -4125,7 +4125,7 @@ countries:
       continent: AF
     -
       countryCode: ST
-      countryName: São Tomé and Príncipe
+      countryName: Sao Tome and Principe
       north: 1.701323
       south: 0.024766
       east: 7.466374

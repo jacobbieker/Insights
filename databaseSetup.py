@@ -22,143 +22,6 @@ import peewee
 import yaml
 from playhouse.migrate import *
 
-#Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
-    config = yaml.load(ymlfile)
-
-DB_NAME = config.get('databaseLoc')
-
-
-#Define the fields used in the database so migrate can be called and used:
-date_field = DateField(null=True)
-time_field = TimeField(null=True)
-datetime_field = DateTimeField(null=True)
-char_field = CharField(null=True)
-text_field = TextField(null=True)
-int_field = IntegerField(null=True)
-double_field = DoubleField(null=True)
-boolean_field = BooleanField(null=True)
-timestamp_field = DateTimeField(default=datetime.datetime.now)
-
-#Create base database
-class BaseModel(peewee.Model):
-    class Meta:
-        database = SqliteDatabase(DB_NAME).connect()
-
-'''
-Since there does not seem to be a way to create tables programmatically using peewee, we'll create all the tables in
-config, and then add a column using the database migration tools programmically. Limitation: have to create atleast one
-column per table by default
-'''
-
-class Message(BaseModel):
-    type = text_field
-    date = datetime_field
-    time = time_field
-    sender = char_field
-    reciever = char_field
-    message = text_field
-    length = int_field
-    timestamp = timestamp_field
-
-class Word(BaseModel):
-    word = char_field
-    length = int_field
-    occurences = int_field
-    timestamp = timestamp_field
-
-class Call(BaseModel):
-    date = datetime_field
-    time = time_field
-    caller = char_field
-    reciever = char_field
-    length = double_field
-    answered = boolean_field
-    timestamp = timestamp_field
-
-class Voicemail(BaseModel):
-    date = datetime_field
-    time = time_field
-    caller = char_field
-    message = text_field
-    timestamp = timestamp_field
-
-class Contacts(BaseModel):
-    name = char_field
-    first_contact = datetime_field
-    last_contact = datetime_field
-    last_message = text_field
-    phone_numbers = int_field
-    country_code = text_field
-    last_number = int_field
-    timestamp = timestamp_field
-
-class Locations(BaseModel):
-    date = datetime_field
-    time = time_field
-    longitude = double_field
-    latitude = double_field
-    continent = char_field
-    country = char_field
-    state = char_field
-    zip = int_field
-    city = char_field
-    street = text_field
-    name = text_field
-    timestamp = timestamp_field
-
-class Jobs(BaseModel):
-    title = char_field
-    company = char_field
-    description = text_field
-    start_date = datetime_field
-    end_date = datetime_field
-    type = text_field
-    currently_working = boolean_field
-    location = text_field
-    timestamp = timestamp_field
-
-class SocialMedia(BaseModel):
-    type = char_field
-    date = datetime_field
-    time = time_field
-    message = text_field
-    tags = text_field
-    urls = text_field
-    timestamp = timestamp_field
-
-class Photos(BaseModel):
-    name = char_field
-    date = datetime_field
-    time = time_field
-    location = text_field
-    shutter = text_field
-    iso = int_field
-    shot_format = text_field
-    aperture = text_field
-    manufacturer = char_field
-    camera_model = char_field
-    exposure_priority = text_field
-    exposure_mode = text_field
-    flash = boolean_field
-    lens_model = text_field
-    focal_length = double_field
-    service = text_field
-    date_uploaded = datetime_field
-    timestamp = timestamp_field
-
-class Calendars(BaseModel):
-    start_date = datetime_field
-    start_time = time_field
-    end_date = datetime_field
-    end_time = time_field
-    type = char_field
-    which_calender = char_field
-    description = text_field
-    name = text_field
-    duration = double_field
-    is_task = boolean_field
-    timestamp = timestamp_field
 
 if __name__ == "__main__":
     with open("dbconfig.yaml", 'r') as ymlfile:
@@ -180,18 +43,258 @@ if __name__ == "__main__":
         else:
             database = SqliteDatabase(DB_NAME, threadlocals=True)
 
-        database.connect()
+    database.connect()
 
-        def create_tables():
-            Calendars.create_table()
-            Message.create_table()
-            Locations.create_table()
-            Call.create_table()
-            Voicemail.create_table()
-            Word.create_table()
-            Jobs.create_table()
-            Contacts.create_table()
-            SocialMedia.create_table()
-            Photos.create_table()
+    #Create base database
+    class BaseModel(peewee.Model):
+        class Meta:
+            database = database
 
-        create_tables()
+    class Message(BaseModel):
+        type = TextField(null=True)
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        sender = CharField(null=True)
+        reciever = CharField(null=True)
+        message = TextField(null=True)
+        length = IntegerField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Word(BaseModel):
+        word = CharField(null=True)
+        length = IntegerField(null=True)
+        occurences = IntegerField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Call(BaseModel):
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        caller = CharField(null=True)
+        reciever = CharField(null=True)
+        length = DoubleField(null=True)
+        answered = BooleanField()
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Voicemail(BaseModel):
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        caller = CharField(null=True)
+        message = TextField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Contacts(BaseModel):
+        name = CharField(null=True)
+        first_contact = DateTimeField(null=True)
+        last_contact = DateTimeField(null=True)
+        last_message = TextField(null=True)
+        phone_numbers = IntegerField(null=True)
+        country_code = TextField(null=True)
+        last_number = IntegerField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Locations(BaseModel):
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        longitude = DoubleField(null=True)
+        latitude = DoubleField(null=True)
+        continent = CharField(null=True)
+        country = CharField(null=True)
+        state = CharField(null=True)
+        zip = IntegerField(null=True)
+        city = CharField(null=True)
+        street = TextField(null=True)
+        name = TextField(null=True)
+
+    class Jobs(BaseModel):
+        title = CharField(null=True)
+        company = CharField(null=True)
+        description = TextField(null=True)
+        start_date = DateTimeField(null=True)
+        end_date = DateTimeField(null=True)
+        type = TextField(null=True)
+        currently_working = BooleanField()
+        location = TextField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class SocialMedia(BaseModel):
+        type = CharField(null=True)
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        message = TextField(null=True)
+        tags = TextField(null=True)
+        urls = TextField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Photos(BaseModel):
+        name = CharField(null=True)
+        date = DateTimeField(null=True)
+        time = TimeField(null=True)
+        location = TextField(null=True)
+        shutter = TextField(null=True)
+        iso = IntegerField(null=True)
+        shot_format = TextField(null=True)
+        aperture = TextField(null=True)
+        manufacturer = CharField(null=True)
+        camera_model = CharField(null=True)
+        exposure_priority = TextField(null=True)
+        exposure_mode = TextField(null=True)
+        flash = BooleanField()
+        lens_model = TextField(null=True)
+        focal_length = DoubleField(null=True)
+        service = TextField(null=True)
+        date_uploaded = DateTimeField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    class Calendars(BaseModel):
+        start_date = DateTimeField(null=True)
+        start_time = TimeField(null=True)
+        end_date = DateTimeField(null=True)
+        end_time = TimeField(null=True)
+        type = CharField(null=True)
+        which_calender = CharField(null=True)
+        description = TextField(null=True)
+        name = TextField(null=True)
+        duration = DoubleField(null=True)
+        is_task = BooleanField()
+        timestamp = DateTimeField(default=datetime.datetime.now())
+
+    Calendars.create_table()
+    Message.create_table()
+    Locations.create_table()
+    Call.create_table()
+    Voicemail.create_table()
+    Word.create_table()
+    Jobs.create_table()
+    Contacts.create_table()
+    SocialMedia.create_table()
+    Photos.create_table()
+
+    database.close()
+#Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+        config = yaml.load(ymlfile)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        config = yaml.load(ymlfile)
+
+'''
+As of right now, this should create a database in each folder the script is run, to then combine them later
+Peewee seems to have a problem with connecting to a database that is not in the current folder
+'''
+
+database = SqliteDatabase(config.get('database'))
+#Create base database
+class BaseModel(peewee.Model):
+    class Meta:
+        database = database
+
+class Message(BaseModel):
+    type = TextField(null=True)
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    sender = CharField(null=True)
+    reciever = CharField(null=True)
+    message = TextField(null=True)
+    length = IntegerField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Word(BaseModel):
+    word = CharField(null=True)
+    length = IntegerField(null=True)
+    occurences = IntegerField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Call(BaseModel):
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    caller = CharField(null=True)
+    reciever = CharField(null=True)
+    length = DoubleField(null=True)
+    answered = BooleanField()
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Voicemail(BaseModel):
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    caller = CharField(null=True)
+    message = TextField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Contacts(BaseModel):
+    name = CharField(null=True)
+    first_contact = DateTimeField(null=True)
+    last_contact = DateTimeField(null=True)
+    last_message = TextField(null=True)
+    phone_numbers = IntegerField(null=True)
+    country_code = TextField(null=True)
+    last_number = IntegerField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Locations(BaseModel):
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    longitude = DoubleField(null=True)
+    latitude = DoubleField(null=True)
+    continent = CharField(null=True)
+    country = CharField(null=True)
+    state = CharField(null=True)
+    zip = IntegerField(null=True)
+    city = CharField(null=True)
+    street = TextField(null=True)
+    name = TextField(null=True)
+    provider = CharField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Jobs(BaseModel):
+    title = CharField(null=True)
+    company = CharField(null=True)
+    description = TextField(null=True)
+    start_date = DateTimeField(null=True)
+    end_date = DateTimeField(null=True)
+    type = TextField(null=True)
+    currently_working = BooleanField()
+    location = TextField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class SocialMedia(BaseModel):
+    type = CharField(null=True)
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    message = TextField(null=True)
+    tags = TextField(null=True)
+    urls = TextField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Photos(BaseModel):
+    name = CharField(null=True)
+    date = DateTimeField(null=True)
+    time = TimeField(null=True)
+    location = TextField(null=True)
+    shutter = TextField(null=True)
+    iso = IntegerField(null=True)
+    shot_format = TextField(null=True)
+    aperture = TextField(null=True)
+    manufacturer = CharField(null=True)
+    camera_model = CharField(null=True)
+    exposure_priority = TextField(null=True)
+    exposure_mode = TextField(null=True)
+    flash = BooleanField()
+    lens_model = TextField(null=True)
+    focal_length = DoubleField(null=True)
+    service = TextField(null=True)
+    date_uploaded = DateTimeField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Calendars(BaseModel):
+    start_date = DateTimeField(null=True)
+    start_time = TimeField(null=True)
+    end_date = DateTimeField(null=True)
+    end_time = TimeField(null=True)
+    type = CharField(null=True)
+    which_calender = CharField(null=True)
+    description = TextField(null=True)
+    name = TextField(null=True)
+    duration = DoubleField(null=True)
+    is_task = BooleanField()
+    timestamp = DateTimeField(default=datetime.datetime.now())
