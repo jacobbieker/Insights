@@ -28,13 +28,17 @@ from geopy.geocoders import Nominatim, GoogleV3, OpenCage
 from geopy.point import Point
 from geopy.exc import *
 
+
 def address_to_parts(address):
     parts = str(address).split(", ")
     return parts
 
+
 '''
 Functions that convert the individual responses into a common format to be put in database
 '''
+
+
 def nominatim_parser(nominatim_response, longitude, latitude):
     '''
     Look at Nomatimin.json as an example
@@ -55,9 +59,10 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     area = nominatim_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider = "Nominatim"
-    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                             name=building, provider=provider)
+
 
 def opencage_parser(opencage_response, longitude, latitude):
     '''
@@ -76,9 +81,10 @@ def opencage_parser(opencage_response, longitude, latitude):
     area = opencage_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider = "OpenCage"
-    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                             provider=provider)
+
 
 def googleV3_parser(google_response, longitude, latitude):
     '''
@@ -88,11 +94,19 @@ def googleV3_parser(google_response, longitude, latitude):
     :return:
     '''
     google_data = google_response.get("address_components")
+    street = ""
+    area = ""
+    city = ""
+    county = ""
+    country = ""
+    state = ""
+    zipcode = ""
+    building = ""
     for piece in google_data:
         type_of_data = piece.get("types")[0]
         name = piece.get("long_name")
         if type_of_data == "route":
-           street = name
+            street = name
         elif type_of_data == "neighborhood":
             area = name
         elif type_of_data == "locality":
@@ -110,24 +124,25 @@ def googleV3_parser(google_response, longitude, latitude):
     continent = continent_finder(latitude, longitude)
     provider = "Google"
 
-    return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
+    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                             name=building, provider=provider)
 
 
-#Find the continent based off the coordinates, more consistent than going off the name
+# Find the continent based off the coordinates, more consistent than going off the name
 def continent_finder(latitude, longitude):
-    #get the list of country data
+    # get the list of country data
     for country_data in location_data.get('countries').get('country'):
         if country_data.get('north') > latitude > country_data.get('south'):
             if country_data.get('east') > longitude > country_data.get('west'):
                 return country_data.get('continentName')
     return "Continent Not Found"
 
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-#Open continents.yaml to get location data
+# Open continents.yaml to get location data
 with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
@@ -144,18 +159,18 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         print location
         time_stamp = location.get('timestampMs')
         print time_stamp
-        converted_time_stamp = datetime.fromtimestamp(float(time_stamp)/1000.0)
-        longitude = location.get('longitudeE7')/10000000.0
-        latitude = location.get('latitudeE7')/10000000.0
+        converted_time_stamp = datetime.fromtimestamp(float(time_stamp) / 1000.0)
+        longitude = location.get('longitudeE7') / 10000000.0
+        latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        #Check if already exist
+        # Check if already exist
         if locationCache.has_key(point_string):
             address = locationCache.get(point_string)[0]
             provider = locationCache.get(point_string)[1]
         else:
             try:
-                #Try OpenCage first
+                # Try OpenCage first
                 time.sleep(2)
                 address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
@@ -164,7 +179,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 opencage_parser(address.raw, longitude, latitude).execute()
             except GeocoderQuotaExceeded or GeocoderTimedOut:
                 try:
-                    #Try GoogleV3 next
+                    # Try GoogleV3 next
                     time.sleep(3)
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
@@ -173,8 +188,8 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     googleV3_parser(address.raw, longitude, latitude)
                 except GeocoderQuotaExceeded or GeocoderTimedOut:
                     try:
-                        #Try Nominatum last
-                        #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
+                        # Try Nominatum last
+                        # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
                         time.sleep(5)
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
@@ -183,4 +198,4 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         nominatim_parser(address.raw, longitude, latitude).execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
-                        exit() #Exits if it cannot get all the location data
+                        exit()  # Exits if it cannot get all the location data
