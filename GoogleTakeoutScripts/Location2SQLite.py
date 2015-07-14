@@ -58,10 +58,10 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     state = nominatim_data.get("state")
     area = nominatim_data.get("suburb")
     continent = continent_finder(latitude, longitude)
-    provider = "Nominatim"
+    provider_type = "Nominatim"
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            name=building, provider=provider)
+                            name=building, provider=provider_type)
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -80,10 +80,10 @@ def opencage_parser(opencage_response, longitude, latitude):
     state = opencage_data.get("state")
     area = opencage_data.get("suburb")
     continent = continent_finder(latitude, longitude)
-    provider = "OpenCage"
+    provider_type = "OpenCage"
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            provider=provider)
+                            provider=provider_type)
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -122,11 +122,11 @@ def googleV3_parser(google_response, longitude, latitude):
         elif type_of_data == "street_number":
             building = name
     continent = continent_finder(latitude, longitude)
-    provider = "Google"
+    provider_type = "Google"
 
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            name=building, provider=provider)
+                            name=building, provider=provider_type)
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
@@ -168,6 +168,13 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         if locationCache.has_key(point_string):
             address = locationCache.get(point_string)[0]
             provider = locationCache.get(point_string)[1]
+            # Send to appropriate parser once gotten
+            if provider == "OpenCage":
+                opencage_parser(address, longitude=longitude, latitude=latitude)
+            elif provider == "Google":
+                googleV3_parser(address, longitude=longitude, latitude=latitude)
+            elif provider == "Nominatim":
+                nominatim_parser(address, longitude=longitude, latitude=latitude)
         else:
             try:
                 # Try OpenCage first
