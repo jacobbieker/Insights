@@ -44,9 +44,17 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     :param latitude:
     :return:
     '''
+    nominatim_data = nominatim_response.get("address")
+    building = nominatim_data.get("building")
+    city = nominatim_data.get("city")
+    country = nominatim_data.get("country")
+    county = nominatim_data.get("county")
+    street = nominatim_data.get("pedestrian")
+    zipcode = nominatim_data.get("postcode")
+    state = nominatim_data.get("state")
+    area = nominatim_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider = "Nominatim"
-
     return Locations.insert(date=converted_time_stamp,time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
                             name=building, provider=provider)
