@@ -48,8 +48,9 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-geolocator = OpenCage(api_key="")
+opencage_geolocator = OpenCage(api_key="")
 google_geolocator = googlev3.Geocoder()
+nominatim_geolocator = Nominatim()
 locationCache = {}
 
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
@@ -69,7 +70,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             #To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
             time.sleep(1)
-            address = geolocator.reverse(point1)
+            address = opencage_geolocator.reverse(point1)
             locationCache[point] = address
         print address[0]
         parts = address_to_parts(address)
