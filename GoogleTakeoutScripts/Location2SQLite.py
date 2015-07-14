@@ -37,12 +37,7 @@ Functions that convert the individual responses into a common format to be put i
 '''
 def nominatim_parser(nominatim_response, longitude, latitude):
     '''
-    Response is: {u'display_name': u'St. Helens, Southwest Montgomery Street, University District, Portland, Multnomah
-    County, Oregon, 97205, United States of America', u'place_id': u'2576336731', u'lon': u'-122.687582109765',
-    u'osm_type': u'way', u'licence': u'Data \xa9 OpenStreetMap contributors, ODbL 1.0. http://www.openstreetmap.org/copyright',
-    u'osm_id': u'220740999', u'lat': u'45.51331725', u'address': {u'building': u'St. Helens', u'city': u'Portland',
-    u'suburb': u'University District', u'country': u'United States of America', u'county': u'Multnomah County',
-    u'pedestrian': u'Southwest Montgomery Street', u'state': u'Oregon', u'postcode': u'97205', u'country_code': u'us'}}
+    Look at Nomatimin.json as an example
 
     :param nominatim_response:
     :param longitude:
@@ -73,92 +68,7 @@ def nominatim_parser(nominatim_response, longitude, latitude):
 
 def opencage_parser(opencage_response, longitude, latitude):
     '''
-    Response is assumed to be similar to this
-    {
-   "licenses" : [
-      {
-         "name" : "CC-BY-SA",
-         "url" : "http://creativecommons.org/licenses/by-sa/3.0/"
-      },
-      {
-         "name" : "ODbL",
-         "url" : "http://opendatacommons.org/licenses/odbl/summary/"
-      }
-   ],
-   "rate" : {
-      "limit" : 2500,
-      "remaining" : 2494,
-      "reset" : 1434844800
-   },
-   "results" : [
-      {
-         "annotations" : {
-            "DMS" : {
-               "lat" : "22\u00b0 40' 46.34184'' S",
-               "lng" : "14\u00b0 31' 39.36216'' E"
-            },
-            "MGRS" : "33KVQ5147391877",
-            "Maidenhead" : "JG77gh36hv",
-            "Mercator" : {
-               "x" : 1617205.101,
-               "y" : -2576841.391
-            },
-            "OSM" : {
-               "url" : "http://www.openstreetmap.org/?mlat=-22.67954&mlon=14.52760#map=17/-22.67954/14.52760"
-            },
-            "callingcode" : 264,
-            "geohash" : "k7fqfx6djekju86um1br",
-            "sun" : {
-               "rise" : {
-                  "astronomical" : 1434774000,
-                  "civil" : 1434777300,
-                  "nautical" : 1434775620
-               },
-               "set" : {
-                  "astronomical" : 1434822420,
-                  "civil" : 1434819120,
-                  "nautical" : 1434820800
-               }
-            },
-            "timezone" : {
-               "name" : "Africa/Windhoek",
-               "now_in_dst" : 0,
-               "offset_sec" : 3600,
-               "offset_string" : 100,
-               "short_name" : "WAT"
-            },
-            "what3words" : {
-               "words" : "matriarchs.nano.rotates"
-            }
-         },
-         "components" : {
-            "city" : "Swakopmund",
-            "clothes" : "Jet",
-            "country" : "Namibia",
-            "country_code" : "na",
-            "road" : "Nathaniel Maxuilili St (Breite St)",
-            "state" : "Erongo Region",
-            "suburb" : "Central"
-         },
-         "confidence" : 0,
-         "formatted" : "Jet, Nathaniel Maxuilili St (Breite St), Swakopmund, Namibia",
-         "geometry" : {
-            "lat" : -22.6795394,
-            "lng" : 14.5276006
-         }
-      }
-   ],
-   "status" : {
-      "code" : 200,
-      "message" : "OK"
-   },
-   "thanks" : "For using an OpenCage Data API",
-   "timestamp" : {
-      "created_http" : "Sat, 20 Jun 2015 21:54:45 GMT",
-      "created_unix" : 1434837285
-   },
-   "total_results" : 1
-}
+    Look at OpenCage.json for an example
     :param opencage_response:
     :return:
     '''
@@ -176,22 +86,7 @@ def opencage_parser(opencage_response, longitude, latitude):
 
 def googleV3_parser(google_response, longitude, latitude):
     '''
-    Response will be parsed JSON in the form of: {u'geometry': {u'location_type': u'RANGE_INTERPOLATED', u'bounds':
-    {u'northeast': {u'lat': 45.513379, u'lng': -122.6880259}, u'southwest': {u'lat': 45.5132255, u'lng': -122.6881}},
-    u'viewport': {u'northeast': {u'lat': 45.51465123029151, u'lng': -122.6867139697085}, u'southwest':
-    {u'lat': 45.51195326970851, u'lng': -122.6894119302915}}, u'location': {u'lat': 45.51333349999999, u'lng': -122.6880284}},
-     u'address_components': [{u'long_name': u'1784-1798', u'types': [u'street_number'], u'short_name': u'1784-1798'},
-     {u'long_name': u'Southwest 12th Avenue', u'types': [u'route'], u'short_name': u'SW 12th Ave'}, {u'long_name':
-     u'Southwest Portland', u'types': [u'neighborhood', u'political'], u'short_name': u'Southwest Portland'},
-     {u'long_name': u'Portland', u'types': [u'locality', u'political'], u'short_name': u'Portland'},
-     {u'long_name': u'Multnomah County', u'types': [u'administrative_area_level_2', u'political'], u'short_name': u'Multnomah County'},
-      {u'long_name': u'Oregon', u'types': [u'administrative_area_level_1', u'political'], u'short_name': u'OR'},
-      {u'long_name': u'United States', u'types': [u'country', u'political'], u'short_name': u'US'},
-      {u'long_name': u'97201', u'types': [u'postal_code'], u'short_name': u'97201'}],
-      u'place_id': u'EjgxNzg0LTE3OTggU291dGh3ZXN0IDEydGggQXZlbnVlLCBQb3J0bGFuZCwgT1IgOTcyMDEsIFVTQQ',
-      u'formatted_address': u'1784-1798 Southwest 12th Avenue, Portland, OR 97201, USA', u'types': [u'street_address']}
-
-    :param google_response:
+    Looka at Google.json for an example
     :param longitude:
     :param latitude:
     :return:
@@ -220,7 +115,7 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-opencage_geolocator = OpenCage(api_key="")
+opencage_geolocator = OpenCage(api_key="***REMOVED***")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 locationCache = {}
@@ -247,18 +142,17 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 time.sleep(2)
                 address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
-                locationCache[point_string] = address, provider
-                print address.raw
-                opencage_parser(address, longitude, latitude).execute()
+                locationCache[point_string] = address.raw, provider
+                opencage_parser(address.raw, longitude, latitude).execute()
             except GeocoderQuotaExceeded or GeocoderTimedOut:
                 try:
                     #Try GoogleV3 next
                     time.sleep(3)
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
-                    locationCache[point_string] = address, provider
-                    print address
-                    googleV3_parser(address, longitude, latitude)
+                    locationCache[point_string] = address.raw, provider
+                    print address.raw
+                    googleV3_parser(address.raw, longitude, latitude)
                 except GeocoderQuotaExceeded or GeocoderTimedOut:
                     try:
                         #Try Nominatum last
@@ -266,9 +160,9 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         time.sleep(5)
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
-                        locationCache[point_string] = address, provider
-                        print address
-                        nominatim_parser(address, longitude, latitude).execute()
+                        locationCache[point_string] = address.raw, provider
+                        print address.raw
+                        nominatim_parser(address.raw, longitude, latitude).execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
                         exit() #Exits if it cannot get all the location data
