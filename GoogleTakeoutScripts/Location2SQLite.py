@@ -60,8 +60,8 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     continent = continent_finder(latitude, longitude)
     provider_type = "Nominatim"
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
-                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            name=building, provider=provider_type)
+                            continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
+                            city=city, street=street, name=building, provider=provider_type)
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -82,8 +82,8 @@ def opencage_parser(opencage_response, longitude, latitude):
     continent = continent_finder(latitude, longitude)
     provider_type = "OpenCage"
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
-                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            provider=provider_type)
+                            continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
+                            city=city, street=street, name=building, provider=provider_type)
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -125,8 +125,8 @@ def googleV3_parser(google_response, longitude, latitude):
     provider_type = "Google"
 
     return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
-                            continent=continent, country=country, state=state, zip=zipcode, city=city, street=street,
-                            name=building, provider=provider_type)
+                            continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
+                            city=city, street=street, name=building, provider=provider_type)
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
