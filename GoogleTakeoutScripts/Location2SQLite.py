@@ -74,7 +74,9 @@ def opencage_parser(opencage_response, longitude, latitude):
     city = opencage_data.get("city")
     country = opencage_data.get("country")
     county = opencage_data.get("county")
-    street = opencage_data.get("pedestrian")
+    street = opencage_data.get("road")
+    if street is None:
+        street = opencage_data.get("pedestrian")
     zipcode = opencage_data.get("postcode")
     state = opencage_data.get("state")
     area = opencage_data.get("suburb")
@@ -181,7 +183,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 provider = "OpenCage"
                 locationCache[point_string] = address.raw, provider
                 with open("OpenCage.json", "a") as output:
-                    json.dump(address.raw, output)
+                    json.dump(address.raw, output, sort_keys=True, indent=4)
                 opencage_parser(address.raw, longitude, latitude).execute()
             except:
                 # noinspection PyBroadException
@@ -192,8 +194,8 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     provider = "Google"
                     locationCache[point_string] = address.raw, provider
                     with open("Google.json", "a") as output:
-                        json.dump(address.raw, output)
-                    googleV3_parser(address.raw, longitude, latitude)
+                        json.dump(address.raw, output, sort_keys=True, indent=4)
+                    googleV3_parser(address.raw, longitude, latitude).execute()
                 except:
                     try:
                         # Try Nominatum last
@@ -203,7 +205,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         provider = "Nominatim"
                         locationCache[point_string] = address.raw, provider
                         with open("Nominatim.json", "a") as output:
-                            json.dump(address.raw, output)
+                            json.dump(address.raw, output, sort_keys=True, indent=4)
                         nominatim_parser(address.raw, longitude, latitude).execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
