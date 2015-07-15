@@ -244,6 +244,8 @@ class Locations(BaseModel):
     state = CharField(null=True)
     zip = IntegerField(null=True)
     city = CharField(null=True)
+    area = TextField(null=True)
+    county = TextField(null=True)
     street = TextField(null=True)
     name = TextField(null=True)
     provider = CharField(null=True)
