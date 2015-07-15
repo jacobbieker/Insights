@@ -104,6 +104,8 @@ if __name__ == "__main__":
         city = CharField(null=True)
         street = TextField(null=True)
         name = TextField(null=True)
+        provider = CharField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Jobs(BaseModel):
         title = CharField(null=True)
@@ -183,11 +185,10 @@ As of right now, this should create a database in each folder the script is run,
 Peewee seems to have a problem with connecting to a database that is not in the current folder
 '''
 
-database = SqliteDatabase(config.get('database'))
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = database
+        database = SqliteDatabase(config.get('databaseLoc'))
 
 class Message(BaseModel):
     type = TextField(null=True)
