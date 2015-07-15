@@ -158,8 +158,8 @@ def track_bounds(northeast, southwest, latitude, longitude):
     eastern_most = northeast[1]
     southern_most = southwest[0]
     western_most = southwest[1]
-    if northern_most > latitude > southern_most:
-        if eastern_most > longitude > western_most:
+    if northern_most >= latitude >= southern_most:
+        if eastern_most >= longitude >= western_most:
             return True
     else:
         return False
@@ -188,17 +188,21 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        # Check if already exist
-        if locationCache.has_key(point_string):
-            address = locationCache.get(point_string)[0]
-            provider = locationCache.get(point_string)[1]
-            # Send to appropriate parser once gotten
-            if provider == "OpenCage":
-                opencage_parser(address, longitude=longitude, latitude=latitude)
-            elif provider == "Google":
-                googleV3_parser(address, longitude=longitude, latitude=latitude)
-            elif provider == "Nominatim":
-                nominatim_parser(address, longitude=longitude, latitude=latitude)
+        for key, values in locationCache:
+            print key
+            #Check if in bounds of a previous entry
+            if track_bounds(values[2], values[3], latitude, longitude):
+                address = locationCache.get(key)[0]
+                provider = locationCache.get(key)[1]
+                if provider == "OpenCage":
+                    opencage_parser(address, longitude=longitude, latitude=latitude)
+                    break
+                elif provider == "Google":
+                    googleV3_parser(address, longitude=longitude, latitude=latitude)
+                    break
+                elif provider == "Nominatim":
+                    nominatim_parser(address, longitude=longitude, latitude=latitude)
+                    break
         else:
             # noinspection PyBroadException
             try:
