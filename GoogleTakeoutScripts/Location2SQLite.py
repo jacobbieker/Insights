@@ -188,12 +188,11 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        for key, values in locationCache:
-            print key
+        for values in locationCache.itervalues():
             #Check if in bounds of a previous entry
             if track_bounds(values[2], values[3], latitude, longitude):
-                address = locationCache.get(key)[0]
-                provider = locationCache.get(key)[1]
+                address = values[0]
+                provider = values[1]
                 if provider == "OpenCage":
                     opencage_parser(address, longitude=longitude, latitude=latitude)
                     break
