@@ -17,7 +17,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 '''
 __author__ = 'Jacob Bieker'
 
-import json
 import os
 import time
 from datetime import datetime
@@ -174,6 +173,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
             elif provider == "Nominatim":
                 nominatim_parser(address, longitude=longitude, latitude=latitude)
         else:
+            # noinspection PyBroadException
             try:
                 # Try OpenCage first
                 time.sleep(2)
@@ -184,6 +184,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     json.dump(address.raw, output)
                 opencage_parser(address.raw, longitude, latitude).execute()
             except:
+                # noinspection PyBroadException
                 try:
                     # Try GoogleV3 next
                     time.sleep(3)
