@@ -147,7 +147,7 @@ with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
     location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-opencage_geolocator = OpenCage(api_key="")
+opencage_geolocator = OpenCage(api_key="***REMOVED***")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 locationCache = {}
@@ -156,9 +156,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     data = json.load(source)
     locations = data.get('locations')
     for location in locations:
-        print location
         time_stamp = location.get('timestampMs')
-        print time_stamp
         converted_time_stamp = datetime.fromtimestamp(float(time_stamp) / 1000.0)
         longitude = location.get('longitudeE7') / 10000000.0
         latitude = location.get('latitudeE7') / 10000000.0
@@ -182,18 +180,20 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
                 locationCache[point_string] = address.raw, provider
-                print address.raw
+                with open("OpenCage.json", "a") as output:
+                    json.dump(address.raw, output)
                 opencage_parser(address.raw, longitude, latitude).execute()
-            except GeocoderQuotaExceeded or GeocoderTimedOut:
+            except:
                 try:
                     # Try GoogleV3 next
                     time.sleep(3)
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     locationCache[point_string] = address.raw, provider
-                    print address.raw
+                    with open("Google.json", "a") as output:
+                        json.dump(address.raw, output)
                     googleV3_parser(address.raw, longitude, latitude)
-                except GeocoderQuotaExceeded or GeocoderTimedOut:
+                except:
                     try:
                         # Try Nominatum last
                         # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
@@ -201,7 +201,8 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         locationCache[point_string] = address.raw, provider
-                        print address.raw
+                        with open("Nominatim.json", "a") as output:
+                            json.dump(address.raw, output)
                         nominatim_parser(address.raw, longitude, latitude).execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
