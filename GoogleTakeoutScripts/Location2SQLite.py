@@ -23,7 +23,7 @@ from datetime import datetime
 from databaseSetup import Locations
 import yaml
 import json
-from geopy.geocoders import Nominatim, GoogleV3, OpenCage
+from geopy.geocoders import Nominatim, GoogleV3, OpenCage, Bing, GeoNames, YahooPlaceFinder
 from geopy.point import Point
 from geopy.exc import *
 
@@ -58,9 +58,11 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     area = nominatim_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider_type = "Nominatim"
-    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+    northeast = [latitude, longitude]
+    southwest = [latitude, longitude]
+    return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                            city=city, street=street, name=building, provider=provider_type)
+                            city=city, street=street, name=building, provider=provider_type), northeast, southwest]
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -70,7 +72,11 @@ def opencage_parser(opencage_response, longitude, latitude):
     :return:
     '''
     opencage_data = opencage_response.get("components")
-    building = opencage_data.get("building")
+    building = opencage_data.get("house")
+    if building is None:
+        building = opencage_data.get("building")
+        if building is None:
+            building = opencage_data.get("house_number")
     city = opencage_data.get("city")
     country = opencage_data.get("country")
     county = opencage_data.get("county")
@@ -82,9 +88,13 @@ def opencage_parser(opencage_response, longitude, latitude):
     area = opencage_data.get("suburb")
     continent = continent_finder(latitude, longitude)
     provider_type = "OpenCage"
-    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+    bounds = opencage_response.get("bounds")
+    northeast = [bounds.get("northeast").get("lat"), bounds.get("northeast").get("lng")]
+    southwest = [bounds.get("southwest").get("lat"), bounds.get("southwest").get("lng")]
+
+    return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                            city=city, street=street, name=building, provider=provider_type)
+                            city=city, street=street, name=building, provider=provider_type), northeast, southwest]
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -124,10 +134,13 @@ def googleV3_parser(google_response, longitude, latitude):
             building = name
     continent = continent_finder(latitude, longitude)
     provider_type = "Google"
+    bounds = google_response.get("geometry").get("viewport")
+    northeast = [bounds.get("northeast").get("lat"), bounds.get("northeast").get("lng")]
+    southwest = [bounds.get("southwest").get("lat"), bounds.get("southwest").get("lng")]
 
-    return Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+    return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                             continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                            city=city, street=street, name=building, provider=provider_type)
+                            city=city, street=street, name=building, provider=provider_type), northeast, southwest]
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
@@ -139,6 +152,17 @@ def continent_finder(latitude, longitude):
                 return country_data.get('continentName')
     return "Continent Not Found"
 
+#Keep track of bounds of geocoding, so that less requests are sent to remote servers
+def track_bounds(northeast, southwest, latitude, longitude):
+    northern_most = northeast[0]
+    eastern_most = northeast[1]
+    southern_most = southwest[0]
+    western_most = southwest[1]
+    if northern_most > latitude > southern_most:
+        if eastern_most > longitude > western_most:
+            return True
+    else:
+        return False
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
@@ -151,6 +175,7 @@ rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 opencage_geolocator = OpenCage(api_key="d1e2dc9584fd84b683ac13c5cf12cc98")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
+
 locationCache = {}
 
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
@@ -181,10 +206,11 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                 time.sleep(2)
                 address = opencage_geolocator.reverse(point, exactly_one=True)
                 provider = "OpenCage"
-                locationCache[point_string] = address.raw, provider
                 with open("OpenCage.json", "a") as output:
                     json.dump(address.raw, output, sort_keys=True, indent=4)
-                opencage_parser(address.raw, longitude, latitude).execute()
+                response = opencage_parser(address.raw, longitude, latitude)
+                response[0].execute()
+                locationCache[point_string] = address.raw, provider, response[1], response[2]
             except:
                 # noinspection PyBroadException
                 try:
@@ -192,10 +218,11 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     time.sleep(3)
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
-                    locationCache[point_string] = address.raw, provider
-                    with open("Google.json", "a") as output:
+                    with open("GoogleV3.json", "a") as output:
                         json.dump(address.raw, output, sort_keys=True, indent=4)
-                    googleV3_parser(address.raw, longitude, latitude).execute()
+                    response = googleV3_parser(address.raw, longitude, latitude)
+                    response[0].execute()
+                    locationCache[point_string] = address.raw, provider, response[1], response[2]
                 except:
                     try:
                         # Try Nominatum last
@@ -203,10 +230,11 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         time.sleep(5)
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
-                        locationCache[point_string] = address.raw, provider
                         with open("Nominatim.json", "a") as output:
                             json.dump(address.raw, output, sort_keys=True, indent=4)
-                        nominatim_parser(address.raw, longitude, latitude).execute()
+                        response = nominatim_parser(address.raw, longitude, latitude)
+                        response[0].execute()
+                        locationCache[point_string] = address.raw, provider, response[1], response[2]
                     except GeocoderQuotaExceeded or GeocoderTimedOut:
                         print "Could not access geocoders for location: " + point_string
                         exit()  # Exits if it cannot get all the location data
