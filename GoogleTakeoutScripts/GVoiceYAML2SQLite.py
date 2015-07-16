@@ -20,6 +20,46 @@ from peewee import *
 from databaseSetup import Message, Contacts, Voicemail, Call
 import os
 import yaml
+from glob import glob
+
+def voicemail2SQLite(voicemail):
+    caller = voicemail.get("caller")
+    duration = voicemail.get("duration")
+    time = voicemail.get("time")
+    number = voicemail.get("phone number")
+    message = voicemail.get("message")
+
+def text2SQLite(text):
+    sender = text.get("sender")
+    reciever = text.get("reciever")
+    time = text.get("time")
+    number = text.get("number")
+    message = text.get("message")
+
+def call2SQLite(call):
+    caller = call.get("caller")
+    status = call.get("status")
+    time = call.get("time")
+    duration = call.get("duration")
+    number = call.get("phone number")
+
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
+
+location = constants.get("outputDir")
+#Walk through and get every gvoice. file in output directory
+conversations = [y for x in os.walk(location) for y in glob(os.path.join(x[0], 'gvoice.*'))]
+
+for conversation in conversations:
+    #Go through each file
+    messages = yaml.load(conversations)
+    for message in messages:
+        #Each individual message now
+        type = message.get("type")
+        if type == "sms":
+            text2SQLite(message)
+        elif type == "voicemail":
+            voicemail2SQLite(message)
+        elif type == "call":
+            call2SQLite(message)
