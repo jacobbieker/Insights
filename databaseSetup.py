@@ -328,3 +328,26 @@ class Calendars(BaseModel):
     duration = DoubleField(null=True)
     is_task = BooleanField()
     timestamp = DateTimeField(default=datetime.datetime.now())
+
+'''
+Set of functions to normalize data and standardize different inputs and queries
+'''
+def get_contact(phone_number):
+    try_1 = Contacts.get(phone_number_1=phone_number)
+    try_2 = Contacts.get(phone_number_2=phone_number)
+    try_3 = Contacts.get(phone_number_3=phone_number)
+    try_4 = Contacts.get(phone_number_4=phone_number)
+    if try_1 is not  None:
+        return try_1
+    elif try_2 is not None:
+        return try_2
+    elif try_3 is not None:
+        return try_3
+    elif try_4 is not None:
+        return try_4
+    else:
+        return "Contact does not exist"
+
+def normalize_number(phone_number):
+    return phone_number
+#Make all phone numbers the same setup
