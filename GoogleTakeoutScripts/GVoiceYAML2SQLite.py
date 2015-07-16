@@ -28,6 +28,7 @@ def voicemail2SQLite(voicemail):
     time = voicemail.get("time")
     number = voicemail.get("phone number")
     message = voicemail.get("message")
+    Voicemail.insert(date=time, caller=caller, message=message)
 
 def text2SQLite(text):
     sender = text.get("sender")
