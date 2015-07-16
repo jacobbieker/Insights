@@ -84,13 +84,23 @@ if __name__ == "__main__":
 
     class Contacts(BaseModel):
         name = CharField(null=True)
+        birthday = DateField(null=True)
+        address = TextField(null=True)
+        email_1 = TextField(null=True)
+        email_2 = TextField(null=True)
+        email_3 = TextField(null=True)
+        email_4 = TextField(null=True)
         first_contact = DateTimeField(null=True)
         last_contact = DateTimeField(null=True)
         last_message = TextField(null=True)
-        phone_numbers = IntegerField(null=True)
+        phone_number_1 = IntegerField(null=True)
+        phone_number_2 = IntegerField(null=True)
+        phone_number_3 = IntegerField(null=True)
+        phone_number_4 = IntegerField(null=True)
         country_code = TextField(null=True)
         last_number = IntegerField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
+
 
     class Locations(BaseModel):
         date = DateTimeField(null=True)
@@ -226,10 +236,19 @@ class Voicemail(BaseModel):
 
 class Contacts(BaseModel):
     name = CharField(null=True)
+    birthday = DateField(null=True)
+    address = TextField(null=True)
+    email_1 = TextField(null=True)
+    email_2 = TextField(null=True)
+    email_3 = TextField(null=True)
+    email_4 = TextField(null=True)
     first_contact = DateTimeField(null=True)
     last_contact = DateTimeField(null=True)
     last_message = TextField(null=True)
-    phone_numbers = IntegerField(null=True)
+    phone_number_1 = IntegerField(null=True)
+    phone_number_2 = IntegerField(null=True)
+    phone_number_3 = IntegerField(null=True)
+    phone_number_4 = IntegerField(null=True)
     country_code = TextField(null=True)
     last_number = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
