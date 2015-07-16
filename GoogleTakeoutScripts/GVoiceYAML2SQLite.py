@@ -15,4 +15,11 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
-__author__ = 'jacob_000'
+__author__ = 'Jacob Bieker'
+from peewee import *
+from databaseSetup import Message, Contacts, Voicemail, Call
+import os
+import yaml
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
