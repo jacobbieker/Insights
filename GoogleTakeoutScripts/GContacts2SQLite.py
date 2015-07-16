@@ -40,6 +40,7 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
             email_3 = entry.get("E-mail 3 - Value")
             email_4 = entry.get("E-mail 4 - Value")
             nickname = entry.get("Nickname")
+            #TODO Strip all but numbers from phone numbers
             phone_1 = entry.get("Phone 1 - Value")
             phone_2 = entry.get("Phone 2 - Value")
             phone_3 = entry.get("Phone 3 - Value")
