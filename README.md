@@ -8,8 +8,9 @@ Only tested on Python 2.7
 https://github.com/jay0lee/got-your-back to access GMail data, at least until mbox can get made to work
 
 # Use
-To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives and place them in the same folder as 
-these scripts. Then run insights.py.
+To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives, and unzip them to the data folder
+Then run insights.py. Currently, many of the scripts take a long time to run, so it might be better to walk away from the
+computer for awhile and let it run.
 
 # Contributions
 Fork and pull request away! Any help is appreciated.

@@ -16,3 +16,35 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
 __author__ = 'Jacob Bieker'
+import os
+from databaseSetup import Contacts
+import csv
+from peewee import *
+import yaml
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Contacts")
+
+with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
+    csv_reader = csv.DictReader(x.replace('\0', '') for x in source)
+    with open("ContactsOutput.yaml", "a") as output:
+        for entry in csv_reader:
+            first_name = entry.get("Given Name")
+            middle_name = entry.get("Additional Name")
+            last_name = entry.get("Family Name")
+            birthday = entry.get("Birthday")
+            email_1 = entry.get("E-mail 1 - Value")
+            email_2 = entry.get("E-mail 2 - Value")
+            email_3 = entry.get("E-mail 3 - Value")
+            email_4 = entry.get("E-mail 4 - Value")
+            nickname = entry.get("Nickname")
+            #TODO Strip all but numbers from phone numbers
+            phone_1 = entry.get("Phone 1 - Value")
+            phone_2 = entry.get("Phone 2 - Value")
+            phone_3 = entry.get("Phone 3 - Value")
+            address_1 = entry.get("Address 1 - Formatted")
+            #build up query from dictionary parts
+            output.write(yaml.dump(entry, default_flow_style=False))
+

@@ -58,6 +58,7 @@ if __name__ == "__main__":
         reciever = CharField(null=True)
         message = TextField(null=True)
         length = IntegerField(null=True)
+        contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Word(BaseModel):
@@ -73,6 +74,7 @@ if __name__ == "__main__":
         reciever = CharField(null=True)
         length = DoubleField(null=True)
         answered = BooleanField()
+        contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Voicemail(BaseModel):
@@ -80,17 +82,28 @@ if __name__ == "__main__":
         time = TimeField(null=True)
         caller = CharField(null=True)
         message = TextField(null=True)
+        contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Contacts(BaseModel):
         name = CharField(null=True)
+        birthday = DateField(null=True)
+        address = TextField(null=True)
+        email_1 = TextField(null=True)
+        email_2 = TextField(null=True)
+        email_3 = TextField(null=True)
+        email_4 = TextField(null=True)
         first_contact = DateTimeField(null=True)
         last_contact = DateTimeField(null=True)
         last_message = TextField(null=True)
-        phone_numbers = IntegerField(null=True)
+        phone_number_1 = IntegerField(null=True)
+        phone_number_2 = IntegerField(null=True)
+        phone_number_3 = IntegerField(null=True)
+        phone_number_4 = IntegerField(null=True)
         country_code = TextField(null=True)
         last_number = IntegerField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
+
 
     class Locations(BaseModel):
         date = DateTimeField(null=True)
@@ -102,8 +115,12 @@ if __name__ == "__main__":
         state = CharField(null=True)
         zip = IntegerField(null=True)
         city = CharField(null=True)
+        area = TextField(null=True)
+        county = TextField(null=True)
         street = TextField(null=True)
         name = TextField(null=True)
+        provider = CharField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Jobs(BaseModel):
         title = CharField(null=True)
@@ -183,11 +200,10 @@ As of right now, this should create a database in each folder the script is run,
 Peewee seems to have a problem with connecting to a database that is not in the current folder
 '''
 
-database = SqliteDatabase(config.get('database'))
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = database
+        database = SqliteDatabase(config.get('databaseLoc'))
 
 class Message(BaseModel):
     type = TextField(null=True)
@@ -197,6 +213,7 @@ class Message(BaseModel):
     reciever = CharField(null=True)
     message = TextField(null=True)
     length = IntegerField(null=True)
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Word(BaseModel):
@@ -212,6 +229,7 @@ class Call(BaseModel):
     reciever = CharField(null=True)
     length = DoubleField(null=True)
     answered = BooleanField()
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Voicemail(BaseModel):
@@ -219,14 +237,24 @@ class Voicemail(BaseModel):
     time = TimeField(null=True)
     caller = CharField(null=True)
     message = TextField(null=True)
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Contacts(BaseModel):
     name = CharField(null=True)
+    birthday = DateField(null=True)
+    address = TextField(null=True)
+    email_1 = TextField(null=True)
+    email_2 = TextField(null=True)
+    email_3 = TextField(null=True)
+    email_4 = TextField(null=True)
     first_contact = DateTimeField(null=True)
     last_contact = DateTimeField(null=True)
     last_message = TextField(null=True)
-    phone_numbers = IntegerField(null=True)
+    phone_number_1 = IntegerField(null=True)
+    phone_number_2 = IntegerField(null=True)
+    phone_number_3 = IntegerField(null=True)
+    phone_number_4 = IntegerField(null=True)
     country_code = TextField(null=True)
     last_number = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
@@ -241,6 +269,8 @@ class Locations(BaseModel):
     state = CharField(null=True)
     zip = IntegerField(null=True)
     city = CharField(null=True)
+    area = TextField(null=True)
+    county = TextField(null=True)
     street = TextField(null=True)
     name = TextField(null=True)
     provider = CharField(null=True)
