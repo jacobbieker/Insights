@@ -47,3 +47,4 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
             address_1 = entry.get("Address 1 - Formatted")
             #build up query from dictionary parts
             output.write(yaml.dump(entry, default_flow_style=False))
+
