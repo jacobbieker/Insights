@@ -74,6 +74,7 @@ if __name__ == "__main__":
         reciever = CharField(null=True)
         length = DoubleField(null=True)
         answered = BooleanField()
+        contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Voicemail(BaseModel):
@@ -81,6 +82,7 @@ if __name__ == "__main__":
         time = TimeField(null=True)
         caller = CharField(null=True)
         message = TextField(null=True)
+        contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Contacts(BaseModel):
@@ -211,6 +213,7 @@ class Message(BaseModel):
     reciever = CharField(null=True)
     message = TextField(null=True)
     length = IntegerField(null=True)
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Word(BaseModel):
@@ -226,6 +229,7 @@ class Call(BaseModel):
     reciever = CharField(null=True)
     length = DoubleField(null=True)
     answered = BooleanField()
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Voicemail(BaseModel):
@@ -233,6 +237,7 @@ class Voicemail(BaseModel):
     time = TimeField(null=True)
     caller = CharField(null=True)
     message = TextField(null=True)
+    contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Contacts(BaseModel):
