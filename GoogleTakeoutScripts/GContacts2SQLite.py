@@ -16,3 +16,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
 __author__ = 'Jacob Bieker'
+import os
+from databaseSetup import Contacts
+import csv
+from peewee import *
+import yaml
+
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Contacts")
+
+with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
+    csv_reader = csv.DictReader(x.replace('\0', '') for x in source)
+    for entry in csv_reader:
+        print entry
