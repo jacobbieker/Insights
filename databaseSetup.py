@@ -58,6 +58,7 @@ if __name__ == "__main__":
         reciever = CharField(null=True)
         message = TextField(null=True)
         length = IntegerField(null=True)
+        contact = ForeignKeyField(Contacts)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Word(BaseModel):
