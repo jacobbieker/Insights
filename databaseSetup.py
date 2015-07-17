@@ -21,6 +21,7 @@ import datetime
 import peewee
 import yaml
 from playhouse.migrate import *
+import phonenumbers
 
 
 if __name__ == "__main__":
@@ -49,6 +50,25 @@ if __name__ == "__main__":
     class BaseModel(peewee.Model):
         class Meta:
             database = database
+
+    class Contacts(BaseModel):
+        name = CharField(null=True)
+        birthday = DateField(null=True)
+        address = TextField(null=True)
+        email_1 = TextField(null=True)
+        email_2 = TextField(null=True)
+        email_3 = TextField(null=True)
+        email_4 = TextField(null=True)
+        first_contact = DateTimeField(null=True)
+        last_contact = DateTimeField(null=True)
+        last_message = TextField(null=True)
+        phone_number_1 = TextField(null=True)
+        phone_number_2 = TextField(null=True)
+        phone_number_3 = TextField(null=True)
+        phone_number_4 = TextField(null=True)
+        country_code = TextField(null=True)
+        last_number = TextField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Message(BaseModel):
         type = TextField(null=True)
@@ -84,26 +104,6 @@ if __name__ == "__main__":
         message = TextField(null=True)
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
-
-    class Contacts(BaseModel):
-        name = CharField(null=True)
-        birthday = DateField(null=True)
-        address = TextField(null=True)
-        email_1 = TextField(null=True)
-        email_2 = TextField(null=True)
-        email_3 = TextField(null=True)
-        email_4 = TextField(null=True)
-        first_contact = DateTimeField(null=True)
-        last_contact = DateTimeField(null=True)
-        last_message = TextField(null=True)
-        phone_number_1 = IntegerField(null=True)
-        phone_number_2 = IntegerField(null=True)
-        phone_number_3 = IntegerField(null=True)
-        phone_number_4 = IntegerField(null=True)
-        country_code = TextField(null=True)
-        last_number = IntegerField(null=True)
-        timestamp = DateTimeField(default=datetime.datetime.now())
-
 
     class Locations(BaseModel):
         date = DateTimeField(null=True)
@@ -205,6 +205,25 @@ class BaseModel(peewee.Model):
     class Meta:
         database = SqliteDatabase(config.get('databaseLoc'))
 
+class Contacts(BaseModel):
+    name = CharField(null=True)
+    birthday = DateField(null=True)
+    address = TextField(null=True)
+    email_1 = TextField(null=True)
+    email_2 = TextField(null=True)
+    email_3 = TextField(null=True)
+    email_4 = TextField(null=True)
+    first_contact = DateTimeField(null=True)
+    last_contact = DateTimeField(null=True)
+    last_message = TextField(null=True)
+    phone_number_1 = TextField(null=True)
+    phone_number_2 = TextField(null=True)
+    phone_number_3 = TextField(null=True)
+    phone_number_4 = TextField(null=True)
+    country_code = TextField(null=True)
+    last_number = IntegerField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
 class Message(BaseModel):
     type = TextField(null=True)
     date = DateTimeField(null=True)
@@ -238,25 +257,6 @@ class Voicemail(BaseModel):
     caller = CharField(null=True)
     message = TextField(null=True)
     contact = ForeignKeyField(Contacts, null=True)
-    timestamp = DateTimeField(default=datetime.datetime.now())
-
-class Contacts(BaseModel):
-    name = CharField(null=True)
-    birthday = DateField(null=True)
-    address = TextField(null=True)
-    email_1 = TextField(null=True)
-    email_2 = TextField(null=True)
-    email_3 = TextField(null=True)
-    email_4 = TextField(null=True)
-    first_contact = DateTimeField(null=True)
-    last_contact = DateTimeField(null=True)
-    last_message = TextField(null=True)
-    phone_number_1 = IntegerField(null=True)
-    phone_number_2 = IntegerField(null=True)
-    phone_number_3 = IntegerField(null=True)
-    phone_number_4 = IntegerField(null=True)
-    country_code = TextField(null=True)
-    last_number = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Locations(BaseModel):
@@ -332,7 +332,7 @@ class Calendars(BaseModel):
 '''
 Set of functions to normalize data and standardize different inputs and queries
 '''
-def get_contact(phone_number):
+def get_contact_by_number(phone_number):
     try_1 = Contacts.get(phone_number_1=phone_number)
     try_2 = Contacts.get(phone_number_2=phone_number)
     try_3 = Contacts.get(phone_number_3=phone_number)
@@ -348,6 +348,24 @@ def get_contact(phone_number):
     else:
         return "Contact does not exist"
 
+def get_contact_by_email(email):
+    try_1 = Contacts.get(email_1=email)
+    try_2 = Contacts.get(email_2=email)
+    try_3 = Contacts.get(email_3=email)
+    try_4 = Contacts.get(email_4=email)
+    if try_1 is not  None:
+        return try_1
+    elif try_2 is not None:
+        return try_2
+    elif try_3 is not None:
+        return try_3
+    elif try_4 is not None:
+        return try_4
+    else:
+        return "Contact does not exist"
+
 def normalize_number(phone_number):
-    return phone_number
+    parsed = phonenumbers.parse(phone_number, 'US')
+    normalized = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
+    return normalized
 #Make all phone numbers the same setup

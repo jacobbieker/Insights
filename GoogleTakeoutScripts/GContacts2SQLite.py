@@ -34,17 +34,30 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
             first_name = entry.get("Given Name")
             middle_name = entry.get("Additional Name")
             last_name = entry.get("Family Name")
+            alt_name = entry.get("Additional Name")
             birthday = entry.get("Birthday")
             email_1 = entry.get("E-mail 1 - Value")
             email_2 = entry.get("E-mail 2 - Value")
             email_3 = entry.get("E-mail 3 - Value")
             email_4 = entry.get("E-mail 4 - Value")
             nickname = entry.get("Nickname")
-            #TODO Strip all but numbers from phone numbers
             phone_1 = entry.get("Phone 1 - Value")
             phone_2 = entry.get("Phone 2 - Value")
             phone_3 = entry.get("Phone 3 - Value")
             address_1 = entry.get("Address 1 - Formatted")
             #build up query from dictionary parts
             output.write(yaml.dump(entry, default_flow_style=False))
+            if first_name is not None:
+                if last_name is not None:
+                    if middle_name is not None:
+                        full_name = first_name + middle_name + last_name
+                    else:
+                        full_name = first_name + last_name
+                else:
+                    full_name = first_name
+            else:
+                full_name = alt_name
+            Contacts.insert(name=full_name, birthday=birthday, address=address_1, email_1=email_1, email_2=email_2,
+                            email_3=email_3, email_4=email_4, phone_number_1=phone_1, phone_number_2=phone_2,
+                            phone_number_3=phone_3).execute()
 
