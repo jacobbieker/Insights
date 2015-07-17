@@ -240,6 +240,6 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                         response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
                         locationCache[point_string] = address.raw, provider, response[1], response[2]
-                    except GeocoderQuotaExceeded or GeocoderTimedOut:
+                    except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                         print "Could not access geocoders for location: " + point_string
-                        exit()  # Exits if it cannot get all the location data
+                        break  # Skips if cannot find location data
