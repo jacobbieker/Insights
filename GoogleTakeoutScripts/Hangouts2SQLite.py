@@ -24,3 +24,14 @@ import yaml
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
+
+with open(rootdir, "r") as source:
+    data = json.load(source)
+    conversations = data.get("conversation_state")
+    for conversation in conversations:
+        #Gets every conversation
+        count = 1
+        with open()
+
