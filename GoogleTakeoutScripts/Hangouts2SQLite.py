@@ -30,8 +30,10 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangout
 with open(rootdir, "r") as source:
     data = json.load(source)
     conversations = data.get("conversation_state")
+    count = 0
     for conversation in conversations:
         #Gets every conversation
-        count = 1
-        with open()
+        count += 1
+        with open("hangouts." + str(count) + ".json", "a") as output:
+            json_output = json.dump(conversation, output, sort_keys=True, indent=4)
 
