@@ -18,6 +18,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 __author__ = 'Jacob Bieker'
 from peewee import *
 from databaseSetup import Message, Contacts, Voicemail, Call
+import databaseSetup
 import os
 import yaml
 from glob import glob
@@ -28,14 +29,17 @@ def voicemail2SQLite(voicemail):
     time = voicemail.get("time")
     number = voicemail.get("phone number")
     message = voicemail.get("message")
-    Voicemail.insert(date=time, caller=caller, message=message)
+    contact = databaseSetup.get_contact_by_number(number)
+    Voicemail.insert(date=time, caller=caller, message=message, duration=duration, contact=contact).execute()
 
 def text2SQLite(text):
     sender = text.get("sender")
     reciever = text.get("reciever")
     time = text.get("time")
     number = text.get("number")
+    contact = databaseSetup.get_contact_by_number(number)
     message = text.get("message")
+    Message.insert(date=time, sender=sender, reciever=reciever, message=message, contact=contact).execute()
 
 def call2SQLite(call):
     caller = call.get("caller")
@@ -43,7 +47,8 @@ def call2SQLite(call):
     time = call.get("time")
     duration = call.get("duration")
     number = call.get("phone number")
-
+    contact = databaseSetup.get_contact_by_number(number)
+    Call.insert(date=time, caller=caller, reciever='Me', contact=contact, answered=status, length=duration).execute()
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)

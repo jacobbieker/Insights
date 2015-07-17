@@ -93,7 +93,7 @@ if __name__ == "__main__":
         caller = CharField(null=True)
         reciever = CharField(null=True)
         length = DoubleField(null=True)
-        answered = BooleanField()
+        answered = TextField(null=True)
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
@@ -247,7 +247,7 @@ class Call(BaseModel):
     caller = CharField(null=True)
     reciever = CharField(null=True)
     length = DoubleField(null=True)
-    answered = BooleanField()
+    answered = TextField(null=True)
     contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
@@ -346,7 +346,8 @@ def get_contact_by_number(phone_number):
     elif try_4 is not None:
         return try_4
     else:
-        return "Contact does not exist"
+        print "Contact does not exist"
+        return None
 
 def get_contact_by_email(email):
     try_1 = Contacts.get(email_1=email)
@@ -362,7 +363,8 @@ def get_contact_by_email(email):
     elif try_4 is not None:
         return try_4
     else:
-        return "Contact does not exist"
+        print "Contact does not exist"
+        return None
 
 def normalize_number(phone_number):
     parsed = phonenumbers.parse(phone_number, 'US')
