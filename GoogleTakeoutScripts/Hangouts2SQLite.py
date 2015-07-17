@@ -22,6 +22,30 @@ from databaseSetup import Contacts, Message, Call, Voicemail
 import json
 import yaml
 
+def get_particpant(participant):
+    name = participant.get("fallback_name")
+    phone_data = participant.get("phone_number")
+    number = phone_data.get("e164")
+    international_number = phone_data.get("i18n_data").get("international_number")
+    national_number = phone_data.get("i18n_data").get("national_number")
+    if databaseSetup.get_contact_by_number(number) is None:
+        if databaseSetup.get_contact_by_number(international_number) is None:
+            if databaseSetup.get_contact_by_number(national_number) is None:
+                if Contacts.get(name=name):
+                    contact = Contacts.get(name=name)
+                else:
+                    contact = None
+                contact = None
+            else:
+                contact = databaseSetup.get_contact_by_number(national_number)
+        else:
+            contact = databaseSetup.get_contact_by_number(international_number)
+    else:
+        contact = databaseSetup.get_contact_by_number(number)
+
+    return name, number, contact
+
+
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
@@ -34,6 +58,12 @@ with open(rootdir, "r") as source:
     for conversation in conversations:
         #Gets every conversation
         count += 1
-        with open("hangouts." + str(count) + ".json", "a") as output:
+        with open("hangouts." + str(count) + ".json", "w") as output:
             json_output = json.dump(conversation, output, sort_keys=True, indent=4)
+        participants = conversation.get("participant_data")
+        #Get participant data
+        for participant in participants:
+            user = get_particpant(participant)
+    messages = conversations.get("event")
+    for message in messages:
 
