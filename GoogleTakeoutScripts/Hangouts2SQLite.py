@@ -16,3 +16,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
 __author__ = 'Jacob Bieker'
+import os
+import databaseSetup
+from databaseSetup import Contacts, Message, Call, Voicemail
+import json
+import yaml
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
