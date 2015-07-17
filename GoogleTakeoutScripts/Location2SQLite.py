@@ -147,21 +147,23 @@ def googleV3_parser(google_response, longitude, latitude):
 def continent_finder(latitude, longitude):
     # get the list of country data
     for country_data in location_data.get('countries').get('country'):
-        if country_data.get('north') > latitude > country_data.get('south'):
-            if country_data.get('east') > longitude > country_data.get('west'):
+        if country_data.get('north') >= latitude >= country_data.get('south'):
+            if country_data.get('east') >= longitude >= country_data.get('west'):
                 return country_data.get('continentName')
     return "Continent Not Found"
 
 #Keep track of bounds of geocoding, so that less requests are sent to remote servers
 def track_bounds(northeast, southwest, latitude, longitude):
     northern_most = northeast[0]
+    print "EasternMost: " + str(northeast[1])
     eastern_most = northeast[1]
     southern_most = southwest[0]
+    print "WesternMost: " + str(southwest[1])
     western_most = southwest[1]
     if northern_most >= latitude >= southern_most:
-        print(str(latitude) + " is between " + str(northern_most) + " and " + str(southern_most))
-        if western_most >= longitude >= eastern_most:
-            print(str(longitude) + " is between " + str(eastern_most) + " and " + str(western_most))
+        print("Latitude: " + str(latitude) + " is between " + str(northern_most) + " and " + str(southern_most))
+        if eastern_most >= longitude >= western_most:
+            print("Longitude: " + str(longitude) + " is between " + str(eastern_most) + " and " + str(western_most))
             return True
     else:
         return False
@@ -192,7 +194,27 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         point = Point(latitude=latitude, longitude=longitude)
         for values in locationCache.itervalues():
             #Check if in bounds of a previous entry
+            print "Bounds: "
+            print values[2]
+            print values[3]
+            print "Entry: "
+            print latitude
+            print longitude
             if track_bounds(values[2], values[3], latitude, longitude):
+                print "Inside Bounds"
+                address = values[0]
+                provider = values[1]
+                if provider == "OpenCage":
+                    opencage_parser(address, longitude=longitude, latitude=latitude)
+                    break
+                elif provider == "Google":
+                    googleV3_parser(address, longitude=longitude, latitude=latitude)
+                    break
+                elif provider == "Nominatim":
+                    nominatim_parser(address, longitude=longitude, latitude=latitude)
+                    break
+            elif locationCache.has_key(point_string):
+                print "Cache has Key"
                 address = values[0]
                 provider = values[1]
                 if provider == "OpenCage":
