@@ -46,7 +46,6 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
             phone_3 = entry.get("Phone 3 - Value")
             address_1 = entry.get("Address 1 - Formatted")
             #build up query from dictionary parts
-            output.write(yaml.dump(entry, default_flow_style=False))
             if first_name is not None:
                 if last_name is not None:
                     if middle_name is not None:
@@ -60,4 +59,4 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
             Contacts.insert(name=full_name, birthday=birthday, address=address_1, email_1=email_1, email_2=email_2,
                             email_3=email_3, email_4=email_4, phone_number_1=phone_1, phone_number_2=phone_2,
                             phone_number_3=phone_3).execute()
-
+            output.write(yaml.dump(entry, default_flow_style=False))
