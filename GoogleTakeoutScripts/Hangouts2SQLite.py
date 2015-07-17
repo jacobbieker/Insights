@@ -21,6 +21,7 @@ import databaseSetup
 from databaseSetup import Contacts, Message, Call, Voicemail
 import json
 import yaml
+import datetime
 
 def get_particpant(participant):
     name = participant.get("fallback_name")
@@ -77,5 +78,6 @@ with open(rootdir, "r") as source:
                 if sender_id == user[0]:
                     sender = user
             timestamp = message.get("timestamp")
-            Message.insert(type="hangouts", date=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
+            date = datetime.datetime.fromtimestamp(timestamp=timestamp)
+            Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
 
