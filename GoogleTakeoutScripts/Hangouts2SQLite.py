@@ -24,6 +24,7 @@ import yaml
 
 def get_particpant(participant):
     name = participant.get("fallback_name")
+    chat_id = participant.get("id").get("chat_id")
     phone_data = participant.get("phone_number")
     number = phone_data.get("e164")
     international_number = phone_data.get("i18n_data").get("international_number")
@@ -43,7 +44,7 @@ def get_particpant(participant):
     else:
         contact = databaseSetup.get_contact_by_number(number)
 
-    return name, number, contact
+    return chat_id, name, number, contact
 
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
@@ -55,6 +56,7 @@ with open(rootdir, "r") as source:
     data = json.load(source)
     conversations = data.get("conversation_state")
     count = 0
+    users = []
     for conversation in conversations:
         #Gets every conversation
         count += 1
@@ -63,7 +65,17 @@ with open(rootdir, "r") as source:
         participants = conversation.get("participant_data")
         #Get participant data
         for participant in participants:
-            user = get_particpant(participant)
-    messages = conversations.get("event")
-    for message in messages:
+            users.append(get_particpant(participant))
+        messages = conversation.get("event")
+        for message in messages:
+            #TODO Get reciever(s) for each message, right now
+            text = message.get("chat_message").get("message_content").get("segment").get("text")
+            sender_id = message.get("sender_id").get("chat_id")
+            user_id = message.get("self_event_state").get("user_id").get("chat_id")
+            sender = [None, None, None, None]
+            for user in users:
+                if sender_id == user[0]:
+                    sender = user
+            timestamp = message.get("timestamp")
+            Message.insert(type="hangouts", date=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
 
