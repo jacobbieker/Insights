@@ -20,6 +20,23 @@ import os
 import json
 import yaml
 from peewee import *
+from databaseSetup import Calendars
 
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Tasks", "Tasks.json")
+
+with open(rootdir, 'r') as source:
+    data = json.load(source)
+    task_lists = data.get("items")
+    for task_list in task_lists:
+        for todo in task_list.get("items"):
+            if todo is not None:
+                task = todo.get("title")
+                updated = todo.get("updated")
+                due = todo.get("due")
+                completed = todo.get("completed")
+                status = todo.get("status")
+                Calendars.insert(is_task=True, name=task, start_date=updated, end_date=completed, type="task",
+                                 description=status).execute()
