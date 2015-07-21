@@ -156,7 +156,7 @@ def album2JSON(location, album_name):
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 def thread2JSON(output_name, thread):
-    with open(os.path.join(constants.get('outputDir'), 'facebook.messaging.' + str(output_name) + '.json'), 'a') as json_output:
+    with open(os.path.join(constants.get('outputDir'), 'facebook.messaging.' + str(output_name) + '.yaml'), 'a') as json_output:
         messages = thread.find_all("div", {"class" : "message"})
         #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
         #message
@@ -183,7 +183,7 @@ def thread2JSON(output_name, thread):
                          'sender': user,
                          'recipients': list_of_recipients,
                          'message': text}
-            json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+            json_array = yaml.dump(json_data, json_output, default_flow_style=False)
 
 def wall_post2JSON(wall_post, output_name):
     #Expects a beautifulSoup that includes the following setup, parses to JSON
@@ -273,10 +273,10 @@ def wall_post2JSON(wall_post, output_name):
 <span class="meta"> After above, tells the time for each message
 <p> is the actual message after all the above <p> is between messages and not part of an actual message div
 '''
-for file in os.listdir(os.path.join(constants.get('dataDir'), "html")):
+for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html")):
     if file.endswith(".htm"):
         if file=="messages.htm":
-            with open(os.path.join(constants.get('dataDir'), "html",file), 'r') as source:
+            with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
@@ -305,7 +305,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "html")):
         #
         ###################################################################
         if (file=="photos.htm"):
-            with open(os.path.join(constants.get('dataDir'), "html",file), 'r') as source:
+            with open(os.path.join(constants.get('dataDir'), "Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
@@ -336,7 +336,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "html")):
         #
         ###################################################################
         if (file=="synced_photos.htm"):
-            with open(os.path.join(constants.get('dataDir'),"html",file), 'r') as source:
+            with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
@@ -352,7 +352,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "html")):
         #
         ###################################################################
         if (file=="wall.htm"):
-            with open(os.path.join(constants.get('dataDir'), "html", file), 'r') as source:
+            with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
                 content = html_file.find("div", {"class" : "contents"})
