@@ -18,9 +18,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 __author__ = 'Jacob Bieker'
 import os
 import yaml
-import json
 import icalendar
 from glob import glob
+import mailbox
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
@@ -29,6 +29,7 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
 calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
 
 for calendar in calendars:
-    with open(os.path.join(rootdir, calendar), "r") as source:
-        parsed_calendar = icalendar.Calendar.from_ical(source)
-        print parsed_calendar
+    print calendar
+    with open(calendar, "r") as source:
+        parsed_calendar = mailbox.mbox(source)
+        print parsed_calendar['subject']
