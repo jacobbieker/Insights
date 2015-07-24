@@ -18,9 +18,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 __author__ = 'Jacob Bieker'
 import os
 import yaml
-import icalendar
 from glob import glob
-import mailbox
+import vobject
 
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
@@ -29,7 +28,7 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
 calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
 
 for calendar in calendars:
-    print calendar
     with open(calendar, "r") as source:
-        parsed_calendar = mailbox.mbox(source)
-        print parsed_calendar['subject']
+        parsed_calendar = vobject.readOne(source)
+        parsed_events = vobject.readComponents(source)
+        print parsed_events
