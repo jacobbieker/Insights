@@ -27,7 +27,7 @@ with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Contacts")
 
-with open(os.path.join(rootdir, "All Contacts.csv"), 'r') as source:
+with open(os.path.join(rootdir, "All Contacts.csv"), 'rU') as source:
     csv_reader = csv.DictReader(x.replace('\0', '') for x in source)
     with open("ContactsOutput.yaml", "a") as output:
         for entry in csv_reader:
