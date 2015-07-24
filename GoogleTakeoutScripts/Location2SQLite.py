@@ -160,6 +160,7 @@ def track_bounds(northeast, southwest, latitude, longitude):
     southern_most = southwest[0]
     print "WesternMost: " + str(southwest[1])
     western_most = southwest[1]
+    return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
     if northern_most >= latitude >= southern_most:
         print("Latitude: " + str(latitude) + " is between " + str(northern_most) + " and " + str(southern_most))
         if eastern_most >= longitude >= western_most:
