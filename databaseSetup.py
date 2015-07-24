@@ -160,6 +160,7 @@ if __name__ == "__main__":
         focal_length = DoubleField(null=True)
         service = TextField(null=True)
         date_uploaded = DateTimeField(null=True)
+        url = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Calendars(BaseModel):
