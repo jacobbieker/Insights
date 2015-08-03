@@ -16,3 +16,18 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
 __author__ = 'Jacob Bieker'
+import json
+import yaml
+import os
+from databaseSetup import Photos
+from glob import glob
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Google Photos")
+photo_data = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.json'))]
+
+for json_file in photo_data:
+    with open(json_file, 'r') as file:
+        metadata = json.dump(file)
