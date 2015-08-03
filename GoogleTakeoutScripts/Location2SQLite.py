@@ -44,14 +44,19 @@ def get_locations_from_database(longitude, latitude):
         loc_model = Locations.get(Locations.latitude == latitude, Locations.longitude == longitude)
         print loc_model
         print("Loc from database")
-        # Insert into database with new timestamp, but same other data
-        query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
-                                 continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
-                                 zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
-                                 city=loc_model.city, street=loc_model.street, name=loc_model.name,
-                                 provider=loc_model.provider)
-        query.execute()
-        return True
+        if loc_model.time == time_stamp:
+            #Same entry, do not repeat
+            print("Same entry found in database")
+            return True
+        else:
+            # Insert into database with new timestamp, but same other data
+            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+                                     continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
+                                     zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
+                                     city=loc_model.city, street=loc_model.street, name=loc_model.name,
+                                     provider=loc_model.provider)
+            query.execute()
+            return True
     except DoesNotExist:
         print ("Error: Does not Exist")
         return False
