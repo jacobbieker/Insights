@@ -41,20 +41,34 @@ Query database if it exists, and try to retrive a record for the current lat and
 
 def get_locations_from_database(longitude, latitude):
     try:
-        loc_model = Locations.get(Locations.latitude == latitude, Locations.longitude == longitude)
-        print loc_model
-        print("Loc from database")
-        # Insert into database with new timestamp, but same other data
-        query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+        #Try to location and getting same time, reduce duplicates
+        loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
+            (Locations.bound_north >= latitude >= Locations.bound_south) &
+            (Locations.bound_east >= longitude >= Locations.bound_west))) &
+            (Locations.time == time_stamp))
+        print("Same entry found in database")
+        return True
+    except DoesNotExist:
+        try:
+            #If same time does not exist, try without time, and see if it can be found
+            loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
+                (Locations.bound_north >= latitude >= Locations.bound_south) &
+                (Locations.bound_east >= longitude >= Locations.bound_west))))
+            print("Inserting new Record")
+            # Insert into database with new timestamp, but same other data
+            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                                  continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
                                  zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
                                  city=loc_model.city, street=loc_model.street, name=loc_model.name,
-                                 provider=loc_model.provider)
-        query.execute()
-        return True
-    except DoesNotExist:
-        print ("Error: Does not Exist")
-        return False
+                                 provider=loc_model.provider, bound_north=loc_model.bound_north,
+                                 bound_east=loc_model.bound_east, bound_south=loc_model.bound_south,
+                                 bound_west=loc_model.bound_west)
+            query.execute()
+            return True
+        except DoesNotExist:
+            print ("Error: Does not Exist")
+            return False
+
 
 
 '''
@@ -86,7 +100,9 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     southwest = [latitude, longitude]
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -118,7 +134,9 @@ def opencage_parser(opencage_response, longitude, latitude):
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -164,7 +182,9 @@ def googleV3_parser(google_response, longitude, latitude):
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
@@ -180,10 +200,8 @@ def continent_finder(latitude, longitude):
 # Keep track of bounds of geocoding, so that less requests are sent to remote servers
 def track_bounds(northeast, southwest, latitude, longitude):
     northern_most = northeast[0]
-    print "EasternMost: " + str(northeast[1])
     eastern_most = northeast[1]
     southern_most = southwest[0]
-    print "WesternMost: " + str(southwest[1])
     western_most = southwest[1]
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
@@ -212,44 +230,37 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        for values in locationCache.itervalues():
-            # Check if in bounds of a previous entry
-            print "Bounds: "
-            print values[2]
-            print values[3]
-            print "Entry: "
-            print latitude
-            print longitude
-            if track_bounds(values[2], values[3], latitude, longitude):
-                print "Inside Bounds"
-                address = values[0]
-                provider = values[1]
-                if provider == "OpenCage":
-                    opencage_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Google":
-                    googleV3_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Nominatim":
-                    nominatim_parser(address, longitude=longitude, latitude=latitude)
-                    break
-            elif locationCache.has_key(point_string):
-                print "Cache has Key"
-                address = values[0]
-                provider = values[1]
-                if provider == "OpenCage":
-                    opencage_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Google":
-                    googleV3_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Nominatim":
-                    nominatim_parser(address, longitude=longitude, latitude=latitude)
-                    break
+        if get_locations_from_database(longitude, latitude):
+            continue
         else:
-            # noinspection PyBroadException
-            if get_locations_from_database(longitude, latitude):
-                pass
+            for values in locationCache.itervalues():
+                # Check if in bounds of a previous entry
+                if track_bounds(values[2], values[3], latitude, longitude):
+                    print "Inside Bounds"
+                    address = values[0]
+                    provider = values[1]
+                    if provider == "OpenCage":
+                        opencage_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Google":
+                        googleV3_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Nominatim":
+                        nominatim_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                elif locationCache.has_key(point_string):
+                    print "Cache has Key"
+                    address = values[0]
+                    provider = values[1]
+                    if provider == "OpenCage":
+                        opencage_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Google":
+                        googleV3_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Nominatim":
+                        nominatim_parser(address, longitude=longitude, latitude=latitude)
+                        break
             else:
                 # noinspection PyBroadException
                 try:
@@ -288,4 +299,4 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                             locationCache[point_string] = address.raw, provider, response[1], response[2]
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print "Could not access geocoders for location: " + point_string
-                            break  # Skips if cannot find location data
+                            break  # Skips if cannot find locat
