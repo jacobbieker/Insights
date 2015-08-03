@@ -41,28 +41,34 @@ Query database if it exists, and try to retrive a record for the current lat and
 
 def get_locations_from_database(longitude, latitude):
     try:
-        loc_model = Locations.get(Locations.bound_north >= latitude >= Locations.bound_south, Locations.bound_east >= longitude >= Locations.bound_west)
-        print("Loc from database")
-        print time_stamp
-        print loc_model.time
-        if loc_model.time == time_stamp or loc_model.date == converted_time_stamp:
-            # Same entry, do not repeat
-            print("Same entry found in database")
-            return True
-        else:
+        #Try to location and getting same time, reduce duplicates
+        loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
+            (Locations.bound_north >= latitude >= Locations.bound_south) &
+            (Locations.bound_east >= longitude >= Locations.bound_west))) &
+            (Locations.time == time_stamp))
+        print("Same entry found in database")
+        return True
+    except DoesNotExist:
+        try:
+            #If same time does not exist, try without time, and see if it can be found
+            loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
+                (Locations.bound_north >= latitude >= Locations.bound_south) &
+                (Locations.bound_east >= longitude >= Locations.bound_west))))
+            print("Inserting new Record")
             # Insert into database with new timestamp, but same other data
             query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
-                                     continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
-                                     zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
-                                     city=loc_model.city, street=loc_model.street, name=loc_model.name,
-                                     provider=loc_model.provider, bound_north=loc_model.bound_north,
-                                     bound_east=loc_model.bound_east, bound_south=loc_model.bound_south,
-                                     bound_west=loc_model.bound_west)
+                                 continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
+                                 zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
+                                 city=loc_model.city, street=loc_model.street, name=loc_model.name,
+                                 provider=loc_model.provider, bound_north=loc_model.bound_north,
+                                 bound_east=loc_model.bound_east, bound_south=loc_model.bound_south,
+                                 bound_west=loc_model.bound_west)
             query.execute()
             return True
-    except DoesNotExist:
-        print ("Error: Does not Exist")
-        return False
+        except DoesNotExist:
+            print ("Error: Does not Exist")
+            return False
+
 
 
 '''
@@ -293,4 +299,4 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                             locationCache[point_string] = address.raw, provider, response[1], response[2]
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print "Could not access geocoders for location: " + point_string
-                            break  # Skips if cannot find location data
+                            break  # Skips if cannot find locat
