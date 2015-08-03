@@ -113,7 +113,7 @@ if __name__ == "__main__":
         continent = CharField(null=True)
         country = CharField(null=True)
         state = CharField(null=True)
-        zip = IntegerField(null=True)
+        zip = TextField(null=True)
         city = CharField(null=True)
         area = TextField(null=True)
         county = TextField(null=True)
@@ -160,6 +160,7 @@ if __name__ == "__main__":
         focal_length = DoubleField(null=True)
         service = TextField(null=True)
         date_uploaded = DateTimeField(null=True)
+        url = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Calendars(BaseModel):
@@ -267,7 +268,7 @@ class Locations(BaseModel):
     continent = CharField(null=True)
     country = CharField(null=True)
     state = CharField(null=True)
-    zip = IntegerField(null=True)
+    zip = TextField(null=True)
     city = CharField(null=True)
     area = TextField(null=True)
     county = TextField(null=True)
