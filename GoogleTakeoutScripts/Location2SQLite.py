@@ -249,7 +249,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             # noinspection PyBroadException
             if get_locations_from_database(longitude, latitude):
-                continue
+                pass
             else:
                 # noinspection PyBroadException
                 try:
