@@ -120,6 +120,10 @@ if __name__ == "__main__":
         street = TextField(null=True)
         name = TextField(null=True)
         provider = CharField(null=True)
+        bound_north = DoubleField(null=True)
+        bound_south = DoubleField(null=True)
+        bound_east = DoubleField(null=True)
+        bound_west = DoubleField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Jobs(BaseModel):
@@ -275,6 +279,10 @@ class Locations(BaseModel):
     street = TextField(null=True)
     name = TextField(null=True)
     provider = CharField(null=True)
+    bound_north = DoubleField(null=True)
+    bound_south = DoubleField(null=True)
+    bound_east = DoubleField(null=True)
+    bound_west = DoubleField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Jobs(BaseModel):
