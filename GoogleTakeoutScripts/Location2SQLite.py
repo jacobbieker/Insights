@@ -41,13 +41,12 @@ Query database if it exists, and try to retrive a record for the current lat and
 
 def get_locations_from_database(longitude, latitude):
     try:
-        loc_model = Locations.get(Locations.latitude == latitude, Locations.longitude == longitude)
-        print loc_model
+        loc_model = Locations.get(Locations.bound_north >= latitude >= Locations.bound_south, Locations.bound_east >= longitude >= Locations.bound_west)
         print("Loc from database")
         print time_stamp
         print loc_model.time
         if loc_model.time == time_stamp or loc_model.date == converted_time_stamp:
-            #Same entry, do not repeat
+            # Same entry, do not repeat
             print("Same entry found in database")
             return True
         else:
@@ -56,7 +55,9 @@ def get_locations_from_database(longitude, latitude):
                                      continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
                                      zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
                                      city=loc_model.city, street=loc_model.street, name=loc_model.name,
-                                     provider=loc_model.provider)
+                                     provider=loc_model.provider, bound_north=loc_model.bound_north,
+                                     bound_east=loc_model.bound_east, bound_south=loc_model.bound_south,
+                                     bound_west=loc_model.bound_west)
             query.execute()
             return True
     except DoesNotExist:
@@ -93,7 +94,9 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     southwest = [latitude, longitude]
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -125,7 +128,9 @@ def opencage_parser(opencage_response, longitude, latitude):
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -171,7 +176,9 @@ def googleV3_parser(google_response, longitude, latitude):
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
-                             city=city, street=street, name=building, provider=provider_type), northeast, southwest]
+                             city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
+                             bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
+            southwest]
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
@@ -222,12 +229,6 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             for values in locationCache.itervalues():
                 # Check if in bounds of a previous entry
-                print "Bounds: "
-                print values[2]
-                print values[3]
-                print "Entry: "
-                print latitude
-                print longitude
                 if track_bounds(values[2], values[3], latitude, longitude):
                     print "Inside Bounds"
                     address = values[0]
