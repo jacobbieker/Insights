@@ -44,7 +44,9 @@ def get_locations_from_database(longitude, latitude):
         loc_model = Locations.get(Locations.latitude == latitude, Locations.longitude == longitude)
         print loc_model
         print("Loc from database")
-        if loc_model.time == time_stamp:
+        print time_stamp
+        print loc_model.time
+        if loc_model.time == time_stamp or loc_model.date == converted_time_stamp:
             #Same entry, do not repeat
             print("Same entry found in database")
             return True
@@ -217,44 +219,43 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        for values in locationCache.itervalues():
-            # Check if in bounds of a previous entry
-            print "Bounds: "
-            print values[2]
-            print values[3]
-            print "Entry: "
-            print latitude
-            print longitude
-            if track_bounds(values[2], values[3], latitude, longitude):
-                print "Inside Bounds"
-                address = values[0]
-                provider = values[1]
-                if provider == "OpenCage":
-                    opencage_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Google":
-                    googleV3_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Nominatim":
-                    nominatim_parser(address, longitude=longitude, latitude=latitude)
-                    break
-            elif locationCache.has_key(point_string):
-                print "Cache has Key"
-                address = values[0]
-                provider = values[1]
-                if provider == "OpenCage":
-                    opencage_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Google":
-                    googleV3_parser(address, longitude=longitude, latitude=latitude)
-                    break
-                elif provider == "Nominatim":
-                    nominatim_parser(address, longitude=longitude, latitude=latitude)
-                    break
+        if get_locations_from_database(longitude, latitude):
+            pass
         else:
-            # noinspection PyBroadException
-            if get_locations_from_database(longitude, latitude):
-                pass
+            for values in locationCache.itervalues():
+                # Check if in bounds of a previous entry
+                print "Bounds: "
+                print values[2]
+                print values[3]
+                print "Entry: "
+                print latitude
+                print longitude
+                if track_bounds(values[2], values[3], latitude, longitude):
+                    print "Inside Bounds"
+                    address = values[0]
+                    provider = values[1]
+                    if provider == "OpenCage":
+                        opencage_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Google":
+                        googleV3_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Nominatim":
+                        nominatim_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                elif locationCache.has_key(point_string):
+                    print "Cache has Key"
+                    address = values[0]
+                    provider = values[1]
+                    if provider == "OpenCage":
+                        opencage_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Google":
+                        googleV3_parser(address, longitude=longitude, latitude=latitude)
+                        break
+                    elif provider == "Nominatim":
+                        nominatim_parser(address, longitude=longitude, latitude=latitude)
+                        break
             else:
                 # noinspection PyBroadException
                 try:
