@@ -187,10 +187,8 @@ def continent_finder(latitude, longitude):
 # Keep track of bounds of geocoding, so that less requests are sent to remote servers
 def track_bounds(northeast, southwest, latitude, longitude):
     northern_most = northeast[0]
-    print "EasternMost: " + str(northeast[1])
     eastern_most = northeast[1]
     southern_most = southwest[0]
-    print "WesternMost: " + str(southwest[1])
     western_most = southwest[1]
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
@@ -220,7 +218,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
         if get_locations_from_database(longitude, latitude):
-            pass
+            continue
         else:
             for values in locationCache.itervalues():
                 # Check if in bounds of a previous entry
