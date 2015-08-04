@@ -39,24 +39,24 @@ Query database if it exists, and try to retrive a record for the current lat and
 '''
 
 
-def get_locations_from_database(longitude, latitude):
+def get_locations_from_database(longitude_query, latitude_query):
     try:
         #Try to location and getting same time, reduce duplicates
-        loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
-            (Locations.bound_north >= latitude >= Locations.bound_south) &
-            (Locations.bound_east >= longitude >= Locations.bound_west))) &
+        loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
+            (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+            (Locations.bound_east >= longitude_query >= Locations.bound_west))) &
             (Locations.time == time_stamp))
         print("Same entry found in database")
         return True
     except DoesNotExist:
         try:
             #If same time does not exist, try without time, and see if it can be found
-            loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
-                (Locations.bound_north >= latitude >= Locations.bound_south) &
-                (Locations.bound_east >= longitude >= Locations.bound_west))))
+            loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
+                (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+                (Locations.bound_east >= longitude_query >= Locations.bound_west))))
             print("Inserting new Record")
             # Insert into database with new timestamp, but same other data
-            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude_query, latitude=latitude_query,
                                  continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
                                  zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
                                  city=loc_model.city, street=loc_model.street, name=loc_model.name,
