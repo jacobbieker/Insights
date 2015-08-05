@@ -41,7 +41,7 @@ def voicemail2SQLite(caller, number, time, message):
 def text2SQLite(sender, reciever, time, number, message):
     print("Text called")
     #contact = databaseSetup.get_contact_by_number(number)
-    Message.insert(date=time, sender=sender, reciever=reciever, message=message).execute()
+    Message.insert(date=time, type="sms", sender=sender, reciever=reciever, message=message).execute()
 
 def call2SQLite(caller, status, time, duration, number):
     print("Call called")
