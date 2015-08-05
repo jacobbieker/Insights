@@ -104,7 +104,7 @@ execfile("databaseSetup.py")
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
-    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2YAML.py"))
+    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2SQLite.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2YAML.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "GmailJSON2SQLite.py"))
     execfile(os.path.join(GOOGLE_SCRIPTS, "Location2SQLite.py"))

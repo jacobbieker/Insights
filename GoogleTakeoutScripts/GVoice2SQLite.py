@@ -20,6 +20,8 @@ import os
 import yaml
 from datetime import datetime
 from bs4 import BeautifulSoup
+from databaseSetup import Message, Voicemail, Call
+import databaseSetup
 
 try:
     from lxml import etree
@@ -30,6 +32,21 @@ with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Voice", "Calls")
+
+def voicemail2SQLite(caller, number, time, message):
+    print("Voicemail called")
+    #contact = databaseSetup.get_contact_by_number(number)
+    Voicemail.insert(date=time, caller=caller, message=message).execute()
+
+def text2SQLite(sender, reciever, time, number, message):
+    print("Text called")
+    #contact = databaseSetup.get_contact_by_number(number)
+    Message.insert(date=time, sender=sender, reciever=reciever, message=message).execute()
+
+def call2SQLite(caller, status, time, duration, number):
+    print("Call called")
+    #contact = databaseSetup.get_contact_by_number(number)
+    Call.insert(date=time, caller=caller, reciever='Me', answered=status, length=duration).execute()
 
 '''
 SAMPLE INPUT:
@@ -94,6 +111,7 @@ for file in os.listdir(rootdir):
                                           'reciever': reciever,
                                           'phone number': phone_number[1],
                                           'message': text})
+                        text2SQLite(sender, reciever, date_string, phone_number[1], text)
                     yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
             conversation_number += 1  # increase, as each HTML file with Text is one conversation
             ###################################################################
@@ -113,7 +131,7 @@ for file in os.listdir(rootdir):
                     for call in calls:
                         # Date and Time
                         date_and_time = call.abbr.text
-
+                        print(date_and_time)
                         # TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -128,7 +146,7 @@ for file in os.listdir(rootdir):
                                           + time_components[3] + time_components[4]
                         # Not using this at the moment, since datetime cannot be serialized to yaml, use date_string instead
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
-
+                        print(date_string)
                         # Get caller
                         if (len(call.find_all("span", {"class": "fn"})) >= 1):
                             caller = call.find_all("span", {"class": "fn"})[1].text
@@ -140,6 +158,7 @@ for file in os.listdir(rootdir):
                         # Call length
                         if (len(call.find_all("abbr", {"class": "duration"})) >= 1):
                             duration = call.find_all("abbr", {"class": "duration"})[0].text
+                            print(duration)
 
                         else:
                             duration = None
@@ -152,6 +171,7 @@ for file in os.listdir(rootdir):
                                           'caller': caller,
                                           'duration': duration,
                                           'phone number': phone_number[1]})
+                        call2SQLite(caller=caller, status=status, time=date_string, duration=duration, number=phone_number[1])
                     yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
             ###################################################################
             #
@@ -208,6 +228,7 @@ for file in os.listdir(rootdir):
                                           'duration': duration,
                                           'phone number': phone_number[1],
                                           'message': text})
+                        voicemail2SQLite(caller=caller, number=phone_number[1], time=date_string, message=text)
                     yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
                     ###################################################################
                     #
