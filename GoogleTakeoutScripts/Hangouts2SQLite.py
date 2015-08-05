@@ -55,7 +55,7 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangout
 
 with open(rootdir, "r") as source:
     data = json.load(source)
-    conversations = data.get("conversation_state")
+    conversations = data["conversation_state"]
     count = 0
     users = []
     for conversation in conversations:
@@ -63,21 +63,28 @@ with open(rootdir, "r") as source:
         count += 1
         with open("hangouts." + str(count) + ".json", "w") as output:
             json_output = json.dump(conversation, output, sort_keys=True, indent=4)
-        participants = conversation.get("participant_data")
+        participants = conversation.get("conversation_state").get("conversation").get("participant_data")
         #Get participant data
-        for participant in participants:
-            users.append(get_particpant(participant))
-        messages = conversation.get("event")
-        for message in messages:
-            #TODO Get reciever(s) for each message, right now
-            text = message.get("chat_message").get("message_content").get("segment").get("text")
-            sender_id = message.get("sender_id").get("chat_id")
-            user_id = message.get("self_event_state").get("user_id").get("chat_id")
-            sender = [None, None, None, None]
-            for user in users:
-                if sender_id == user[0]:
-                    sender = user
-            timestamp = message.get("timestamp")
-            date = datetime.datetime.fromtimestamp(timestamp=timestamp)
-            Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
-
+        #for participant in participants:
+         #   users.append(get_particpant(participant))
+        #messages = conversations.get("event")
+        #print(messages)
+        for i, event in enumerate(conversations):
+            for messages in event:
+                for message in event.get(messages):
+                    print message
+                    for text in event.get(messages).get(message):
+                        print text
+                '''
+                #TODO Get reciever(s) for each message, right now
+                text = message.get("chat_message").get("message_content").get("segment").get("text")
+                sender_id = message.get("sender_id").get("chat_id")
+                user_id = message.get("self_event_state").get("user_id").get("chat_id")
+                sender = [None, None, None, None]
+                #for user in users:
+                 #   if sender_id == user[0]:
+                  #      sender = user
+                timestamp = message.get("timestamp")
+                date = datetime.datetime.fromtimestamp(timestamp=timestamp)
+                Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
+'''
