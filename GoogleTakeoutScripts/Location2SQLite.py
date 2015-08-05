@@ -42,9 +42,7 @@ Query database if it exists, and try to retrive a record for the current lat and
 def get_locations_from_database(longitude_query, latitude_query):
     try:
         #Try to location and getting same time, reduce duplicates
-        loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
-            (Locations.bound_north >= latitude_query >= Locations.bound_south) &
-            (Locations.bound_east >= longitude_query >= Locations.bound_west))) &
+        loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
             (Locations.time == time_stamp))
         print("Same entry found in database")
         return True
@@ -230,7 +228,7 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        if get_locations_from_database(longitude, latitude):
+        if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
             continue
         else:
             for values in locationCache.itervalues():
