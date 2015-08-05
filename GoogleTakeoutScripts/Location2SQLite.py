@@ -216,8 +216,6 @@ opencage_geolocator = OpenCage(api_key="d1e2dc9584fd84b683ac13c5cf12cc98")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 
-locationCache = {}
-
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     data = json.load(source)
     locations = data.get('locations')
@@ -231,70 +229,38 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
             continue
         else:
-            for values in locationCache.itervalues():
-                # Check if in bounds of a previous entry
-                if track_bounds(values[2], values[3], latitude, longitude):
-                    print "Inside Bounds"
-                    address = values[0]
-                    provider = values[1]
-                    if provider == "OpenCage":
-                        opencage_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Google":
-                        googleV3_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Nominatim":
-                        nominatim_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                elif locationCache.has_key(point_string):
-                    print "Cache has Key"
-                    address = values[0]
-                    provider = values[1]
-                    if provider == "OpenCage":
-                        opencage_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Google":
-                        googleV3_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Nominatim":
-                        nominatim_parser(address, longitude=longitude, latitude=latitude)
-                        break
-            else:
+            # noinspection PyBroadException
+            try:
+                # Try OpenCage first
+                time.sleep(2)
+                address = opencage_geolocator.reverse(point, exactly_one=True)
+                provider = "OpenCage"
+                with open("OpenCage.json", "a") as output:
+                    json.dump(address.raw, output, sort_keys=True, indent=4)
+                response = opencage_parser(address.raw, longitude, latitude)
+                response[0].execute()
+            except:
                 # noinspection PyBroadException
                 try:
-                    # Try OpenCage first
-                    time.sleep(2)
-                    address = opencage_geolocator.reverse(point, exactly_one=True)
-                    provider = "OpenCage"
-                    with open("OpenCage.json", "a") as output:
+                    # Try GoogleV3 next
+                    time.sleep(3)
+                    address = google_geolocator.reverse(point, exactly_one=True)
+                    provider = "Google"
+                    with open("GoogleV3.json", "a") as output:
                         json.dump(address.raw, output, sort_keys=True, indent=4)
-                    response = opencage_parser(address.raw, longitude, latitude)
+                    response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
-                    locationCache[point_string] = address.raw, provider, response[1], response[2]
                 except:
-                    # noinspection PyBroadException
                     try:
-                        # Try GoogleV3 next
-                        time.sleep(3)
-                        address = google_geolocator.reverse(point, exactly_one=True)
-                        provider = "Google"
-                        with open("GoogleV3.json", "a") as output:
+                        # Try Nominatum last
+                        # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
+                        time.sleep(5)
+                        address = nominatim_geolocator.reverse(point, exactly_one=True)
+                        provider = "Nominatim"
+                        with open("Nominatim.json", "a") as output:
                             json.dump(address.raw, output, sort_keys=True, indent=4)
-                        response = googleV3_parser(address.raw, longitude, latitude)
+                        response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
-                        locationCache[point_string] = address.raw, provider, response[1], response[2]
-                    except:
-                        try:
-                            # Try Nominatum last
-                            # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-                            time.sleep(5)
-                            address = nominatim_geolocator.reverse(point, exactly_one=True)
-                            provider = "Nominatim"
-                            with open("Nominatim.json", "a") as output:
-                                json.dump(address.raw, output, sort_keys=True, indent=4)
-                            response = nominatim_parser(address.raw, longitude, latitude)
-                            response[0].execute()
-                            locationCache[point_string] = address.raw, provider, response[1], response[2]
-                        except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
-                            print "Could not access geocoders for location: " + point_string
-                            break  # Skips if cannot find locat
+                    except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
+                        print "Could not access geocoders for location: " + point_string
+                        break  # Skips if cannot find locat
