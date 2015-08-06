@@ -1,7 +1,7 @@
 #Configuration file for all the scripts that work with the SQLite database
 sqlite:
   name: insights
-  dbType: sqlite #Choices are: sqlite, extended, apsw
+  dbType: apsw #Choices are: sqlite, extended, apsw
   storage_location:
   tables:
     message:

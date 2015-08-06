@@ -231,13 +231,14 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         else:
             # noinspection PyBroadException
             try:
-                # Try OpenCage first
+                # Try Nominatum last
+                # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
                 time.sleep(2)
-                address = opencage_geolocator.reverse(point, exactly_one=True)
-                provider = "OpenCage"
-                with open("OpenCage.json", "a") as output:
+                address = nominatim_geolocator.reverse(point, exactly_one=True)
+                provider = "Nominatim"
+                with open("Nominatim.json", "a") as output:
                     json.dump(address.raw, output, sort_keys=True, indent=4)
-                response = opencage_parser(address.raw, longitude, latitude)
+                response = nominatim_parser(address.raw, longitude, latitude)
                 response[0].execute()
             except:
                 # noinspection PyBroadException
@@ -252,14 +253,13 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     response[0].execute()
                 except:
                     try:
-                        # Try Nominatum last
-                        # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-                        time.sleep(5)
-                        address = nominatim_geolocator.reverse(point, exactly_one=True)
-                        provider = "Nominatim"
-                        with open("Nominatim.json", "a") as output:
+                        # Try OpenCage first
+                        time.sleep(2)
+                        address = opencage_geolocator.reverse(point, exactly_one=True)
+                        provider = "OpenCage"
+                        with open("OpenCage.json", "a") as output:
                             json.dump(address.raw, output, sort_keys=True, indent=4)
-                        response = nominatim_parser(address.raw, longitude, latitude)
+                        response = opencage_parser(address.raw, longitude, latitude)
                         response[0].execute()
                     except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                         print "Could not access geocoders for location: " + point_string
