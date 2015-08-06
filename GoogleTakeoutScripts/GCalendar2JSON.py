@@ -31,4 +31,5 @@ for calendar in calendars:
     with open(calendar, "r") as source:
         parsed_calendar = vobject.readOne(source)
         parsed_events = vobject.readComponents(source)
-        print parsed_events
+        if parsed_events:
+            print parsed_events.next()
