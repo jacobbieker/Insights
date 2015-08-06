@@ -56,7 +56,7 @@ with open(os.path.join(rootdir, "All Contacts.csv"), 'rU') as source:
                     full_name = first_name
             else:
                 full_name = alt_name
-            print("Inesrting new Contact" + str(full_name))
+            print("Inesrting new Contact " + str(full_name))
             Contacts.insert(name=full_name, birthday=birthday, address=address_1, email_1=email_1, email_2=email_2,
                             email_3=email_3, email_4=email_4, phone_number_1=phone_1, phone_number_2=phone_2,
                             phone_number_3=phone_3).execute()
