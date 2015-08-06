@@ -71,10 +71,10 @@ with open(rootdir, "r") as source:
         #print(messages)
         for i, event in enumerate(conversations):
             for messages in event:
-                for message in event.get(messages):
-                    print message
-                    for text in event.get(messages).get(message):
-                        print text
+                for j, message in enumerate(event.get(messages)):
+                    for k, text in enumerate(message):
+                        print message.get(text)
+                        print text.get("timestamp")
                 '''
                 #TODO Get reciever(s) for each message, right now
                 text = message.get("chat_message").get("message_content").get("segment").get("text")
