@@ -39,24 +39,22 @@ Query database if it exists, and try to retrive a record for the current lat and
 '''
 
 
-def get_locations_from_database(longitude, latitude):
+def get_locations_from_database(longitude_query, latitude_query):
     try:
         #Try to location and getting same time, reduce duplicates
-        loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
-            (Locations.bound_north >= latitude >= Locations.bound_south) &
-            (Locations.bound_east >= longitude >= Locations.bound_west))) &
+        loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
             (Locations.time == time_stamp))
         print("Same entry found in database")
         return True
     except DoesNotExist:
         try:
             #If same time does not exist, try without time, and see if it can be found
-            loc_model = Locations.get(((Locations.latitude == latitude) & (Locations.longitude == longitude) | (
-                (Locations.bound_north >= latitude >= Locations.bound_south) &
-                (Locations.bound_east >= longitude >= Locations.bound_west))))
+            loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
+                (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+                (Locations.bound_east >= longitude_query >= Locations.bound_west))))
             print("Inserting new Record")
             # Insert into database with new timestamp, but same other data
-            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
+            query = Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude_query, latitude=latitude_query,
                                  continent=loc_model.continent, country=loc_model.country, state=loc_model.state,
                                  zip=loc_model.zip, area=loc_model.area, county=loc_model.county,
                                  city=loc_model.city, street=loc_model.street, name=loc_model.name,
@@ -218,8 +216,6 @@ opencage_geolocator = OpenCage(api_key="***REMOVED***")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 
-locationCache = {}
-
 with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
     data = json.load(source)
     locations = data.get('locations')
@@ -230,73 +226,41 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
         latitude = location.get('latitudeE7') / 10000000.0
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
-        if get_locations_from_database(longitude, latitude):
+        if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
             continue
         else:
-            for values in locationCache.itervalues():
-                # Check if in bounds of a previous entry
-                if track_bounds(values[2], values[3], latitude, longitude):
-                    print "Inside Bounds"
-                    address = values[0]
-                    provider = values[1]
-                    if provider == "OpenCage":
-                        opencage_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Google":
-                        googleV3_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Nominatim":
-                        nominatim_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                elif locationCache.has_key(point_string):
-                    print "Cache has Key"
-                    address = values[0]
-                    provider = values[1]
-                    if provider == "OpenCage":
-                        opencage_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Google":
-                        googleV3_parser(address, longitude=longitude, latitude=latitude)
-                        break
-                    elif provider == "Nominatim":
-                        nominatim_parser(address, longitude=longitude, latitude=latitude)
-                        break
-            else:
+            # noinspection PyBroadException
+            try:
+                # Try OpenCage first
+                time.sleep(2)
+                address = opencage_geolocator.reverse(point, exactly_one=True)
+                provider = "OpenCage"
+                with open("OpenCage.json", "a") as output:
+                    json.dump(address.raw, output, sort_keys=True, indent=4)
+                response = opencage_parser(address.raw, longitude, latitude)
+                response[0].execute()
+            except:
                 # noinspection PyBroadException
                 try:
-                    # Try OpenCage first
-                    time.sleep(2)
-                    address = opencage_geolocator.reverse(point, exactly_one=True)
-                    provider = "OpenCage"
-                    with open("OpenCage.json", "a") as output:
+                    # Try GoogleV3 next
+                    time.sleep(3)
+                    address = google_geolocator.reverse(point, exactly_one=True)
+                    provider = "Google"
+                    with open("GoogleV3.json", "a") as output:
                         json.dump(address.raw, output, sort_keys=True, indent=4)
-                    response = opencage_parser(address.raw, longitude, latitude)
+                    response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
-                    locationCache[point_string] = address.raw, provider, response[1], response[2]
                 except:
-                    # noinspection PyBroadException
                     try:
-                        # Try GoogleV3 next
-                        time.sleep(3)
-                        address = google_geolocator.reverse(point, exactly_one=True)
-                        provider = "Google"
-                        with open("GoogleV3.json", "a") as output:
+                        # Try Nominatum last
+                        # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
+                        time.sleep(5)
+                        address = nominatim_geolocator.reverse(point, exactly_one=True)
+                        provider = "Nominatim"
+                        with open("Nominatim.json", "a") as output:
                             json.dump(address.raw, output, sort_keys=True, indent=4)
-                        response = googleV3_parser(address.raw, longitude, latitude)
+                        response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
-                        locationCache[point_string] = address.raw, provider, response[1], response[2]
-                    except:
-                        try:
-                            # Try Nominatum last
-                            # To not overload OSM servers, they request a delay of atleast 1 second per request, add some extra
-                            time.sleep(5)
-                            address = nominatim_geolocator.reverse(point, exactly_one=True)
-                            provider = "Nominatim"
-                            with open("Nominatim.json", "a") as output:
-                                json.dump(address.raw, output, sort_keys=True, indent=4)
-                            response = nominatim_parser(address.raw, longitude, latitude)
-                            response[0].execute()
-                            locationCache[point_string] = address.raw, provider, response[1], response[2]
-                        except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
-                            print "Could not access geocoders for location: " + point_string
-                            break  # Skips if cannot find locat
+                    except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
+                        print "Could not access geocoders for location: " + point_string
+                        break  # Skips if cannot find locat
