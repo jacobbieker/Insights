@@ -57,8 +57,10 @@ def current_position_saver(keys):
     #del temp_list[0:keys] # Delete the keys from first to whatever key it is
     with open(os.path.join(constants.get("outputDir"), "LocationsIndex"), "w") as temp_file:
         print("Dumping " + str(keys) + " Records")
-        temp_file.write(yaml.dump(str(keys)))
-
+        if(keys == 0):
+            temp_file.write(yaml.dump(str(keys)))
+        else:
+            temp_file.write(yaml.dump(str(keys - 5000)))
 
 def can_load_last_position():
     if os.path.isfile(os.path.join(constants.get("outputDir"), "LocationsIndex")):
