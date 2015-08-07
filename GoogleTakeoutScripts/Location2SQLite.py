@@ -36,6 +36,8 @@ Variables used by multiple functions
 
 # List holding the values to be bulk inserted
 location_bulk_insert_queries = []
+#Changing the nmber below affects how often inserts are made, as well as location in data saved
+number_entries_before_action = 5000
 #default, so that current_location_saver will work with google_location_parse
 
 def address_to_parts(address):
@@ -57,10 +59,12 @@ def current_position_saver(keys):
     #del temp_list[0:keys] # Delete the keys from first to whatever key it is
     with open(os.path.join(constants.get("outputDir"), "LocationsIndex"), "w") as temp_file:
         print("Dumping " + str(keys) + " Records")
-        if(keys == 0):
+        if(keys < number_entries_before_action):
             temp_file.write(yaml.dump(str(keys)))
         else:
-            temp_file.write(yaml.dump(str(keys - 5000)))
+            # Just to make sure that none are skipped, wirtes a number lower than the actual, not too much performance
+            # impact, relative to going through them all again, for bigger performance gain, delete the negative
+            temp_file.write(yaml.dump(str(keys - number_entries_before_action)))
 
 def can_load_last_position():
     if os.path.isfile(os.path.join(constants.get("outputDir"), "LocationsIndex")):
@@ -69,7 +73,7 @@ def can_load_last_position():
         return False
 
 def insert_many_locations(locations_list):
-    if (len(locations_list) >= 5000):
+    if (len(locations_list) >= number_entries_before_action):
         #with databaseSetup.database.atomic():  WOULD INCREASE SPEED, IMPORT PROBLEMS
         Locations.insert_many(locations_list).execute()
         print("Inserted " + str(len(locations_list)) + " Records")
@@ -270,7 +274,7 @@ if can_load_last_position():
             latitude = location.get('latitudeE7') / 10000000.0
             point_string = str(latitude) + ", " + str(longitude)
             point = Point(latitude=latitude, longitude=longitude)
-            if (key % 5000) == 0:
+            if (key % number_entries_before_action) == 0:
                 current_position_saver(key)
             if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
                 continue
@@ -327,7 +331,7 @@ else:
             latitude = location.get('latitudeE7') / 10000000.0
             point_string = str(latitude) + ", " + str(longitude)
             point = Point(latitude=latitude, longitude=longitude)
-            if (key % 5000) == 0:
+            if (key % number_entries_before_action) == 0:
                 current_position_saver(key)
             if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
                 continue
