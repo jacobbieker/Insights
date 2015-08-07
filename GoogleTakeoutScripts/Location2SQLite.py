@@ -46,10 +46,10 @@ Remove elements from the Locations JSON as it is consumed, overwriting a file as
 '''
 
 def current_position_saver(dictionary, key):
-    temp = dict(dictionary)
-    del temp[key]
+    #temp = dict(dictionary)
+    del dictionary[key]
     with open(os.path.join(constants.get("outputDir"), "LocationsStart.json"), "w") as temp_file:
-        json.dump(temp, temp_file, indent=4, sort_keys=True)
+        json.dump(dictionary, temp_file, indent=4, sort_keys=True)
 
 def can_load_last_position():
     if os.path.isfile(os.path.join(constants.get("outputDir"), "LocationsStart.json")):
@@ -58,7 +58,8 @@ def can_load_last_position():
         return False
 
 def load_last_position():
-    return json.load(os.path.join(constants.get("outputDir"), "LocationsStart.json"))
+    with open(os.path.join(constants.get("outputDir"), "LocationsStart.json"), "r") as source:
+        return json.load(source)
 
 '''
 Query database if it exists, and try to retrive a record for the current lat and long in the request
@@ -231,7 +232,7 @@ def track_bounds(northeast, southwest, latitude, longitude):
 
 def parse_google_locations(json_dictionary):
     locations = json_dictionary.get('locations')
-    for location in locations:
+    for key, location in enumerate(locations):
         time_stamp = location.get('timestampMs')
         converted_time_stamp = datetime.fromtimestamp(float(time_stamp) / 1000.0)
         longitude = location.get('longitudeE7') / 10000000.0
@@ -239,6 +240,7 @@ def parse_google_locations(json_dictionary):
         point_string = str(latitude) + ", " + str(longitude)
         point = Point(latitude=latitude, longitude=longitude)
         if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
+            current_position_saver(locations, key)
             continue
         else:
             # noinspection PyBroadException
@@ -252,6 +254,7 @@ def parse_google_locations(json_dictionary):
                     json.dump(address.raw, output, sort_keys=True, indent=4)
                 response = nominatim_parser(address.raw, longitude, latitude)
                 response[0].execute()
+                current_position_saver(locations, key)
             except:
                 # noinspection PyBroadException
                 try:
@@ -263,6 +266,7 @@ def parse_google_locations(json_dictionary):
                         json.dump(address.raw, output, sort_keys=True, indent=4)
                     response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
+                    current_position_saver(locations, key)
                 except:
                     try:
                         # Try OpenCage first
@@ -273,6 +277,7 @@ def parse_google_locations(json_dictionary):
                             json.dump(address.raw, output, sort_keys=True, indent=4)
                         response = opencage_parser(address.raw, longitude, latitude)
                         response[0].execute()
+                        current_position_saver(locations, key)
                     except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                         print "Could not access geocoders for location: " + point_string
                         break  # Skips if cannot find locat
@@ -290,7 +295,7 @@ opencage_geolocator = OpenCage(api_key="d1e2dc9584fd84b683ac13c5cf12cc98")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 
-if load_last_position():
+if can_load_last_position():
     parse_google_locations(load_last_position())
 else:
     with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
