@@ -28,11 +28,37 @@ from geopy.geocoders import Nominatim, GoogleV3, OpenCage, Bing, GeoNames, Yahoo
 from geopy.point import Point
 from geopy.exc import *
 
+'''
+Variables used by multiple functions
+'''
+
+time_stamp = 0
+converted_time_stamp = 0
+
 
 def address_to_parts(address):
     parts = str(address).split(", ")
     return parts
 
+'''
+Remove elements from the Locations JSON as it is consumed, overwriting a file as it goes, which is then loaded, if it
+ exists at the next run of the script
+'''
+
+def current_position_saver(dictionary, key):
+    temp = dict(dictionary)
+    del temp[key]
+    with open(os.path.join(constants.get("outputDir"), "LocationsStart.json"), "w") as temp_file:
+        json.dump(temp, temp_file, indent=4, sort_keys=True)
+
+def can_load_last_position():
+    if os.path.isfile(os.path.join(constants.get("outputDir"), "LocationsStart.json")):
+        return True
+    else:
+        return False
+
+def load_last_position():
+    return json.load(os.path.join(constants.get("outputDir"), "LocationsStart.json"))
 
 '''
 Query database if it exists, and try to retrive a record for the current lat and long in the request
@@ -203,22 +229,8 @@ def track_bounds(northeast, southwest, latitude, longitude):
     western_most = southwest[1]
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
-
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
-
-# Open continents.yaml to get location data
-with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
-    location_data = yaml.load(loc_data)
-
-rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-opencage_geolocator = OpenCage(api_key="***REMOVED***")
-google_geolocator = GoogleV3()
-nominatim_geolocator = Nominatim()
-
-with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
-    data = json.load(source)
-    locations = data.get('locations')
+def parse_google_locations(json_dictionary):
+    locations = json_dictionary.get('locations')
     for location in locations:
         time_stamp = location.get('timestampMs')
         converted_time_stamp = datetime.fromtimestamp(float(time_stamp) / 1000.0)
@@ -264,3 +276,23 @@ with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
                     except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                         print "Could not access geocoders for location: " + point_string
                         break  # Skips if cannot find locat
+
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+# Open continents.yaml to get location data
+with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
+    location_data = yaml.load(loc_data)
+
+rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
+opencage_geolocator = OpenCage(api_key="***REMOVED***")
+google_geolocator = GoogleV3()
+nominatim_geolocator = Nominatim()
+
+if load_last_position():
+    parse_google_locations(load_last_position())
+else:
+    with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
+        data = json.load(source)
+        parse_google_locations(data)
