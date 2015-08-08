@@ -204,7 +204,6 @@ else:
 As of right now, this should create a database in each folder the script is run, to then combine them later
 Peewee seems to have a problem with connecting to a database that is not in the current folder
 '''
-
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:

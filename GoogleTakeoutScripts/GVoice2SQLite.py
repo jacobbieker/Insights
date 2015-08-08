@@ -32,21 +32,38 @@ with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Voice", "Calls")
+# Three lists used to hold output for a peewee many_insert call at the
+call_dict = []
+text_dict = []
+voicemail_dict = []
+
+# Inserts multiple ones at the same time
+def insert_many_queries(call_queries, text_queries, voicemail_queries):
+    if len(call_queries) >= 100:
+        Call.insert_many(call_queries).execute()
+        #Remove all the stored ones
+        del call_dict[:]
+        print("Inserted 100 or more Calls")
+    if len(text_queries) >= 1000:
+        Message.insert_many(text_queries).execute()
+        del text_dict[:]
+        print("Inserted 1000 or more Texts")
+    if len(voicemail_queries) >= 100:
+        Voicemail.insert_many(voicemail_queries).execute()
+        del voicemail_dict[:]
+        print("Inserted 100 or more Voicemails")
 
 def voicemail2SQLite(caller, number, time, message):
-    print("Voicemail called")
     #contact = databaseSetup.get_contact_by_number(number)
-    Voicemail.insert(date=time, caller=caller, message=message).execute()
+    voicemail_dict.append({'date': time, 'caller': caller, 'message': message})
 
 def text2SQLite(sender, reciever, time, number, message):
-    print("Text called")
     #contact = databaseSetup.get_contact_by_number(number)
-    Message.insert(date=time, type="sms", sender=sender, reciever=reciever, message=message).execute()
+    text_dict.append({'date': time, 'type': 'sms', 'sender': sender, 'reciever': reciever, 'message': message})
 
 def call2SQLite(caller, status, time, duration, number):
-    print("Call called")
     #contact = databaseSetup.get_contact_by_number(number)
-    Call.insert(date=time, caller=caller, reciever='Me', answered=status, length=duration).execute()
+    call_dict.append({'date': time, 'caller': caller, 'reciever': 'Me', 'answered': status, 'length': duration})
 
 '''
 SAMPLE INPUT:
@@ -57,6 +74,7 @@ GMT</abbr>:
 '''
 conversation_number = 1  # Track conversation number, for continuity
 for file in os.listdir(rootdir):
+    insert_many_queries(call_dict, text_dict, voicemail_dict)
     if file.endswith(".html"):
         with open(os.path.join(rootdir, file), 'r') as source:
             file_name = os.path.splitext(os.path.basename(file))
@@ -131,7 +149,6 @@ for file in os.listdir(rootdir):
                     for call in calls:
                         # Date and Time
                         date_and_time = call.abbr.text
-                        print(date_and_time)
                         # TODO split and convert to Date Field
                         time_components = date_and_time.split()
                         time_components[1] = time_components[1][:-1]
@@ -146,7 +163,6 @@ for file in os.listdir(rootdir):
                                           + time_components[3] + time_components[4]
                         # Not using this at the moment, since datetime cannot be serialized to yaml, use date_string instead
                         date_object = datetime.strptime(date_string, '%b %d %Y %I:%M:%f%p')
-                        print(date_string)
                         # Get caller
                         if (len(call.find_all("span", {"class": "fn"})) >= 1):
                             caller = call.find_all("span", {"class": "fn"})[1].text
@@ -158,7 +174,6 @@ for file in os.listdir(rootdir):
                         # Call length
                         if (len(call.find_all("abbr", {"class": "duration"})) >= 1):
                             duration = call.find_all("abbr", {"class": "duration"})[0].text
-                            print(duration)
 
                         else:
                             duration = None
@@ -235,3 +250,10 @@ for file in os.listdir(rootdir):
                     #              End of Voicemail to yaml script
                     #
                     ###################################################################
+# Insert any remaining entries
+if len(call_dict) != 0:
+    Call.insert_many(call_dict)
+if len(text_dict) != 0:
+    Message.insert_many(text_dict)
+if len(voicemail_dict) != 0:
+    Voicemail.insert_many(voicemail_dict)
