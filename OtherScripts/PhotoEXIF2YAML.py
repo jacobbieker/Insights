@@ -31,16 +31,17 @@ from glob import glob
 with open(os.path.join("..","access.yaml"), 'r') as access:
     access_config = yaml.load(access)
 locations = access_config.get('local').get('photoLocations')[0]
+print(locations)
 with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 #Go through each location:
-for location in locations:
+for location in locations[0]:
     ###################################################################
     #
     #             Start of .JPG Processing
     #
     ###################################################################
-    photos = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.JPG'))]
+    photos = [y for x in os.walk('E:\OneDrive\EOS Pictures') for y in glob(os.path.join(x[0], '*.JPG'))]
 
     for photo in photos:
         file_name = os.path.splitext(os.path.basename(photo))

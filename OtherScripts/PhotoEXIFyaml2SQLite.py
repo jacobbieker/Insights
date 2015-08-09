@@ -28,8 +28,19 @@ jpg_queries = []
 raw_queries = []
 
 def jpg_exif_parser(yaml_exif):
+    name = yaml_exif.get('Filename')
+    date = yaml_exif.get('Image DateTime')
+    iso = yaml_exif.get('EXIF ISOSpeedRatings')
+    camera_model = yaml_exif.get('Image Model')
+    shutter = yaml_exif.get('EXIF ShutterSpeedValue')
+    exposure = yaml_exif.get('EXIF ExposureTime')
+    apeture = yaml_exif.get('EXIF ApertureValue')
+    flash = yaml_exif.get('EXIF Flash')
 
-
+    jpg_queries.append({'name': name, 'date': date, 'location': None,
+                        'shutter': '', 'iso': iso, 'aperture': '',
+                        'manufacturer': '', 'camera_model': camera_model, 'exposure_priority': '', 'exposure_mode': '', 'flash': '',
+                        'lens_model': '', 'focal_length': '', 'service': None, 'date_uploaded': None, 'url': None})
 
 with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
@@ -39,7 +50,7 @@ with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
 #             Start of .JPG YAML Processing
 #
 ###################################################################
-photos = [y for x in os.walk(constants.get('outputDir')) for y in glob(os.path.join(x[0], 'photo.exif.*.jpg.yml'))]
+photos = [y for x in os.walk(constants.get('outputDir')) for y in glob(os.path.join(x[0], 'photo.exif.*.*.yml'))]
 
 for photo in photos:
     exif_data = yaml.load(photo)
