@@ -22,15 +22,15 @@ import os
 import json
 import yaml
 from glob import glob
-from rawkit.raw import Raw
-from rawkit.metadata import Metadata
-import libraw
+#from rawkit.raw import Raw
+#from rawkit.metadata import Metadata
+#import libraw
 
 #TODO Check for filename conflicts and rename if necessary
 
 with open(os.path.join("..","access.yaml"), 'r') as access:
     access_config = yaml.load(access)
-locations = access_config.get('local').get('photoLocations')
+locations = access_config.get('local').get('photoLocations')[0]
 with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 #Go through each location:
@@ -64,7 +64,7 @@ for location in locations:
     #
     ###################################################################
     canon_raws = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.CR2'))]
-
+'''
     for raw_file in canon_raws:
         file_name = os.path.splitext(os.path.basename(raw_file))
         with Raw(filename=raw_file) as raw:
@@ -74,6 +74,7 @@ for location in locations:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in raw_output._fields:
                     print tag
+'''
     ###################################################################
     #
     #             end of .CR2 Processing

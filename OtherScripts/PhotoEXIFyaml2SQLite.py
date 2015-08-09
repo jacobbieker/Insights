@@ -15,22 +15,32 @@ You should have received a copy of the GNU General Public License along
 with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
-__author__ = 'Jacob Bieker'
-import json
-import yaml
+__author__ = 'Jacob'
 import os
+import yaml
+import peewee
 from databaseSetup import Photos
 from glob import glob
 
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+
+# Lists holding the dictionaries that will be bulk inserted into the database
+jpg_queries = []
+raw_queries = []
+
+def jpg_exif_parser(yaml_exif):
+
+
+
+with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Google Photos")
-photo_data = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.json'))]
+###################################################################
+#
+#             Start of .JPG YAML Processing
+#
+###################################################################
+photos = [y for x in os.walk(constants.get('outputDir')) for y in glob(os.path.join(x[0], 'photo.exif.*.jpg.yml'))]
 
-count = 0
-for json_file in photo_data:
-    with open(json_file, 'r') as file:
-        count += 1
-        with open(os.path.join(constants.get("outputDir"), "gphotos.metadata." +str(count) +".json"), "w") as output:
-            metadata = json.dump(file, output)
+for photo in photos:
+    exif_data = yaml.load(photo)
+    jpg_exif_parser(exif_data)

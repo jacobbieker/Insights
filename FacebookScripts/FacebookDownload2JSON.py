@@ -22,24 +22,32 @@ import json
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+
+# Lists containing the dictionaries that will be inserted into the database
+facebook_message_queries = []
+facebook_photos_queries = []
+facebook_post_queries = []
+facebook_album_queries = []
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
-#Date and Time, Facebook Format
+# Date and Time, Facebook Format
 def get_date_and_time(time_string):
     time_components = time_string.split()
-    #print time_components
-    #Converting to proper format for strptime
-    if(int(time_components[1]) < 10):
+    # print time_components
+    # Converting to proper format for strptime
+    if (int(time_components[1]) < 10):
         date_string = time_components[0] + " 0" + time_components[1] + " " + time_components[2] + " " \
-                      + time_components[3] + " " +time_components[5]
-    else: # NO leading 0 added
+                      + time_components[3] + " " + time_components[5]
+    else:  # NO leading 0 added
         date_string = time_components[0] + " " + time_components[1] + " " + time_components[2] + " " \
-                      + time_components[3] + " " +time_components[5]
-    #Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
-    #Note: Different than GVoice time, different format
+                      + time_components[3] + " " + time_components[5]
+    # Not using this at the moment, since datetime cannot be serialized to JSON, use date_string instead
+    # Note: Different than GVoice time, different format
     date_object = datetime.strptime(date_string, '%A, %d %B %Y %H:%M')
     return date_string
+
 
 # Go through album and extract all the information on the photos inside and return a dictionary
 def synced_photo2JSON(synced_photo):
@@ -56,15 +64,16 @@ def synced_photo2JSON(synced_photo):
     output_file_name = 0
     for photo in photos:
         output_file_name += 1
-        with open(os.path.join(constants.get('outputDir'), "facebook.synced.photo." + str(output_file_name) + ".json"), 'a') as json_output:
-            #Work down into the attributes of each photo
-            photo_date_and_times = photo.find_all("div", {"class" : "meta"})
-            #First one is always the pictures:
+        with open(os.path.join(constants.get('outputDir'), "facebook.synced.photo." + str(output_file_name) + ".json"),
+                  'a') as json_output:
+            # Work down into the attributes of each photo
+            photo_date_and_times = photo.find_all("div", {"class": "meta"})
+            # First one is always the pictures:
             photo_date_and_time = photo_date_and_times[0]
 
             date_string = get_date_and_time(photo_date_and_time)
 
-            #Get metadata
+            # Get metadata
             photo_metadata = photo.find('table', {"class": "meta"})
             photo_taken = photo.find('td').text
             camera_make = photo.find('td').text
@@ -74,11 +83,11 @@ def synced_photo2JSON(synced_photo):
             photo_iso = photo.find('td').text
             focal_length = photo.find('td').text
 
-            #Get comments
+            # Get comments
             photo_comments = photo.find_all("div", {"class": "comment"})
             for comment in photo_comments:
                 photo_commenter = comment.find("span", {"class": "user"}).text
-                #TODO Check this to make sure it finds the right text
+                # TODO Check this to make sure it finds the right text
                 photo_comment = comment.text
                 photo_comment_time = get_date_and_time(comment.find("div", {"class": "meta"}).text)
                 json_output.write(",\n")
@@ -95,6 +104,7 @@ def synced_photo2JSON(synced_photo):
                              'comment time': photo_comment_time,
                              'comment': photo_comment}
                 json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
+
 
 # Go through album and extract all the information on the photos inside and return a dictionary
 def album2JSON(location, album_name):
@@ -114,15 +124,17 @@ def album2JSON(location, album_name):
         output_file_name = 0
         for photo in photos:
             output_file_name += 1
-            with open(os.path.join(constants.get('outputDir'), "facebook." + str(album_name) + ".photo." + str(output_file_name) + ".json"), 'a') as json_output:
-                #Work down into the attributes of each photo
-                photo_date_and_times = photo.find_all("div", {"class" : "meta"})
-                #First one is always the pictures:
+            with open(os.path.join(constants.get('outputDir'),
+                                   "facebook." + str(album_name) + ".photo." + str(output_file_name) + ".json"),
+                      'a') as json_output:
+                # Work down into the attributes of each photo
+                photo_date_and_times = photo.find_all("div", {"class": "meta"})
+                # First one is always the pictures:
                 photo_date_and_time = photo_date_and_times[0]
 
                 date_string = get_date_and_time(photo_date_and_time)
 
-                #Get metadata
+                # Get metadata
                 photo_metadata = photo.find('table', {"class": "meta"})
                 photo_taken = photo.find('td').text
                 camera_make = photo.find('td').text
@@ -132,11 +144,11 @@ def album2JSON(location, album_name):
                 photo_iso = photo.find('td').text
                 focal_length = photo.find('td').text
 
-                #Get comments
+                # Get comments
                 photo_comments = photo.find_all("div", {"class": "comment"})
                 for comment in photo_comments:
                     photo_commenter = comment.find("span", {"class": "user"}).text
-                    #TODO Check this to make sure it finds the right text
+                    # TODO Check this to make sure it finds the right text
                     photo_comment = comment.text
                     photo_comment_time = get_date_and_time(comment.find("div", {"class": "meta"}).text)
                     json_output.write(",\n")
@@ -155,26 +167,28 @@ def album2JSON(location, album_name):
                                  'comment': photo_comment}
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
+
 def thread2JSON(output_name, thread):
-    with open(os.path.join(constants.get('outputDir'), 'facebook.messaging.' + str(output_name) + '.yaml'), 'a') as json_output:
-        messages = thread.find_all("div", {"class" : "message"})
-        #Get all <p> tags, which include the actual content, to iterate throug hand match up with each
-        #message
+    with open(os.path.join(constants.get('outputDir'), 'facebook.messaging.' + str(output_name) + '.yaml'),
+              'a') as json_output:
+        messages = thread.find_all("div", {"class": "message"})
+        # Get all <p> tags, which include the actual content, to iterate throug hand match up with each
+        # message
         message_content = thread.find_all("p")
-        #TODO Get the list of all paricipants in a thread from the <thread> tag
+        # TODO Get the list of all paricipants in a thread from the <thread> tag
         list_of_recipients = []
-        #Now at the level of each message
+        # Now at the level of each message
         for index, message in enumerate(messages):
-            #print message
-            #user writing the message
+            # print message
+            # user writing the message
             user = message.find("span", {"class": "user"}).text
-            if(user not in s for s in list_of_recipients):
+            if (user not in s for s in list_of_recipients):
                 list_of_recipients.append(user)
 
             date_and_time = message.find("span", {"class": "meta"}).text
             date_string = get_date_and_time(date_and_time)
 
-            #The actual message
+            # The actual message
             text = message_content[index].text
             if (output_name != 1):
                 json_output.write(",\n")
@@ -185,17 +199,19 @@ def thread2JSON(output_name, thread):
                          'message': text}
             json_array = yaml.dump(json_data, json_output, default_flow_style=False)
 
+
 def wall_post2JSON(wall_post, output_name):
-    #Expects a beautifulSoup that includes the following setup, parses to JSON
+    # Expects a beautifulSoup that includes the following setup, parses to JSON
     '''
     <p><div class="meta">Thursday, 10 November 2011 at 20:41 PST</div>NAME wrote on your timeline.<div class="comment">http://dictionary.reference.com/browse/dragon
     check the pronunciation</div></p>
     '''
-    with open(os.path.join(constants.get('outputDir'), 'facebook.wall.' + str(output_name) +'.json'), 'a') as json_output:
+    with open(os.path.join(constants.get('outputDir'), 'facebook.wall.' + str(output_name) + '.json'),
+              'a') as json_output:
         date_string = get_date_and_time(wall_post.find("div", {"class": "meta"}).text)
-        writers = wall_post.text # get text between date_string and </p>
+        writers = wall_post.text  # get text between date_string and </p>
 
-        #Regex below for the different possibilities:
+        # Regex below for the different possibilities:
         re_post = re.compile("wrote on your timeline")
         re_life_event = re.compile("added a life event: *")
         re_changed_event = re.compile("changed *")
@@ -205,19 +221,19 @@ def wall_post2JSON(wall_post, output_name):
         re_changed_relationship = re.compile("went from being *")
         re_status = re.compile("updated his status")
         re_photo = re.compile("added a new photo to the album *")
-        re_participants = re.compile("Jacob Bieker and *\s*\s$") #get the two participants if they exist
+        re_participants = re.compile("Jacob Bieker and *\s*\s$")  # get the two participants if they exist
 
-        #Now check if any of the above are in the text, and diff category for each
+        # Now check if any of the above are in the text, and diff category for each
         participants = writers.re.match(re_participants)
-        if  participants:
+        if participants:
             split_people = participants.group().split(" ")
-            other_person = split_people[3, ] #all names after "and"
+            other_person = split_people[3,]  # all names after "and"
         else:
             other_person = ""
 
         post = ""
         event_type = ""
-        #Check for ones with wildcard
+        # Check for ones with wildcard
         life_event = writers.search(re_life_event)
         changed_event = writers.search(re_changed_event)
         edited_event = writers.search(re_edited_event)
@@ -226,29 +242,29 @@ def wall_post2JSON(wall_post, output_name):
 
         if life_event:
             words = life_event.group().split(" ")
-            type_of_event = words[4, ]
+            type_of_event = words[4,]
             event_type = "life event"
         elif changed_event:
             words = changed_event.group().split(" ")
-            type_of_event = words[1, ]
+            type_of_event = words[1,]
             event_type = "changed profile"
         elif edited_event:
             words = edited_event.group().split(" ")
-            type_of_event = words[1, ]
+            type_of_event = words[1,]
             event_type = "edited profile"
         elif change_relationship:
             words = change_relationship.group().split(" ")
-            type_of_event = words[3, ]
+            type_of_event = words[3,]
             event_type = "changed relationship"
         elif photo:
             words = photo.group().split(" ")
-            type_of_event = words[7, ]
+            type_of_event = words[7,]
             event_type = "photo added"
             post = wall_post.find("div", {"class": "comment"})
         else:
             type_of_event = ""
 
-        #Now check the true/false event types
+        # Now check the true/false event types
         if writers.search(re_post):
             event_type = "wall post"
             post = wall_post.find("div", {"class": "comment"})
@@ -267,6 +283,7 @@ def wall_post2JSON(wall_post, output_name):
                      'post': post}
         json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
+
 '''
 <div class="thread"> = a new message group/conversation and names of participants
 <div class="message"><div class="message_header"><span class="user"> = Before each person and their response in a thread
@@ -275,55 +292,55 @@ def wall_post2JSON(wall_post, output_name):
 '''
 for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html")):
     if file.endswith(".htm"):
-        if file=="messages.htm":
-            with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
+        if file == "messages.htm":
+            with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
-                content = html_file.find("div", {"class" : "contents"})
-            ###################################################################
-            #
-            #              Start of FB Message to JSON script
-            #
-            ###################################################################
-                #Get all the threads in content
-                threads = content.find_all("div", {"class" : "thread"})
+                content = html_file.find("div", {"class": "contents"})
+                ###################################################################
+                #
+                #              Start of FB Message to JSON script
+                #
+                ###################################################################
+                # Get all the threads in content
+                threads = content.find_all("div", {"class": "thread"})
                 output_file_name = 0
-                #Now step into each message thread
+                # Now step into each message thread
                 for thread in threads:
-                    #json_data = []
-                    #TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
+                    # json_data = []
+                    # TODO Check to make sure name won't be longer than 256 characters, the Windows limitation
                     output_file_name += 1
                     thread2JSON(output_file_name, thread)
-            ###################################################################
-            #
-            #              End of FB Message to JSON script
-            #
-            ###################################################################
+                    ###################################################################
+                    #
+                    #              End of FB Message to JSON script
+                    #
+                    ###################################################################
         ###################################################################
         #
         #              Start of FB Photos to JSON script
         #
         ###################################################################
-        if (file=="photos.htm"):
-            with open(os.path.join(constants.get('dataDir'), "Facebook", "html",file), 'r') as source:
+        if (file == "photos.htm"):
+            with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
-                content = html_file.find("div", {"class" : "contents"})
-                #Get all the albumns in content
-                albums = content.find_all("div", {"class" : "block"})
+                content = html_file.find("div", {"class": "contents"})
+                # Get all the albumns in content
+                albums = content.find_all("div", {"class": "block"})
                 print albums
                 output_file_name = 0
-                #Now step into each album
+                # Now step into each album
 
                 for album in albums:
-                    #json_data = []
-                    #Get all links, which includes location of an album index.htm
+                    # json_data = []
+                    # Get all links, which includes location of an album index.htm
                     links = album.find_all("a", href=True)
                     for link in links['href']:
                         if link == '*index.htm':
                             album_location = link
                             album_name = link.text
-                            #Now has the location of the album
+                            # Now has the location of the album
                             album2JSON(album_location, album_name)
         ###################################################################
         #
@@ -335,11 +352,11 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         #              Start of FB Synced Photos to JSON script
         #
         ###################################################################
-        if (file=="synced_photos.htm"):
-            with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
+        if (file == "synced_photos.htm"):
+            with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
-                content = html_file.find("div", {"class" : "contents"})
+                content = html_file.find("div", {"class": "contents"})
                 synced_photo2JSON(content)
         ###################################################################
         #
@@ -351,15 +368,15 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         #              Start of FB Wall to JSON script
         #
         ###################################################################
-        if (file=="wall.htm"):
+        if (file == "wall.htm"):
             with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
                 html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
-                content = html_file.find("div", {"class" : "contents"})
+                content = html_file.find("div", {"class": "contents"})
                 for wall_post in content.find_all("p"):
                     wall_post2JSON(wall_post, "wall")
-        ###################################################################
-        #
-        #              End of FB Wall to JSON script
-        #
-        ###################################################################
+                    ###################################################################
+                    #
+                    #              End of FB Wall to JSON script
+                    #
+                    ###################################################################
