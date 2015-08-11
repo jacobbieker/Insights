@@ -1,6 +1,6 @@
 #Configuration file for all the scripts that work with the SQLite database
 sqlite:
-  name: insights
+  name: postgres_insights
   dbType: postgres #Choices are: sqlite, extended, apsw
   storage_location:
   tables:

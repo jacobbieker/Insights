@@ -23,6 +23,8 @@ import yaml
 from playhouse.migrate import *
 from playhouse.postgres_ext import *
 import phonenumbers
+import psycopg2
+from playhouse.apsw_ext import APSWDatabase
 
 
 if __name__ == "__main__":
@@ -35,17 +37,17 @@ if __name__ == "__main__":
         database = SqliteDatabase(DB_NAME)
         database.connect()
     else:
+        print(config.get('sqlite').get('type'))
         #Check to see what type of database wanted, and creates the type specificed
         if config.get('sqlite').get('type') == 'extended':
             from playhouse.sqlite_ext import SqliteExtDatabase
             database = SqliteExtDatabase(DB_NAME, threadlocals=True)
         elif config.get('sqlite').get('type') == 'apsw':
-            from playhouse.apsw_ext import APSWDatabase
             database = APSWDatabase(DB_NAME, threadlocals=True)
         elif config.get('sqlite').get('type') == 'postgres':
-            database = PostgresqlExtDatabase(database = DB_NAME, user = 'postgres', password = 'insights')
+            database = APSWDatabase(database = DB_NAME)
         else:
-            database = SqliteExtDatabase(DB_NAME, threadlocals=True)
+            database = APSWDatabase(database = DB_NAME)
 
     database.connect()
 
@@ -195,8 +197,9 @@ if __name__ == "__main__":
     Photos.create_table()
 
     database.close()
-#Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
+    from playhouse.apsw_ext import APSWDatabase
     with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
         config = yaml.load(ymlfile)
 else:
@@ -210,7 +213,7 @@ Peewee seems to have a problem with connecting to a database that is not in the 
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = PostgresqlExtDatabase(config.get('databaseLoc'), user = 'postgres', password = 'insights')
+        database = APSWDatabase(config.get('databaseLoc'))
 
 class Contacts(BaseModel):
     name = CharField(null=True)
