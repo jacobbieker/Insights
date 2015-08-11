@@ -19,6 +19,7 @@ __author__ = 'Jacob'
 import os
 import yaml
 import json
+from databaseSetup import Message, SocialMedia, Photos, Calendars
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
@@ -165,6 +166,9 @@ def album2JSON(location, album_name):
                                  'commenter': photo_commenter,
                                  'comment time': photo_comment_time,
                                  'comment': photo_comment}
+                    facebook_photos_queries.append({'date': photo_taken, 'camera_model': camera_make, 'iso': photo_iso,
+                                                    'exposure_mode': photo_exposure, 'focal_length': focal_length,
+                                                    'service': 'facebook', 'date_uploaded': date_string})
                     json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 
@@ -182,7 +186,7 @@ def thread2JSON(output_name, thread):
             # print message
             # user writing the message
             user = message.find("span", {"class": "user"}).text
-            if (user not in s for s in list_of_recipients):
+            if (user not in list_of_recipients):
                 list_of_recipients.append(user)
 
             date_and_time = message.find("span", {"class": "meta"}).text
@@ -197,6 +201,7 @@ def thread2JSON(output_name, thread):
                          'sender': user,
                          'recipients': list_of_recipients,
                          'message': text}
+            facebook_message_queries.append({'type': 'facebook message', 'date': date_string, 'sender': user, 'reciever': list_of_recipients, 'message': text})
             json_array = yaml.dump(json_data, json_output, default_flow_style=False)
 
 
@@ -281,6 +286,7 @@ def wall_post2JSON(wall_post, output_name):
                      'other person': other_person,
                      'type of event': type_of_event,
                      'post': post}
+        facebook_post_queries.append({'type': 'facebook ' + event_type + ' Other Person: ' + other_person, 'date': date_string, 'message': 'Type of event: ' + type_of_event + 'Post: ' + post})
         json_array = json.dump(json_data, json_output, sort_keys=True, indent=4)
 
 
@@ -336,7 +342,8 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
                     # json_data = []
                     # Get all links, which includes location of an album index.htm
                     links = album.find_all("a", href=True)
-                    for link in links['href']:
+                    links_links = links.find_all['href']
+                    for link in links_links:
                         if link == '*index.htm':
                             album_location = link
                             album_name = link.text

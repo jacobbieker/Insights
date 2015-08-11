@@ -21,6 +21,7 @@ import datetime
 import peewee
 import yaml
 from playhouse.migrate import *
+from playhouse.postgres_ext import *
 import phonenumbers
 
 
@@ -41,8 +42,10 @@ if __name__ == "__main__":
         elif config.get('sqlite').get('type') == 'apsw':
             from playhouse.apsw_ext import APSWDatabase
             database = APSWDatabase(DB_NAME, threadlocals=True)
+        elif config.get('sqlite').get('type') == 'postgres':
+            database = PostgresqlExtDatabase(database = DB_NAME, user = 'postgres', password = 'insights')
         else:
-            database = SqliteDatabase(DB_NAME, threadlocals=True)
+            database = SqliteExtDatabase(DB_NAME, threadlocals=True)
 
     database.connect()
 
@@ -207,7 +210,7 @@ Peewee seems to have a problem with connecting to a database that is not in the 
 #Create base database
 class BaseModel(peewee.Model):
     class Meta:
-        database = SqliteDatabase(config.get('databaseLoc'))
+        database = PostgresqlExtDatabase(config.get('databaseLoc'), user = 'postgres', password = 'insights')
 
 class Contacts(BaseModel):
     name = CharField(null=True)
