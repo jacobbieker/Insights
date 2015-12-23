@@ -32,4 +32,4 @@ for calendar in calendars:
         parsed_calendar = vobject.readOne(source)
         parsed_events = vobject.readComponents(source)
         if parsed_events:
-            print parsed_events.next()
+            print(parsed_events.next())

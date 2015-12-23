@@ -48,12 +48,12 @@ if not flickr.token_valid(perms=permissions):
 
     # Get the verifier code from the user. Do this however you
     # want, as long as the user gives the application the code.
-    verifier = unicode(raw_input('Verifier code: '))
+    verifier = input('Verifier code: ')
 
     # Trade the request token for an access token
     token = flickr.get_access_token(verifier)
-    print token
+    print(token)
 
 #Go through photos
 for photo in flickr.walk_photosets(extras=extras):
-    print photo.get('title')
+    print(photo.get('title'))

@@ -23,7 +23,7 @@ def cleanContent(msg):
     # Bail on unknown encodings if errors happen in BeautifulSoup.
     try:
         soup = BeautifulSoup(msg)
-        print soup
+        print(soup)
     except:
         return ''
     return ''.join(soup.findAll(text=True))

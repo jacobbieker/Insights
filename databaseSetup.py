@@ -354,7 +354,7 @@ def get_contact_by_number(phone_number):
     elif try_4 is not None:
         return try_4
     else:
-        print "Contact does not exist"
+        print("Contact does not exist")
         return None
 
 def get_contact_by_email(email):
@@ -371,7 +371,7 @@ def get_contact_by_email(email):
     elif try_4 is not None:
         return try_4
     else:
-        print "Contact does not exist"
+        print("Contact does not exist")
         return None
 
 def normalize_number(phone_number):

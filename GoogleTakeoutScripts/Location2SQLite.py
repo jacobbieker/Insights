@@ -315,7 +315,7 @@ if can_load_last_position():
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
-                            print "Could not access geocoders for location: " + point_string
+                            print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
         if(len(location_bulk_insert_queries) != 0):
             Locations.insert_many(location_bulk_insert_queries).execute()
@@ -372,7 +372,7 @@ else:
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
-                            print "Could not access geocoders for location: " + point_string
+                            print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
         if(len(location_bulk_insert_queries) != 0):
             Locations.insert_many(location_bulk_insert_queries).execute()

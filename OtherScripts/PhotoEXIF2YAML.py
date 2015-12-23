@@ -73,7 +73,7 @@ for location in locations:
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in raw_output._fields:
-                    print tag
+                    print(tag)
     ###################################################################
     #
     #             end of .CR2 Processing
