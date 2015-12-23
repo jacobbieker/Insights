@@ -36,16 +36,16 @@ auth = tweepy.OAuthHandler(access_config.get('twitter').get('key'), access_confi
 try:
     redirect_url = auth.get_authorization_url()
 except tweepy.TweepError:
-    print 'Error! Failed to get request token.'
+    print('Error! Failed to get request token.')
 
 # Example w/o callback (desktop)
-verifier = raw_input('Verifier:').strip()
+verifier = input('Verifier:').strip()
 
 # Try to get access token for use later
 try:
     auth.get_access_token(verifier=verifier)
 except:
-    print 'Error! Could not get access token'
+    print('Error! Could not get access token')
 
 #Token and secret
 #TODO save to access_config.yaml to read later and skip above steps
@@ -65,12 +65,12 @@ api = tweepy.API(auth)
 # Iterate through all of the authenticated user's friends
 for friend in tweepy.Cursor(api.friends).items():
     #Process the friend here
-    print friend
+    print(friend)
 
 # Iterate through the first 200 statuses in the friends timeline
 for status in tweepy.Cursor(api.friends_timeline).items(200):
     # Process the status here
-    print status
+    print(status)
 
 ###################################################################
 #

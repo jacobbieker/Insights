@@ -68,7 +68,7 @@ else:  # Clean up output file by deleting anything in the folder, if it exists
 
 # Check which services are used and only load those access token
 for service in access_config:
-    print access_config.get(service)
+    print(access_config.get(service))
     if (access_config.get(service).get('used')):
         if service == 'google':
             if access_config.get(service).get('local'):
@@ -100,30 +100,37 @@ Execute the other scripts to create the database and fill it
 '''
 
 # Try creating database
-execfile("databaseSetup.py")
+exec(compile(open("databaseSetup.py"), "rb").read(), "databaseSetup.py", 'exec')
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
-    execfile(os.path.join(GOOGLE_SCRIPTS, "GVoice2SQLite.py"))
-    execfile(os.path.join(GOOGLE_SCRIPTS, "Gmail2YAML.py"))
-    execfile(os.path.join(GOOGLE_SCRIPTS, "GmailJSON2SQLite.py"))
-    execfile(os.path.join(GOOGLE_SCRIPTS, "Location2SQLite.py"))
+    for executables in os.listdir(GOOGLE_SCRIPTS):
+        exec(compile(open(os.path.join(GOOGLE_SCRIPTS, executables), "rb").read(),
+                     os.path.join(GOOGLE_SCRIPTS, executables), 'exec'))
 
 # Then on other zipped files
 if access_config.get('facebook').get('used'):
-    execfile(os.path.join(FACEBOOK_SCRIPTS, "FacebookDownload2JSON.py"))
+    for executables in os.listdir(FACEBOOK_SCRIPTS):
+        exec(compile(open(os.path.join(FACEBOOK_SCRIPTS, executables), "rb").read(),
+                     os.path.join(FACEBOOK_SCRIPTS, executables), 'exec'))
 
 if access_config.get('linkedin').get('used'):
-    execfile("LinkedIn2JSON.py")
+    exec(compile(open("LinkedIn2JSON.py", "rb").read()), "LinkedIn2JSON.py", 'exec')
 
 if access_config.get('twitter').get('used'):
-    execfile(os.path.join(TWITTER_SCRIPTS, "Twitter2SQLite.py"))
+    for executables in os.listdir(TWITTER_SCRIPTS):
+        exec(compile(open(os.path.join(TWITTER_SCRIPTS, executables), "rb").read(),
+                     os.path.join(TWITTER_SCRIPTS, executables), 'exec'))
 
 if access_config.get('flickr').get('used'):
-    execfile("Flickr2SQLite.py")
+    exec(compile(open("Flickr2SQLite.py", "rb").read()), "Flickr2SQLite.py", 'exec')
 
 if access_config.get('instagram').get('used'):
-    execfile(os.path.join(INSTAGRAM_SCRIPTS, "Instagram2SQLite.py"))
+    for executables in os.listdir(INSTAGRAM_SCRIPTS):
+        exec(compile(open(os.path.join(INSTAGRAM_SCRIPTS, executables), "rb").read(),
+                     os.path.join(INSTAGRAM_SCRIPTS, executables), 'exec'))
 
 if access_config.get('local').get('used'):
-    execfile(os.path.join(OTHER_SCRIPTS, "PhotoEXIF2YAML.py"))
+    for executables in os.listdir(OTHER_SCRIPTS):
+        exec(compile(open(os.path.join(OTHER_SCRIPTS, executables), "rb").read(),
+                     os.path.join(OTHER_SCRIPTS, executables), 'exec'))

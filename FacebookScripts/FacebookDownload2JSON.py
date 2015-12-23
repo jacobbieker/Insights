@@ -108,7 +108,7 @@ def album2JSON(location, album_name):
     <span class="user">NAME</span>Sweet kayak!<div class="meta">Thursday, 25 June 2015 at 23:26 PDT</div></div></div></div>
     '''
     with open(location, 'r') as album:
-        html_album = BeautifulSoup(album.read().decode('utf-8', 'ignore'))
+        html_album = BeautifulSoup(album.read())
         content_album = html_album.find("div", {"class": "contents"})
         photos = content_album.find_all("div", {"class": "block"})
         output_file_name = 0
@@ -278,7 +278,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         if file=="messages.htm":
             with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
-                html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                html_file = BeautifulSoup(source.read())
                 content = html_file.find("div", {"class" : "contents"})
             ###################################################################
             #
@@ -307,11 +307,11 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         if (file=="photos.htm"):
             with open(os.path.join(constants.get('dataDir'), "Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
-                html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                html_file = BeautifulSoup(source.read())
                 content = html_file.find("div", {"class" : "contents"})
                 #Get all the albumns in content
                 albums = content.find_all("div", {"class" : "block"})
-                print albums
+                print(albums)
                 output_file_name = 0
                 #Now step into each album
 
@@ -338,7 +338,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         if (file=="synced_photos.htm"):
             with open(os.path.join(constants.get('dataDir'),"Facebook", "html",file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
-                html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                html_file = BeautifulSoup(source.read())
                 content = html_file.find("div", {"class" : "contents"})
                 synced_photo2JSON(content)
         ###################################################################
@@ -354,7 +354,7 @@ for file in os.listdir(os.path.join(constants.get('dataDir'), "Facebook", "html"
         if (file=="wall.htm"):
             with open(os.path.join(constants.get('dataDir'), "Facebook", "html", file), 'r') as source:
                 file_name = os.path.splitext(os.path.basename(file))
-                html_file = BeautifulSoup(source.read().decode('utf-8', 'ignore'))
+                html_file = BeautifulSoup(source.read())
                 content = html_file.find("div", {"class" : "contents"})
                 for wall_post in content.find_all("p"):
                     wall_post2JSON(wall_post, "wall")

@@ -28,13 +28,13 @@ def my_two_factor_function():
     while not code:
         # The user could accidentally press Enter before being ready,
         # let's protect them from doing that.
-        code = raw_input('Enter 2FA code: ')
+        code = input('Enter 2FA code: ')
     return code
 
 # Not ideal, but gets it done for now
 password = ''
 while not password:
-    password = raw_input('Password for GitHub: ')
+    password = input('Password for GitHub: ')
 
 # Authentication
 with open("access.yaml", 'r') as access:
