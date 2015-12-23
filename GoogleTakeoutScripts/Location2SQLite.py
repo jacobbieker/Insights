@@ -36,9 +36,11 @@ Variables used by multiple functions
 
 # List holding the values to be bulk inserted
 location_bulk_insert_queries = []
-#Changing the nmber below affects how often inserts are made, as well as location in data saved
+# Changing the nmber below affects how often inserts are made, as well as location in data saved
 number_entries_before_action = 5000
-#default, so that current_location_saver will work with google_location_parse
+# default, so that current_location_saver will work with google_location_parse
+number_entries_searched = number_entries_before_action * 2
+
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -55,16 +57,17 @@ def current_position_saver(keys):
     '''
     Save the current position after every X insertions
     '''
-    #temp_list = dictionary
-    #del temp_list[0:keys] # Delete the keys from first to whatever key it is
+    # temp_list = dictionary
+    # del temp_list[0:keys] # Delete the keys from first to whatever key it is
     with open(os.path.join(constants.get("outputDir"), "LocationsIndex"), "w") as temp_file:
         print("Dumping " + str(keys) + " Records")
-        if(keys < number_entries_before_action):
+        if (keys < number_entries_before_action):
             temp_file.write(yaml.dump(str(keys)))
         else:
             # Just to make sure that none are skipped, wirtes a number lower than the actual, not too much performance
             # impact, relative to going through them all again, for bigger performance gain, delete the negative
             temp_file.write(yaml.dump(str(keys - number_entries_before_action)))
+
 
 def can_load_last_position():
     if os.path.isfile(os.path.join(constants.get("outputDir"), "LocationsIndex")):
@@ -72,21 +75,25 @@ def can_load_last_position():
     else:
         return False
 
+
 def insert_many_locations(locations_list):
     if (len(locations_list) >= number_entries_before_action):
-        #with databaseSetup.database.atomic():  WOULD INCREASE SPEED, IMPORT PROBLEMS
+        # with databaseSetup.database.atomic():  WOULD INCREASE SPEED, IMPORT PROBLEMS
         Locations.insert_many(locations_list).execute()
         print("Inserted " + str(len(locations_list)) + " Records")
         del locations_list[:]
+
+
 '''
 Query database if it exists, and try to retrive a record for the current lat and long in the request
 '''
+
 
 def get_locations_from_database(longitude_query, latitude_query):
     try:
         # Try to location and getting same time, reduce duplicates
         loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
-                                  (Locations.time == time_stamp))
+                                  (Locations.time == time_stamp)).limit(number_entries_searched)
         return True
     except DoesNotExist:
         try:
@@ -94,7 +101,7 @@ def get_locations_from_database(longitude_query, latitude_query):
             loc_model = Locations.get(
                 ((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
                     (Locations.bound_north >= latitude_query >= Locations.bound_south) &
-                    (Locations.bound_east >= longitude_query >= Locations.bound_west))))
+                    (Locations.bound_east >= longitude_query >= Locations.bound_west)))).limit(number_entries_searched)
             location_bulk_insert_queries.append(
                 {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                  'latitude': latitude_query,
@@ -107,7 +114,7 @@ def get_locations_from_database(longitude_query, latitude_query):
             insert_many_locations(location_bulk_insert_queries)
             return True
         except DoesNotExist:
-            print ("Error: Does not Exist")
+            print("Error: Does not Exist")
             return False
 
 
@@ -245,6 +252,7 @@ def track_bounds(northeast, southwest, latitude, longitude):
     western_most = southwest[1]
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
+
 with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
@@ -317,7 +325,7 @@ if can_load_last_position():
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
-        if(len(location_bulk_insert_queries) != 0):
+        if (len(location_bulk_insert_queries) != 0):
             Locations.insert_many(location_bulk_insert_queries).execute()
             print("Inserted " + str(len(location_bulk_insert_queries)) + " Records")
 else:
@@ -374,6 +382,6 @@ else:
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
-        if(len(location_bulk_insert_queries) != 0):
+        if (len(location_bulk_insert_queries) != 0):
             Locations.insert_many(location_bulk_insert_queries).execute()
             print("Inserted " + str(len(location_bulk_insert_queries)) + " Records")
