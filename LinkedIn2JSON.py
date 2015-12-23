@@ -26,7 +26,7 @@ with open("constants.yaml", 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 
-rootdir = "C:\Users\jacob_000\OneDrive\Personal_Projects\LinkedIn"
+rootdir = ""
 
 for file in os.listdir(rootdir):
     if (file.endswith(".csv")):
