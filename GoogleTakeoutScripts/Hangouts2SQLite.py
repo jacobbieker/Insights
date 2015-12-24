@@ -23,79 +23,9 @@ import json
 import yaml
 import datetime
 
-
-def get_particpant(participant):
-    name = participant.get("fallback_name")
-    chat_id = participant.get("id").get("chat_id")
-    phone_data = participant.get("phone_number")
-    number = phone_data.get("e164")
-    international_number = phone_data.get("i18n_data").get("international_number")
-    national_number = phone_data.get("i18n_data").get("national_number")
-    if databaseSetup.get_contact_by_number(number) is None:
-        if databaseSetup.get_contact_by_number(international_number) is None:
-            if databaseSetup.get_contact_by_number(national_number) is None:
-                if Contacts.get(name=name):
-                    contact = Contacts.get(name=name)
-                else:
-                    contact = None
-                contact = None
-            else:
-                contact = databaseSetup.get_contact_by_number(national_number)
-        else:
-            contact = databaseSetup.get_contact_by_number(international_number)
-    else:
-        contact = databaseSetup.get_contact_by_number(number)
-
-    return chat_id, name, number, contact
-
-
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
-
-rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
-
-with open(rootdir, "r", encoding='latin-1') as source:
-    data = json.load(source)
-    conversations = data["conversation_state"]
-    count = 0
-    users = []
-    for conversation in conversations:
-        # Gets every conversation
-        count += 1
-        with open("hangouts." + str(count) + ".json", "w") as output:
-            json_output = json.dump(conversation, output, sort_keys=True, indent=4)
-        participants = conversation.get("conversation_state").get("conversation").get("participant_data")
-        # Get participant data
-        # for participant in participants:
-        #   users.append(get_particpant(participant))
-        # messages = conversations.get("event")
-        # print(messages)
-        for i, event in enumerate(conversations):
-            for messages in event:
-                for j, message in enumerate(event.get(messages)):
-                    for k, text in enumerate(message):
-                        print("Event Text: " + message)
-                        #print(text.get("timestamp"))
-                '''
-                #TODO Get reciever(s) for each message, right now
-                text = message.get("chat_message").get("message_content").get("segment").get("text")
-                sender_id = message.get("sender_id").get("chat_id")
-                user_id = message.get("self_event_state").get("user_id").get("chat_id")
-                sender = [None, None, None, None]
-                #for user in users:
-                 #   if sender_id == user[0]:
-                  #      sender = user
-                timestamp = message.get("timestamp")
-                date = datetime.datetime.fromtimestamp(timestamp=timestamp)
-                Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
-'''
-
 '''
 The article included in this repository is licensed under a Attribution-NonCommercial-ShareAlike 3.0 license, meaning that you are free to copy, distribute, transmit and adapt this work for non-commercial use, but that you must credit Fabian Mueller as the original author of the piece, and provide a link to the source: https://bitbucket.org/dotcs/hangouts-log-reader/
 '''
-
-import json
-import datetime.datetime
 
 class Participant(object):
     """
@@ -366,82 +296,132 @@ class Conversation(object):
         """
         return self.events
 
-class HangoutsReader:
+
+def parse_json_file(filename):
     """
-    Hangouts reader class
+    Parses the json file.
+
+    @return Array of Conversations
     """
-    def __init__(self, json_file):
-        """
-        Constructor
-        """
-        # parse the json file
-        self.parse_json_file(json_file)
 
-    def parse_json_file(self, filename):
-        """
-        Parses the json file.
+    conversation_list = []
+    with open(filename, encoding='latin-1') as json_data:
+        data = json.load(json_data)
 
-        @return None
-        """
-        with open(filename) as json_data:
-            data = json.load(json_data)
+        for conversation in data["conversation_state"]:
+            conversation_data = extract_conversation_data(conversation)
+            conversation_list.append(conversation_data)
 
-            for conversation in data["conversation_state"]:
-                conversation_data = self.extract_conversation_data(conversation)
+    return conversation_list
 
-    def extract_conversation_data(self, conversation):
-        """
-        Extracts the data that belongs to a single conversation.
+def extract_conversation_data(conversation):
+    """
+    Extracts the data that belongs to a single conversation.
 
-        @return Conversation object
-        """
-        try:
-            # note the initial timestamp of this conversation
-            initial_timestamp = conversation["response_header"]["current_server_time"]
-            conversation_id = conversation["conversation_id"]["id"]
+    @return Conversation object
+    """
+    try:
+        # note the initial timestamp of this conversation
+        initial_timestamp = conversation["response_header"]["current_server_time"]
+        conversation_id = conversation["conversation_id"]["id"]
 
-            # find out the participants
-            participant_list = ParticipantList()
-            for participant in conversation["conversation_state"]["conversation"]["participant_data"]:
-                gaia_id = participant["id"]["gaia_id"]
-                chat_id = participant["id"]["chat_id"]
+        # find out the participants
+        participant_list = ParticipantList()
+        for participant in conversation["conversation_state"]["conversation"]["participant_data"]:
+            gaia_id = participant["id"]["gaia_id"]
+            chat_id = participant["id"]["chat_id"]
+            try:
+                name = participant["fallback_name"]
+            except KeyError:
+                name = None
+            try:
+                phone = participant["phone_number"]["e164"]
+            except KeyError:
+                phone = None
+            p = Participant(gaia_id,chat_id,name,phone)
+            participant_list.add(p)
+
+        event_list = EventList()
+
+        for event in conversation["conversation_state"]["event"]:
+            event_id = event["event_id"]
+            sender_id = event["sender_id"] # has dict values "gaia_id" and "chat_id"
+            timestamp = event["timestamp"]
+            text = list()
+            try:
+                message_content = event["chat_message"]["message_content"]
                 try:
-                    name = participant["fallback_name"]
+                    for segment in message_content["segment"]:
+                        if segment["type"].lower() in ("TEXT".lower(), "LINK".lower()):
+                            text.append(segment["text"])
                 except KeyError:
-                    name = None
+                    pass # may happen when there is no (compatible) attachment
                 try:
-                    phone = participant["phone_number"]["e164"]
+                    for attachment in message_content["attachment"]:
+                        # if there is a Google+ photo attachment we append the URL
+                        if attachment["embed_item"]["type"][0].lower() == "PLUS_PHOTO".lower():
+                            text.append(attachment["embed_item"]["embeds.PlusPhoto.plus_photo"]["url"])
                 except KeyError:
-                    phone = None
-                p = Participant(gaia_id,chat_id,name,phone)
-                participant_list.add(p)
+                    pass # may happen when there is no (compatible) attachment
+            except KeyError:
+                continue # that's okay
+            # finally add the event to the event list
+            event_list.add(Event(event_id, sender_id["gaia_id"], timestamp, text))
+    except KeyError:
+        raise RuntimeError("The conversation data could not be extracted.")
+    return Conversation(conversation_id, initial_timestamp, participant_list, event_list)
 
-            event_list = EventList()
+def get_particpant(participant):
+    name = participant.get("fallback_name")
+    chat_id = participant.get("id").get("chat_id")
+    phone_data = participant.get("phone_number")
+    number = phone_data.get("e164")
+    international_number = phone_data.get("i18n_data").get("international_number")
+    national_number = phone_data.get("i18n_data").get("national_number")
+    if databaseSetup.get_contact_by_number(number) is None:
+        if databaseSetup.get_contact_by_number(international_number) is None:
+            if databaseSetup.get_contact_by_number(national_number) is None:
+                if Contacts.get(name=name):
+                    contact = Contacts.get(name=name)
+                else:
+                    contact = None
+                contact = None
+            else:
+                contact = databaseSetup.get_contact_by_number(national_number)
+        else:
+            contact = databaseSetup.get_contact_by_number(international_number)
+    else:
+        contact = databaseSetup.get_contact_by_number(number)
 
-            for event in conversation["conversation_state"]["event"]:
-                event_id = event["event_id"]
-                sender_id = event["sender_id"] # has dict values "gaia_id" and "chat_id"
-                timestamp = event["timestamp"]
-                text = list()
-                try:
-                    message_content = event["chat_message"]["message_content"]
-                    try:
-                        for segment in message_content["segment"]:
-                            if segment["type"].lower() in ("TEXT".lower(), "LINK".lower()):
-                                text.append(segment["text"])
-                    except KeyError:
-                        pass # may happen when there is no (compatible) attachment
-                    try:
-                        for attachment in message_content["attachment"]:
-                            # if there is a Google+ photo attachment we append the URL
-                            if attachment["embed_item"]["type"][0].lower() == "PLUS_PHOTO".lower():
-                                text.append(attachment["embed_item"]["embeds.PlusPhoto.plus_photo"]["url"])
-                    except KeyError:
-                        pass # may happen when there is no (compatible) attachment
-                except KeyError:
-                    continue # that's okay
-                # finally add the event to the event list
-                event_list.add(Event(event_id, sender_id["gaia_id"], timestamp, text))
-        except KeyError:
-            raise RuntimeError("The conversation data could not be extracted.")
-        return Conversation(conversation_id, initial_timestamp, participant_list, event_list)
+    return chat_id, name, number, contact
+
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
+
+with open(rootdir, "r", encoding='latin-1') as source:
+    count = 0
+    users = []
+    conversations = parse_json_file(source)
+
+    '''
+    for conversation in conversations:
+        # Gets every conversation
+        count += 1
+        with open("hangouts." + str(count) + ".json", "w") as output:
+            json_output = json.dump(conversation, output, sort_keys=True, indent=4)
+
+                #TODO Get reciever(s) for each message, right now
+                text = message.get("chat_message").get("message_content").get("segment").get("text")
+                sender_id = message.get("sender_id").get("chat_id")
+                user_id = message.get("self_event_state").get("user_id").get("chat_id")
+                sender = [None, None, None, None]
+                #for user in users:
+                 #   if sender_id == user[0]:
+                  #      sender = user
+                timestamp = message.get("timestamp")
+                date = datetime.datetime.fromtimestamp(timestamp=timestamp)
+                Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
+'''
