@@ -305,7 +305,7 @@ def parse_json_file(filename):
     """
 
     conversation_list = []
-    with open(filename, encoding='latin-1') as json_data:
+    with open(filename, encoding="utf8") as json_data:
         data = json.load(json_data)
 
         for conversation in data["conversation_state"]:
@@ -401,27 +401,6 @@ with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
 
-with open(rootdir, "r", encoding='latin-1') as source:
-    count = 0
-    users = []
-    conversations = parse_json_file(source)
-
-    '''
-    for conversation in conversations:
-        # Gets every conversation
-        count += 1
-        with open("hangouts." + str(count) + ".json", "w") as output:
-            json_output = json.dump(conversation, output, sort_keys=True, indent=4)
-
-                #TODO Get reciever(s) for each message, right now
-                text = message.get("chat_message").get("message_content").get("segment").get("text")
-                sender_id = message.get("sender_id").get("chat_id")
-                user_id = message.get("self_event_state").get("user_id").get("chat_id")
-                sender = [None, None, None, None]
-                #for user in users:
-                 #   if sender_id == user[0]:
-                  #      sender = user
-                timestamp = message.get("timestamp")
-                date = datetime.datetime.fromtimestamp(timestamp=timestamp)
-                Message.insert(type="hangouts", date=date, time=timestamp, sender=sender[1], message=text, contact=sender[3]).execute()
-'''
+conversations = parse_json_file(rootdir)
+for conversation in conversations:
+    print(conversation)
