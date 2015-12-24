@@ -37,7 +37,7 @@ Variables used by multiple functions
 # List holding the values to be bulk inserted
 location_bulk_insert_queries = []
 # Changing the nmber below affects how often inserts are made, as well as location in data saved
-number_entries_before_action = 1000
+number_entries_before_action = 10
 # default, so that current_location_saver will work with google_location_parse
 number_entries_searched = number_entries_before_action * 2
 
@@ -96,17 +96,12 @@ def get_locations_from_database(longitude_query, latitude_query):
                                   (Locations.time == time_stamp))
         return True
     except DoesNotExist:
-        try:
-            # If same time does not exist, try without time, and see if it can be found
-            loc_model = Locations.get(
-                ((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)))
-            return True
-        except DoesNotExist:
             try:
                 loc_model = Locations.get((
                     (Locations.bound_north >= latitude_query >= Locations.bound_south) &
                     (Locations.bound_east >= longitude_query >= Locations.bound_west)))
 
+                '''
                 Locations.insert({'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                                   'latitude': latitude_query,
                                   'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
@@ -126,7 +121,6 @@ def get_locations_from_database(longitude_query, latitude_query):
                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
                     'bound_west': loc_model.bound_west})
                 insert_many_locations(location_bulk_insert_queries)
-                '''
                 return True
             except DoesNotExist:
                 print("Error: Does not Exist")
