@@ -54,7 +54,7 @@ with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
 
-with open(rootdir, "r") as source:
+with open(rootdir, "r", encoding='latin-1') as source:
     data = json.load(source)
     conversations = data["conversation_state"]
     count = 0
@@ -74,8 +74,8 @@ with open(rootdir, "r") as source:
             for messages in event:
                 for j, message in enumerate(event.get(messages)):
                     for k, text in enumerate(message):
-                        print(message.get(text))
-                        print(text.get("timestamp"))
+                        print("Event Text: " + message)
+                        #print(text.get("timestamp"))
                 '''
                 #TODO Get reciever(s) for each message, right now
                 text = message.get("chat_message").get("message_content").get("segment").get("text")
