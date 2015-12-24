@@ -37,21 +37,26 @@ call_dict = []
 text_dict = []
 voicemail_dict = []
 
+num_before_insert = 100
+
 # Inserts multiple ones at the same time
+
 def insert_many_queries(call_queries, text_queries, voicemail_queries):
-    if len(call_queries) >= 100:
+    if len(call_queries) >= num_before_insert:
         Call.insert_many(call_queries).execute()
         #Remove all the stored ones
         del call_dict[:]
-        print("Inserted 100 or more Calls")
-    if len(text_queries) >= 1000:
+        print("Inserted %s or more Calls", num_before_insert)
+    if len(text_queries) >= num_before_insert:
+        #for text_message in text_queries:
+        #    Message.insert(text_message).execute()
         Message.insert_many(text_queries).execute()
         del text_dict[:]
-        print("Inserted 1000 or more Texts")
-    if len(voicemail_queries) >= 100:
+        print("Inserted %s or more Texts", num_before_insert)
+    if len(voicemail_queries) >= num_before_insert:
         Voicemail.insert_many(voicemail_queries).execute()
         del voicemail_dict[:]
-        print("Inserted 100 or more Voicemails")
+        print("Inserted %s or more Voicemails", num_before_insert)
 
 def voicemail2SQLite(caller, number, time, message):
     #contact = databaseSetup.get_contact_by_number(number)
@@ -76,7 +81,7 @@ conversation_number = 1  # Track conversation number, for continuity
 for file in os.listdir(rootdir):
     insert_many_queries(call_dict, text_dict, voicemail_dict)
     if file.endswith(".html"):
-        with open(os.path.join(rootdir, file), 'r') as source:
+        with open(os.path.join(rootdir, file), 'r', encoding='latin-1') as source:
             file_name = os.path.splitext(os.path.basename(file))
             yaml_file_name = file_name[0].split(" -")
             html_file = BeautifulSoup(source.read())
@@ -200,7 +205,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
                     yaml_data = []
                     for voicemail in voicemails:
                         # Date and Time
