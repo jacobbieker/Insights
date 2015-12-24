@@ -1,6 +1,10 @@
 '''
 The article included in this repository is licensed under a Attribution-NonCommercial-ShareAlike 3.0 license, meaning that you are free to copy, distribute, transmit and adapt this work for non-commercial use, but that you must credit Fabian Mueller as the original author of the piece, and provide a link to the source: https://bitbucket.org/dotcs/hangouts-log-reader/
 '''
+
+import json
+import datetime.datetime
+
 class Participant(object):
     """
     Participant class.
@@ -269,6 +273,29 @@ class Conversation(object):
         @return events of the conversation (unsorted)
         """
         return self.events
+
+class HangoutsReader:
+    """
+    Hangouts reader class
+    """
+    def __init__(self, json_file):
+        """
+        Constructor
+        """
+        # parse the json file
+        self.parse_json_file(json_file)
+
+    def parse_json_file(self, filename):
+        """
+        Parses the json file.
+
+        @return None
+        """
+        with open(filename) as json_data:
+            data = json.load(json_data)
+
+            for conversation in data["conversation_state"]:
+                conversation_data = self.extract_conversation_data(conversation)
 
     def extract_conversation_data(self, conversation):
         """
