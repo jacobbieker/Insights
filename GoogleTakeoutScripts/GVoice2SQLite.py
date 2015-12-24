@@ -79,7 +79,7 @@ for file in os.listdir(rootdir):
         with open(os.path.join(rootdir, file), 'r') as source:
             file_name = os.path.splitext(os.path.basename(file))
             yaml_file_name = file_name[0].split(" -")
-            html_file = BeautifulSoup(source.read().decode('utf8', 'ignore'))
+            html_file = BeautifulSoup(source.read())
             ###################################################################
             #
             #              Start of SMS to yaml script
@@ -87,7 +87,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", {"class": "message"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
                     yaml_data = []
                     for message in messages:
                         # Date and Time
@@ -144,7 +144,7 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Missed' or yaml_file_name[1] == ' Recieved' or yaml_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + yaml_file_name[0] + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
                     yaml_data = []
                     for call in calls:
                         # Date and Time

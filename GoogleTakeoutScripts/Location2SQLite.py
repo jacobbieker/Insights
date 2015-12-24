@@ -61,7 +61,7 @@ def current_position_saver(keys):
     # del temp_list[0:keys] # Delete the keys from first to whatever key it is
     with open(os.path.join(constants.get("outputDir"), "LocationsIndex"), "w") as temp_file:
         print("Dumping " + str(keys) + " Records")
-        if (keys < number_entries_before_action):
+        if keys < number_entries_before_action:
             temp_file.write(yaml.dump(str(keys)))
         else:
             # Just to make sure that none are skipped, wirtes a number lower than the actual, not too much performance
@@ -77,7 +77,7 @@ def can_load_last_position():
 
 
 def insert_many_locations(locations_list):
-    if (len(locations_list) >= number_entries_before_action):
+    if len(locations_list) >= number_entries_before_action:
         # with databaseSetup.database.atomic():  WOULD INCREASE SPEED, IMPORT PROBLEMS
         Locations.insert_many(locations_list).execute()
         print("Inserted " + str(len(locations_list)) + " Records")
@@ -93,15 +93,20 @@ def get_locations_from_database(longitude_query, latitude_query):
     try:
         # Try to location and getting same time, reduce duplicates
         loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
-                                  (Locations.time == time_stamp)).limit(number_entries_searched)
+                                  (Locations.time == time_stamp))
         return True
     except DoesNotExist:
         try:
             # If same time does not exist, try without time, and see if it can be found
             loc_model = Locations.get(
-                ((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query) | (
-                    (Locations.bound_north >= latitude_query >= Locations.bound_south) &
-                    (Locations.bound_east >= longitude_query >= Locations.bound_west)))).limit(number_entries_searched)
+                ((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)))
+            return True
+        except DoesNotExist:
+            print("Error: Does not Exist")
+            loc_model = Locations.get((
+                (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+                (Locations.bound_east >= longitude_query >= Locations.bound_west)))
+
             location_bulk_insert_queries.append(
                 {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                  'latitude': latitude_query,
@@ -112,9 +117,6 @@ def get_locations_from_database(longitude_query, latitude_query):
                  'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
                  'bound_west': loc_model.bound_west})
             insert_many_locations(location_bulk_insert_queries)
-            return True
-        except DoesNotExist:
-            print("Error: Does not Exist")
             return False
 
 

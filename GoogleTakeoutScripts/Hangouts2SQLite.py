@@ -23,6 +23,7 @@ import json
 import yaml
 import datetime
 
+
 def get_particpant(participant):
     name = participant.get("fallback_name")
     chat_id = participant.get("id").get("chat_id")
@@ -59,16 +60,16 @@ with open(rootdir, "r") as source:
     count = 0
     users = []
     for conversation in conversations:
-        #Gets every conversation
+        # Gets every conversation
         count += 1
         with open("hangouts." + str(count) + ".json", "w") as output:
             json_output = json.dump(conversation, output, sort_keys=True, indent=4)
         participants = conversation.get("conversation_state").get("conversation").get("participant_data")
-        #Get participant data
-        #for participant in participants:
-         #   users.append(get_particpant(participant))
-        #messages = conversations.get("event")
-        #print(messages)
+        # Get participant data
+        # for participant in participants:
+        #   users.append(get_particpant(participant))
+        # messages = conversations.get("event")
+        # print(messages)
         for i, event in enumerate(conversations):
             for messages in event:
                 for j, message in enumerate(event.get(messages)):
