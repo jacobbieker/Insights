@@ -102,22 +102,25 @@ def get_locations_from_database(longitude_query, latitude_query):
                 ((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)))
             return True
         except DoesNotExist:
-            print("Error: Does not Exist")
-            loc_model = Locations.get((
-                (Locations.bound_north >= latitude_query >= Locations.bound_south) &
-                (Locations.bound_east >= longitude_query >= Locations.bound_west)))
+            try:
+                loc_model = Locations.get((
+                    (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+                    (Locations.bound_east >= longitude_query >= Locations.bound_west)))
 
-            location_bulk_insert_queries.append(
-                {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
-                 'latitude': latitude_query,
-                 'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
-                 'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
-                 'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
-                 'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
-                 'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
-                 'bound_west': loc_model.bound_west})
-            insert_many_locations(location_bulk_insert_queries)
-            return False
+                location_bulk_insert_queries.append(
+                 {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                    'latitude': latitude_query,
+                    'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                    'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                    'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                    'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                    'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                    'bound_west': loc_model.bound_west})
+                insert_many_locations(location_bulk_insert_queries)
+                return True
+            except DoesNotExist:
+                print("Error: Does not Exist")
+                return False
 
 
 '''
