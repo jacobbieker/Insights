@@ -63,7 +63,7 @@ class Participant(object):
         """
         return self.name
 
-    def __unicode__(self):
+    def __str__(self):
         """
         @return name of the participant or its id if name is None
         """
@@ -113,20 +113,20 @@ class ParticipantList(object):
         self.max_iter = len(self.p_list)-1
         return self
 
-    def next(self):
+    def __next__(self):
         if self.current_iter > self.max_iter:
             raise StopIteration
         else:
             self.current_iter += 1
             return self.p_list.values()[self.current_iter-1]
 
-    def __unicode__(self):
+    def __str__(self):
         """
         @return names of the participants seperated by a comma
         """
         string = ""
         for p in self.p_list.values():
-            string += p + ", "
+            string += str(p) + ", "
         return string[:-2]
 
 class Event(object):
@@ -190,7 +190,7 @@ class Event(object):
         """
         string = ""
         for m in self.message:
-            string += m + " "
+            string += str(m) + " "
         return string[:-1]
 
 class EventList(object):
@@ -230,12 +230,12 @@ class EventList(object):
         self.max_iter = len(self.event_list)-1
         return self
 
-    def next(self):
+    def __next__(self):
         if self.current_iter > self.max_iter:
             raise StopIteration
         else:
             self.current_iter += 1
-            return self.event_list.values()[self.current_iter-1]
+            return list(self.event_list.values())[self.current_iter-1]
 
 class Conversation(object):
     """
@@ -305,7 +305,7 @@ def parse_json_file(filename):
     """
 
     conversation_list = []
-    with open(filename, encoding="utf8") as json_data:
+    with open(filename, encoding="utf-8", errors='ignore') as json_data:
         data = json.load(json_data)
 
         for conversation in data["conversation_state"]:
@@ -371,6 +371,41 @@ def extract_conversation_data(conversation):
         raise RuntimeError("The conversation data could not be extracted.")
     return Conversation(conversation_id, initial_timestamp, participant_list, event_list)
 
+def print_conversation(conversation):
+    """
+    Prints conversations in human readable format.
+
+    @return None
+    """
+    participants = conversation.get_participants()
+    for event in conversation.get_events():
+        author = "<UNKNOWN>"
+        author_id = participants.get_by_id(event.get_sender_id())
+        if author_id:
+            author = author_id.get_name()
+        print("%(timestamp)s: <%(author)s> %(message)s" % \
+                    {
+                        "timestamp": event.get_timestamp(),
+                        "author": author,
+                        "message": event.get_formatted_message(),
+                    })
+
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+    constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
+
+conversations = parse_json_file(rootdir)
+for conversation in conversations:
+    #print(conversation.get_timestamp())
+    print("conversation id: %s, participants: %s" % (conversation.get_id(), str(conversation.get_participants())))
+    #print_conversation(conversation)
+
+
+
+
+
+
 def get_particpant(participant):
     name = participant.get("fallback_name")
     chat_id = participant.get("id").get("chat_id")
@@ -394,13 +429,3 @@ def get_particpant(participant):
         contact = databaseSetup.get_contact_by_number(number)
 
     return chat_id, name, number, contact
-
-
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
-
-rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
-
-conversations = parse_json_file(rootdir)
-for conversation in conversations:
-    print(conversation)
