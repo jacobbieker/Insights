@@ -68,6 +68,7 @@ if __name__ == "__main__":
         phone_number_4 = TextField(null=True)
         country_code = TextField(null=True)
         last_number = TextField(null=True)
+        url = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
     class Message(BaseModel):
@@ -226,6 +227,7 @@ class Contacts(BaseModel):
     phone_number_4 = TextField(null=True)
     country_code = TextField(null=True)
     last_number = IntegerField(null=True)
+    url = TextField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 class Message(BaseModel):
