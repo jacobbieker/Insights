@@ -108,6 +108,18 @@ class ParticipantList(object):
         except:
             return None
 
+    def get_recievers_id(self, id):
+        """
+        Queries a list of participants excluding one
+
+        @:return the list of participants
+        """
+        try:
+            recievers = [p for p in self.p_list if p.get_id() != id]
+            return recievers
+        except:
+            return self.p_list
+
     def __iter__(self):
         self.current_iter = 0
         self.max_iter = len(self.p_list)-1
@@ -419,11 +431,17 @@ for conversation in conversations:
     # Need to save to the database
     for event in conversation.get_events():
         participants = conversation.get_participants()
-        reciever = participants.
-        # Save each event to the Message table
-        Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
-                        'sender': participants.get_by_id(event.get_sender_id()), 'reciever': reciever,
+        recievers = participants.get_recievers_id(event.get_sender_id())
+        event_type = event.get_type()
+        if str(event_type) == "VOICEMAIL":
+            Voicemail.insert({'date': event.get_timestamp(), 'caller': participants.get_by_id(event.get_sender_id()),
+                              'message': event.get_formatted_message})
+        elif str(event_type) == "SMS":
+            Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
+                        'sender': participants.get_by_id(event.get_sender_id()), 'reciever': recievers,
                         'message': event.get_formatted_message})
+        else:
+            print("Event Type not Recognized: " + str(event_type))
 
 
 
