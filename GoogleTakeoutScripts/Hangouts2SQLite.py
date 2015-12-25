@@ -437,9 +437,13 @@ for conversation in conversations:
             Voicemail.insert({'date': event.get_timestamp(), 'caller': participants.get_by_id(event.get_sender_id()),
                               'message': event.get_formatted_message})
         elif str(event_type) == "SMS":
-            Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
+            Message.insert({'date': event.get_timestamp, 'type': 'sms',
                         'sender': participants.get_by_id(event.get_sender_id()), 'reciever': recievers,
                         'message': event.get_formatted_message})
+        elif str(event_type) == "REGULAR_CHAT_MESSAGE":
+            Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
+                            'sender': participants.get_by_id(event.get_sender_id()), 'reciever': recievers,
+                            'message': event.get_formatted_message})
         else:
             print("Event Type not Recognized: " + str(event_type))
 
