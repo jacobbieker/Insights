@@ -133,7 +133,7 @@ class Event(object):
     """
     Event class.
     """
-    def __init__(self, event_id, sender_id, timestamp, message):
+    def __init__(self, event_id, sender_id, timestamp, message, event_type):
         """
         Constructor
         """
@@ -141,6 +141,7 @@ class Event(object):
         self.sender_id = sender_id
         self.timestamp = timestamp
         self.message = message
+        self.event_type = event_type
 
     def get_id(self):
         """
@@ -157,6 +158,14 @@ class Event(object):
         @return sender id of the event
         """
         return self.sender_id
+
+    def get_type(self):
+        """
+        Getter method for the sender id.
+
+        @return reciever ids of the event
+        """
+        return self.event_type
 
     def get_timestamp(self):
         """
@@ -305,12 +314,16 @@ def parse_json_file(filename):
     """
 
     conversation_list = []
+    count = 0
     with open(filename, encoding="utf-8", errors='ignore') as json_data:
         data = json.load(json_data)
 
         for conversation in data["conversation_state"]:
             conversation_data = extract_conversation_data(conversation)
             conversation_list.append(conversation_data)
+            count += 1
+            with open(os.path.join(outputdir, "hangouts." + str(count) + ".json"), "w") as dump:
+                json_dump = json.dump(conversation, fp=dump, indent=4, sort_keys=True)
 
     return conversation_list
 
@@ -347,6 +360,7 @@ def extract_conversation_data(conversation):
             event_id = event["event_id"]
             sender_id = event["sender_id"] # has dict values "gaia_id" and "chat_id"
             timestamp = event["timestamp"]
+            event_type = event["event_type"]
             text = list()
             try:
                 message_content = event["chat_message"]["message_content"]
@@ -366,7 +380,7 @@ def extract_conversation_data(conversation):
             except KeyError:
                 continue # that's okay
             # finally add the event to the event list
-            event_list.add(Event(event_id, sender_id["gaia_id"], timestamp, text))
+            event_list.add(Event(event_id, sender_id["gaia_id"], timestamp, text, event_type))
     except KeyError:
         raise RuntimeError("The conversation data could not be extracted.")
     return Conversation(conversation_id, initial_timestamp, participant_list, event_list)
@@ -394,13 +408,22 @@ with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
+outputdir = os.path.join(constants.get("outputDir"))
 
 conversations = parse_json_file(rootdir)
+message_list = []
 for conversation in conversations:
     #print(conversation.get_timestamp())
     print("conversation id: %s, participants: %s" % (conversation.get_id(), str(conversation.get_participants())))
     #print_conversation(conversation)
-
+    # Need to save to the database
+    for event in conversation.get_events():
+        participants = conversation.get_participants()
+        reciever = participants.
+        # Save each event to the Message table
+        Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
+                        'sender': participants.get_by_id(event.get_sender_id()), 'reciever': reciever,
+                        'message': event.get_formatted_message})
 
 
 
