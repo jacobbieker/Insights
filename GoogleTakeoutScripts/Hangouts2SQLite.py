@@ -432,18 +432,22 @@ for conversation in conversations:
     for event in conversation.get_events():
         participants = conversation.get_participants()
         recievers = participants.get_recievers_id(event.get_sender_id())
+        list_of_recievers = str(recievers)
         event_type = event.get_type()
+        message = str(event.get_formatted_message())
+        sender = participants.get_by_id(event.get_sender_id())
+        sender_name = str(sender)
         if str(event_type) == "VOICEMAIL":
-            Voicemail.insert({'date': event.get_timestamp(), 'caller': participants.get_by_id(event.get_sender_id()),
-                              'message': event.get_formatted_message})
+            Voicemail.insert({'date': event.get_timestamp(), 'caller': sender_name,
+                              'message': message}).execute()
         elif str(event_type) == "SMS":
-            Message.insert({'date': event.get_timestamp, 'type': 'sms',
-                        'sender': participants.get_by_id(event.get_sender_id()), 'reciever': recievers,
-                        'message': event.get_formatted_message})
+            Message.insert({'date': event.get_timestamp(), 'type': 'sms',
+                        'sender': sender_name, 'reciever': list_of_recievers,
+                        'message': message}).execute()
         elif str(event_type) == "REGULAR_CHAT_MESSAGE":
-            Message.insert({'date': event.get_timestamp, 'type': 'hangouts',
-                            'sender': participants.get_by_id(event.get_sender_id()), 'reciever': recievers,
-                            'message': event.get_formatted_message})
+            Message.insert({'date': event.get_timestamp(), 'type': 'hangouts',
+                            'sender': sender_name, 'reciever': list_of_recievers,
+                            'message': message}).execute()
         else:
             print("Event Type not Recognized: " + str(event_type))
 
