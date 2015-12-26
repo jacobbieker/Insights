@@ -48,15 +48,15 @@ for calendar in calendars:
                 print("Begin new event")
             elif type_of_data[0] == "DTSTART":
                 #TODO Split into start date and start time
-                event_data.append({"start_time": components[1].replace("\n", "").replace(";", "")})
+                event_data.append({"start_time": components[1]})
             elif type_of_data[0] == "DTEND":
-                event_data.append({"end_time": components[1].replace("\n", "").replace(";", "")})
+                event_data.append({"end_time": components[1]})
             elif type_of_data[0] == "DESCRIPTION":
-                event_data.append({"description": components[1].replace("\n", "").replace(";", "")})
+                event_data.append({"description": components[1]})
             elif type_of_data[0] == "LOCATION":
-                event_data.append({"location": components[1].replace("\n", "").replace(";", "")})
+                event_data.append({"location": components[1]})
             elif type_of_data[0] == "SUMMARY":
-                event_data.append({"name": components[1].replace("\n", "").replace(";", "")})
+                event_data.append({"name": components[1]})
             elif type_of_data[0] == "END" and components[1] == "VEVENT":
                 all_event_data = {}
                 for item in event_data:
