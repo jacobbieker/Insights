@@ -62,6 +62,7 @@ with open(os.path.join(rootdir, "All Contacts.vcf"), 'rU', encoding='latin-1') a
             for item in contact_data:
                 all_contact_data.update(item)
             # Insert Contact into database
+            print(all_contact_data)
             Contacts.insert(all_contact_data).execute()
             print("Inserted Contact")
             # Reset data
