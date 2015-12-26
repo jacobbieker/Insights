@@ -43,6 +43,7 @@ for calendar in calendars:
             type_of_data = components[0].split(";")
             if type_of_data[0] == "BEGIN" and components[1] == "VEVENT":
                 event_data.append({"which_calendar": which_calendar})
+                event_data.append({"is_task": False})
                 # Start of new record
                 print("Begin new event")
             elif type_of_data[0] == "DTSTART":
