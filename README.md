@@ -3,8 +3,8 @@ A set of Python and R scripts to organize and analyze data from various sources 
 easy to access and manipulate.
 
 # Dependencies
-peewee >= 2.6.0, rawkit, readexif, python-instagram, tweepy, facebook, github3
-Only tested on Python 2.7
+peewee >= 2.7.1, rawkit, readexif, python-instagram, tweepy, facebook, github3
+Only tested on Python 3.5
 https://github.com/jay0lee/got-your-back to access GMail data, at least until mbox can get made to work
 
 # Use
