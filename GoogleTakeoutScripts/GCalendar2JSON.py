@@ -61,6 +61,7 @@ for calendar in calendars:
                 for item in event_data:
                     all_event_data.update(item)
                 # Insert Contact into database
+                print(all_event_data)
                 Calendars.insert(all_event_data).execute()
                 print("Inserted Event")
                 # Reset data
