@@ -182,22 +182,26 @@ if __name__ == "__main__":
         is_task = BooleanField()
         timestamp = DateTimeField(default=datetime.datetime.now())
 
-    Calendars.create_table()
-    Message.create_table()
-    Locations.create_table()
-    Call.create_table()
-    Voicemail.create_table()
-    Word.create_table()
-    Jobs.create_table()
-    Contacts.create_table()
-    SocialMedia.create_table()
-    Photos.create_table()
+    Calendars.create_table(True)
+    Message.create_table(True)
+    Locations.create_table(True)
+    Call.create_table(True)
+    Voicemail.create_table(True)
+    Word.create_table(True)
+    Jobs.create_table(True)
+    Contacts.create_table(True)
+    SocialMedia.create_table(True)
+    Photos.create_table(True)
 
     database.close()
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
-    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-        config = yaml.load(ymlfile)
+    if __name__ == "insights":
+        with open("constants.yaml", 'r') as ymlfile:
+            config = yaml.load(ymlfile)
+    else:
+        with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+            config = yaml.load(ymlfile)
 else:
     with open("constants.yaml", 'r') as ymlfile:
         config = yaml.load(ymlfile)
