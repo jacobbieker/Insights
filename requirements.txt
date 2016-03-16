@@ -7,3 +7,5 @@ facebook
 geopy
 python-instagram
 tweepy
+exifread
+rawkit
