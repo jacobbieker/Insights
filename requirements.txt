@@ -1,9 +1,9 @@
 peewee
 phonenumbers
 flickrapi
-github3
+github3.py
 bs4
 facebook
 geopy
-instagram
+python-instagram
 tweepy

@@ -28,7 +28,7 @@ try:
 except ImportError:
     import xml.etree.ElementTree as etree
 
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
+with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
     constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Voice", "Calls")
@@ -39,19 +39,20 @@ voicemail_dict = []
 
 num_before_insert = 100
 
+
 # Inserts multiple ones at the same time
 
 def insert_many_queries(call_queries, text_queries, voicemail_queries):
     if len(call_queries) >= num_before_insert:
         Call.insert_many(call_queries).execute()
-        #Remove all the stored ones
+        # Remove all the stored ones
         del call_dict[:]
         print("Inserted %d or more Calls", num_before_insert)
     if len(text_queries) >= num_before_insert:
         for text_message in text_queries:
             Message.insert(text_message).execute()
 
-        #   Message.insert_many(text_queries).execute()
+        # Message.insert_many(text_queries).execute()
         del text_dict[:]
         print("Inserted %d or more Texts", num_before_insert)
     if len(voicemail_queries) >= num_before_insert:
@@ -59,17 +60,21 @@ def insert_many_queries(call_queries, text_queries, voicemail_queries):
         del voicemail_dict[:]
         print("Inserted %d or more Voicemails", num_before_insert)
 
+
 def voicemail2SQLite(caller, number, time, message):
-    #contact = databaseSetup.get_contact_by_number(number)
+    # contact = databaseSetup.get_contact_by_number(number)
     voicemail_dict.append({'date': time, 'caller': caller, 'message': message})
 
+
 def text2SQLite(sender, reciever, time, number, message):
-    #contact = databaseSetup.get_contact_by_number(number)
+    # contact = databaseSetup.get_contact_by_number(number)
     text_dict.append({'date': time, 'type': 'sms', 'sender': sender, 'reciever': reciever, 'message': message})
 
+
 def call2SQLite(caller, status, time, duration, number):
-    #contact = databaseSetup.get_contact_by_number(number)
+    # contact = databaseSetup.get_contact_by_number(number)
     call_dict.append({'date': time, 'caller': caller, 'reciever': 'Me', 'answered': status, 'length': duration})
+
 
 '''
 SAMPLE INPUT:
@@ -93,7 +98,8 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Text'):
                 messages = html_file.find_all("div", {"class": "message"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'),
+                          'a') as yaml_output:
                     yaml_data = []
                     for message in messages:
                         # Date and Time
@@ -150,7 +156,8 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Missed' or yaml_file_name[1] == ' Recieved' or yaml_file_name[1] == ' Placed'):
                 calls = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'),
+                          'a') as yaml_output:
                     yaml_data = []
                     for call in calls:
                         # Date and Time
@@ -192,7 +199,8 @@ for file in os.listdir(rootdir):
                                           'caller': caller,
                                           'duration': duration,
                                           'phone number': phone_number[1]})
-                        call2SQLite(caller=caller, status=status, time=date_string, duration=duration, number=phone_number[1])
+                        call2SQLite(caller=caller, status=status, time=date_string, duration=duration,
+                                    number=phone_number[1])
                     yaml_array = yaml.dump(yaml_data, yaml_output, default_flow_style=False)
             ###################################################################
             #
@@ -206,7 +214,8 @@ for file in os.listdir(rootdir):
             ###################################################################
             if (yaml_file_name[1] == ' Voicemail'):
                 voicemails = html_file.find_all("div", {"class": "haudio"})
-                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'), 'a') as yaml_output:
+                with open(os.path.join(constants.get('outputDir'), 'gvoice.' + str(yaml_file_name[0]) + '.yaml'),
+                          'a') as yaml_output:
                     yaml_data = []
                     for voicemail in voicemails:
                         # Date and Time
