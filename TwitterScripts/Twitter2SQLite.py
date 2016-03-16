@@ -27,7 +27,7 @@ import yaml
 
 #Authentication with Twitter
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ != "__main__":
+if __name__ == "__main__":
     with open(os.path.join("..","access.yaml"), 'r') as access:
         access_config = yaml.load(access)
 else:
