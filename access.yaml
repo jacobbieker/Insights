@@ -30,7 +30,7 @@ flickr:
     #The extra info to return in the requests to Flickr
     extras: description,date_upload,date_taken,original_format,last_update,tags,views,media,geo
     key: <key>
-    secret: <secrete>
+    secret: <secret>
 google:
     used: yes
     local: yes
