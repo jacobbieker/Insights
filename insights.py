@@ -24,7 +24,6 @@ import glob
 import zipfile
 import yaml
 
-
 # read config data on database
 with open("dbconfig.yaml", 'r') as ymlfile:
     config = yaml.load(ymlfile)
@@ -100,7 +99,7 @@ Execute the other scripts to create the database and fill it
 '''
 
 # Try creating database
-exec(compile(open("databaseSetup.py"), "rb").read(), "databaseSetup.py", 'exec')
+exec(compile(open("databaseSetup.py", "rb").read(), "databaseSetup.py", 'exec'))
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):

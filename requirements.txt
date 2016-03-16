@@ -1,0 +1,9 @@
+peewee
+phonenumbers
+flickrapi
+github3
+bs4
+facebook
+geopy
+instagram
+tweepy
