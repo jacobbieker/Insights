@@ -22,8 +22,13 @@ import json
 from bs4 import BeautifulSoup
 from datetime import datetime
 import re
-with open(os.path.join("..","constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
 
 #Date and Time, Facebook Format
 def get_date_and_time(time_string):

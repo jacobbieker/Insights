@@ -25,8 +25,13 @@ from instagram.bind import InstagramAPIError
 import yaml
 
 #Authentication with Instagram
-with open("../access.yaml", 'r') as access:
-    access_config = yaml.load(access)
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..","access.yaml"), 'r') as access:
+        access_config = yaml.load(access)
+else:
+    with open(os.path.join("access.yaml"), 'r') as access:
+        access_config = yaml.load(access)
 
 #Based on the get_access_token.py on Instagram's Github
 client_id = access_config.get('instagram').get('id')

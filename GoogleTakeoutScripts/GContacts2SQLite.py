@@ -21,8 +21,13 @@ from databaseSetup import Contacts
 from peewee import *
 import yaml
 
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Contacts")
 

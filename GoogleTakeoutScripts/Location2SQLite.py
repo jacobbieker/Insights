@@ -262,12 +262,18 @@ def track_bounds(northeast, southwest, latitude, longitude):
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
 
-with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-    constants = yaml.load(ymlfile)
-
-# Open continents.yaml to get location data
-with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
-    location_data = yaml.load(loc_data)
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+        # Open continents.yaml to get location data
+    with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
+        location_data = yaml.load(loc_data)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+    with open(os.path.join("countries.yaml"), 'r') as loc_data:
+        location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 opencage_geolocator = OpenCage(api_key="d1e2dc9584fd84b683ac13c5cf12cc98")

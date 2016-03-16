@@ -37,8 +37,13 @@ while not password:
     password = input('Password for GitHub: ')
 
 # Authentication
-with open("access.yaml", 'r') as access:
-    access_config = yaml.load(access)
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ != "__main__":
+    with open(os.path.join("..","access.yaml"), 'r') as access:
+        access_config = yaml.load(access)
+else:
+    with open(os.path.join("access.yaml"), 'r') as access:
+        access_config = yaml.load(access)
 
 username = access_config.get('github').get('username')
 
