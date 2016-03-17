@@ -196,7 +196,8 @@ if __name__ == "__main__":
     database.close()
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
-    if __name__ == "insights":
+    print(__name__)
+    if __name__ == "databaseSetup":
         with open("constants.yaml", 'r') as ymlfile:
             config = yaml.load(ymlfile)
     else:
