@@ -49,3 +49,7 @@ local:
     photoLocations:
       - 'C:\Users\Jacob Bieker\OneDrive\EOS Pictures'
       - 'location 2'
+    sleep: no
+    sleepLocation: 'location'
+    heart: no
+    activity: no

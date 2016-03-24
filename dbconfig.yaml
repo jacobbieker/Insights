@@ -93,3 +93,6 @@ sqlite:
         name: string
         duration: double
         isTask: boolean
+    sleep:
+    heart:
+    activity:
