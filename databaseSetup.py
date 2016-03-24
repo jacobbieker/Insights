@@ -23,33 +23,36 @@ import yaml
 from playhouse.migrate import *
 import phonenumbers
 
-
 if __name__ == "__main__":
     with open("dbconfig.yaml", 'r') as ymlfile:
         config = yaml.load(ymlfile)
 
     DB_NAME = config.get('sqlite').get('name') + '.db'
-    #remove old database if in the current directory
+    # remove old database if in the current directory
     if os.path.isfile(DB_NAME):
         database = SqliteDatabase(DB_NAME)
         database.connect()
     else:
-        #Check to see what type of database wanted, and creates the type specificed
+        # Check to see what type of database wanted, and creates the type specificed
         if config.get('sqlite').get('type') == 'extended':
             from playhouse.sqlite_ext import SqliteExtDatabase
+
             database = SqliteExtDatabase(DB_NAME, threadlocals=True)
         elif config.get('sqlite').get('type') == 'apsw':
             from playhouse.apsw_ext import APSWDatabase
+
             database = APSWDatabase(DB_NAME, threadlocals=True)
         else:
             database = SqliteDatabase(DB_NAME, threadlocals=True)
 
     database.connect()
 
-    #Create base database
+
+    # Create base database
     class BaseModel(peewee.Model):
         class Meta:
             database = database
+
 
     class Contacts(BaseModel):
         name = CharField(null=True)
@@ -71,6 +74,7 @@ if __name__ == "__main__":
         url = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Message(BaseModel):
         type = TextField(null=True)
         date = DateTimeField(null=True)
@@ -82,11 +86,13 @@ if __name__ == "__main__":
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Word(BaseModel):
         word = CharField(null=True)
         length = IntegerField(null=True)
         occurences = IntegerField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
+
 
     class Call(BaseModel):
         date = DateTimeField(null=True)
@@ -98,6 +104,7 @@ if __name__ == "__main__":
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Voicemail(BaseModel):
         date = DateTimeField(null=True)
         time = TimeField(null=True)
@@ -105,6 +112,7 @@ if __name__ == "__main__":
         message = TextField(null=True)
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
+
 
     class Locations(BaseModel):
         date = DateTimeField(null=True)
@@ -127,6 +135,7 @@ if __name__ == "__main__":
         bound_west = DoubleField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Jobs(BaseModel):
         title = CharField(null=True)
         company = CharField(null=True)
@@ -138,6 +147,7 @@ if __name__ == "__main__":
         location = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class SocialMedia(BaseModel):
         type = CharField(null=True)
         date = DateTimeField(null=True)
@@ -146,6 +156,7 @@ if __name__ == "__main__":
         tags = TextField(null=True)
         urls = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
+
 
     class Photos(BaseModel):
         name = CharField(null=True)
@@ -168,6 +179,7 @@ if __name__ == "__main__":
         url = TextField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Calendars(BaseModel):
         start_date = DateTimeField(null=True)
         start_time = TimeField(null=True)
@@ -182,6 +194,7 @@ if __name__ == "__main__":
         is_task = BooleanField()
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+
     class Sleep(BaseModel):
         date = DateField(null=True)
         start_time = TimeField(null=True)
@@ -195,6 +208,7 @@ if __name__ == "__main__":
         deep_sleep = FloatField(null=True)
         noise = FloatField(null=True)
 
+
     class Activity(BaseModel):
         date = DateField(null=True)
         start_time = TimeField(null=True)
@@ -207,6 +221,7 @@ if __name__ == "__main__":
         type = CharField(null=True)
         calories = DoubleField(null=True)
 
+
     class Heart(BaseModel):
         start_time = TimeField(null=True)
         end_time = TimeField(null=True)
@@ -217,6 +232,7 @@ if __name__ == "__main__":
         average = DoubleField(null=True)
         highest = DoubleField(null=True)
         activity = ForeignKeyField(Activity, null=True)
+
 
     Calendars.create_table(True)
     Message.create_table(True)
@@ -250,10 +266,13 @@ else:
 As of right now, this should create a database in each folder the script is run, to then combine them later
 Peewee seems to have a problem with connecting to a database that is not in the current folder
 '''
-#Create base database
+
+
+# Create base database
 class BaseModel(peewee.Model):
     class Meta:
         database = SqliteDatabase(config.get('databaseLoc'))
+
 
 class Contacts(BaseModel):
     name = CharField(null=True)
@@ -275,6 +294,7 @@ class Contacts(BaseModel):
     url = TextField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Message(BaseModel):
     type = TextField(null=True)
     date = DateTimeField(null=True)
@@ -286,11 +306,13 @@ class Message(BaseModel):
     contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Word(BaseModel):
     word = CharField(null=True)
     length = IntegerField(null=True)
     occurences = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
+
 
 class Call(BaseModel):
     date = DateTimeField(null=True)
@@ -302,6 +324,7 @@ class Call(BaseModel):
     contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Voicemail(BaseModel):
     date = DateTimeField(null=True)
     time = TimeField(null=True)
@@ -309,6 +332,7 @@ class Voicemail(BaseModel):
     message = TextField(null=True)
     contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
+
 
 class Locations(BaseModel):
     date = DateTimeField(null=True)
@@ -331,6 +355,7 @@ class Locations(BaseModel):
     bound_west = DoubleField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Jobs(BaseModel):
     title = CharField(null=True)
     company = CharField(null=True)
@@ -342,6 +367,7 @@ class Jobs(BaseModel):
     location = TextField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class SocialMedia(BaseModel):
     type = CharField(null=True)
     date = DateTimeField(null=True)
@@ -350,6 +376,7 @@ class SocialMedia(BaseModel):
     tags = TextField(null=True)
     urls = TextField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
+
 
 class Photos(BaseModel):
     name = CharField(null=True)
@@ -371,6 +398,7 @@ class Photos(BaseModel):
     date_uploaded = DateTimeField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Calendars(BaseModel):
     start_date = DateTimeField(null=True)
     start_time = TimeField(null=True)
@@ -385,10 +413,10 @@ class Calendars(BaseModel):
     is_task = BooleanField()
     timestamp = DateTimeField(default=datetime.datetime.now())
 
+
 class Sleep(BaseModel):
-    date = DateField(null=True)
-    start_time = TimeField(null=True)
-    end_time = TimeField(null=True)
+    start_time = DateTimeField(null=True)
+    end_time = DateTimeField(null=True)
     location = ForeignKeyField(Locations, null=True)
     duration = DoubleField(null=True)
     application = CharField(null=True)
@@ -397,6 +425,7 @@ class Sleep(BaseModel):
     comments = TextField(null=True)
     deep_sleep = FloatField(null=True)
     noise = FloatField(null=True)
+
 
 class Activity(BaseModel):
     date = DateField(null=True)
@@ -410,6 +439,7 @@ class Activity(BaseModel):
     type = CharField(null=True)
     calories = DoubleField(null=True)
 
+
 class Heart(BaseModel):
     start_time = TimeField(null=True)
     end_time = TimeField(null=True)
@@ -421,15 +451,18 @@ class Heart(BaseModel):
     highest = DoubleField(null=True)
     activity = ForeignKeyField(Activity, null=True)
 
+
 '''
 Set of functions to normalize data and standardize different inputs and queries
 '''
+
+
 def get_contact_by_number(phone_number):
     try_1 = Contacts.get(phone_number_1=phone_number)
     try_2 = Contacts.get(phone_number_2=phone_number)
     try_3 = Contacts.get(phone_number_3=phone_number)
     try_4 = Contacts.get(phone_number_4=phone_number)
-    if try_1 is not  None:
+    if try_1 is not None:
         return try_1
     elif try_2 is not None:
         return try_2
@@ -440,13 +473,14 @@ def get_contact_by_number(phone_number):
     else:
         print("Contact does not exist")
         return None
+
 
 def get_contact_by_email(email):
     try_1 = Contacts.get(email_1=email)
     try_2 = Contacts.get(email_2=email)
     try_3 = Contacts.get(email_3=email)
     try_4 = Contacts.get(email_4=email)
-    if try_1 is not  None:
+    if try_1 is not None:
         return try_1
     elif try_2 is not None:
         return try_2
@@ -458,8 +492,9 @@ def get_contact_by_email(email):
         print("Contact does not exist")
         return None
 
+
 def normalize_number(phone_number):
     parsed = phonenumbers.parse(phone_number, 'US')
     normalized = phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
     return normalized
-#Make all phone numbers the same setup
+    # Make all phone numbers the same setup

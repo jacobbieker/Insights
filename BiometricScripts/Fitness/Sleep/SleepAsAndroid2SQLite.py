@@ -21,3 +21,28 @@ import yaml
 from databaseSetup import Sleep
 from peewee import *
 import csv
+
+# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+if __name__ == "__main__":
+    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+
+rootdir = os.path.join(constants.get("dataDir"), "Biometric",
+                       "Sleep as Android Spreadsheet - Sleep as Android Spreadsheet.csv")
+
+with open(rootdir, 'r') as source:
+    reader = csv.DictReader(source)
+    for row in reader:
+        sleep_data = {'start_time': row['From'],
+                      'end_time': row['To'],
+                      'duration': row['Hours'],
+                      'rating': row['Rating'],
+                      'comments': row['Comment'],
+                      'cycles': row['Cycles'],
+                      'deep_sleep': row['DeepSleep'],
+                      'noise': row['Noise'],
+                      }
+        Sleep.insert(sleep_data).execute()
