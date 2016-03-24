@@ -77,6 +77,11 @@ def can_load_last_position():
 
 
 def insert_many_locations(locations_list):
+    """
+    Executes multiple inserts at once, to reduce amount of time the database is locked
+    :param locations_list:
+    :return:
+    """
     if len(locations_list) >= number_entries_before_action:
         # with databaseSetup.database.atomic():  WOULD INCREASE SPEED, IMPORT PROBLEMS
         Locations.insert_many(locations_list).execute()
@@ -90,6 +95,13 @@ Query database if it exists, and try to retrive a record for the current lat and
 
 
 def get_locations_from_database(longitude_query, latitude_query):
+    """
+    Go through database and check if the location was already queried
+    :rtype : bool
+    :param longitude_query:
+    :param latitude_query:
+    :return: Whether query already exists in database
+    """
     try:
         # Try to location and getting same time, reduce duplicates
         loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
@@ -197,7 +209,7 @@ def opencage_parser(opencage_response, longitude, latitude):
 
 def googleV3_parser(google_response, longitude, latitude):
     '''
-    Looka at Google.json for an example
+    Look at Google.json for an example
     :param longitude:
     :param latitude:
     :return:
@@ -245,6 +257,12 @@ def googleV3_parser(google_response, longitude, latitude):
 
 # Find the continent based off the coordinates, more consistent than going off the name
 def continent_finder(latitude, longitude):
+    """
+    Returns the continent that that latitude and longitute correspond to
+    :param latitude: Latitude
+    :param longitude: Longitude
+    :return: Continent that contains those coordinates
+    """
     # get the list of country data
     for country_data in location_data.get('countries').get('country'):
         if country_data.get('north') >= latitude >= country_data.get('south'):
@@ -253,8 +271,15 @@ def continent_finder(latitude, longitude):
     return "Continent Not Found"
 
 
-# Keep track of bounds of geocoding, so that less requests are sent to remote servers
 def track_bounds(northeast, southwest, latitude, longitude):
+    """
+    Keeps track of bounds of geocoding, so that less requests are sent to remote servers
+    :param northeast: Northeast coordinates tuple (North, East)
+    :param southwest: Southwest Coordinates tuple (South, West)
+    :param latitude: Lat of point
+    :param longitude: Long of point
+    :return: If the lat and long is within the bounds
+    """
     northern_most = northeast[0]
     eastern_most = northeast[1]
     southern_most = southwest[0]
