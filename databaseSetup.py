@@ -182,6 +182,42 @@ if __name__ == "__main__":
         is_task = BooleanField()
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+    class Sleep(BaseModel):
+        date = DateField(null=True)
+        start_time = TimeField(null=True)
+        end_time = TimeField(null=True)
+        location = ForeignKeyField(Locations, null=True)
+        duration = DoubleField(null=True)
+        application = CharField(null=True)
+        cycles = IntegerField(null=True)
+        rating = DoubleField(null=True)
+        comments = TextField(null=True)
+        deep_sleep = FloatField(null=True)
+        noise = FloatField(null=True)
+
+    class Activity(BaseModel):
+        date = DateField(null=True)
+        start_time = TimeField(null=True)
+        end_time = TimeField(null=True)
+        location = ForeignKeyField(Locations, null=True)
+        duration = DoubleField(null=True)
+        application = CharField(null=True)
+        rating = DoubleField(null=True)
+        comments = TextField(null=True)
+        type = CharField(null=True)
+        calories = DoubleField(null=True)
+
+    class Heart(BaseModel):
+        start_time = TimeField(null=True)
+        end_time = TimeField(null=True)
+        location = ForeignKeyField(Locations, null=True)
+        duration = DoubleField(null=True)
+        application = CharField(null=True)
+        lowest = DoubleField(null=True)
+        average = DoubleField(null=True)
+        highest = DoubleField(null=True)
+        activity = ForeignKeyField(Activity, null=True)
+
     Calendars.create_table(True)
     Message.create_table(True)
     Locations.create_table(True)
@@ -192,6 +228,9 @@ if __name__ == "__main__":
     Contacts.create_table(True)
     SocialMedia.create_table(True)
     Photos.create_table(True)
+    Sleep.create_table(True)
+    Activity.create_table(True)
+    Heart.create_table(True)
 
     database.close()
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
@@ -345,6 +384,42 @@ class Calendars(BaseModel):
     duration = DoubleField(null=True)
     is_task = BooleanField()
     timestamp = DateTimeField(default=datetime.datetime.now())
+
+class Sleep(BaseModel):
+    date = DateField(null=True)
+    start_time = TimeField(null=True)
+    end_time = TimeField(null=True)
+    location = ForeignKeyField(Locations, null=True)
+    duration = DoubleField(null=True)
+    application = CharField(null=True)
+    cycles = IntegerField(null=True)
+    rating = DoubleField(null=True)
+    comments = TextField(null=True)
+    deep_sleep = FloatField(null=True)
+    noise = FloatField(null=True)
+
+class Activity(BaseModel):
+    date = DateField(null=True)
+    start_time = TimeField(null=True)
+    end_time = TimeField(null=True)
+    location = ForeignKeyField(Locations, null=True)
+    duration = DoubleField(null=True)
+    application = CharField(null=True)
+    rating = DoubleField(null=True)
+    comments = TextField(null=True)
+    type = CharField(null=True)
+    calories = DoubleField(null=True)
+
+class Heart(BaseModel):
+    start_time = TimeField(null=True)
+    end_time = TimeField(null=True)
+    location = ForeignKeyField(Locations, null=True)
+    duration = DoubleField(null=True)
+    application = CharField(null=True)
+    lowest = DoubleField(null=True)
+    average = DoubleField(null=True)
+    highest = DoubleField(null=True)
+    activity = ForeignKeyField(Activity, null=True)
 
 '''
 Set of functions to normalize data and standardize different inputs and queries
