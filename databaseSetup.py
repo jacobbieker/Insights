@@ -196,9 +196,8 @@ if __name__ == "__main__":
 
 
     class Sleep(BaseModel):
-        date = DateField(null=True)
-        start_time = TimeField(null=True)
-        end_time = TimeField(null=True)
+        start_time = DateTimeField(null=True)
+        end_time = DateTimeField(null=True)
         location = ForeignKeyField(Locations, null=True)
         duration = DoubleField(null=True)
         application = CharField(null=True)
