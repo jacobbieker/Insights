@@ -49,7 +49,11 @@ local:
     photoLocations:
       - 'C:\Users\Jacob Bieker\OneDrive\EOS Pictures'
       - 'location 2'
-    sleep: no
-    sleepLocation: 'location'
+    biometric: yes
+    reconjet: no
+    hexoskin: no
+    myo: no
+    weight: no
+    sleep: yes
     heart: no
     activity: no
