@@ -219,6 +219,9 @@ if __name__ == "__main__":
         comments = TextField(null=True)
         type = CharField(null=True)
         calories = DoubleField(null=True)
+        avg_altitude = DoubleField(null=True)
+        max_altitude = DoubleField(null=True)
+        min_altitude = DoubleField(null=True)
 
 
     class Heart(BaseModel):
@@ -437,6 +440,9 @@ class Activity(BaseModel):
     comments = TextField(null=True)
     type = CharField(null=True)
     calories = DoubleField(null=True)
+    avg_altitude = DoubleField(null=True)
+    max_altitude = DoubleField(null=True)
+    min_altitude = DoubleField(null=True)
 
 
 class Heart(BaseModel):
