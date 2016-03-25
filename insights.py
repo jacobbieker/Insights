@@ -40,7 +40,7 @@ FACEBOOK_SCRIPTS = os.path.join(PATH, "FacebookScripts")
 TWITTER_SCRIPTS = os.path.join(PATH, "TwitterScripts")
 INSTAGRAM_SCRIPTS = os.path.join(PATH, "InstagramScripts")
 OTHER_SCRIPTS = os.path.join(PATH, "OtherScripts")
-
+BIOMETRIC_SCRIPTS = os.path.join(PATH, "BiometricScripts")
 
 # Create config.yaml to be used for other scripts, so that they don't import insights.py
 constants = {
@@ -53,7 +53,8 @@ constants = {
     'facebookScripts': FACEBOOK_SCRIPTS,
     'twitterScripts': TWITTER_SCRIPTS,
     'instagramScripts': INSTAGRAM_SCRIPTS,
-    'otherScripts': OTHER_SCRIPTS
+    'otherScripts': OTHER_SCRIPTS,
+    'biometricScripts': BIOMETRIC_SCRIPTS
 }
 with open('constants.yaml', 'w') as f:
     yaml.dump(constants, f, default_flow_style=False)
@@ -100,6 +101,45 @@ Execute the other scripts to create the database and fill it
 
 # Try creating database
 exec(compile(open("databaseSetup.py", "rb").read(), "databaseSetup.py", 'exec'))
+
+# execute on biometric data first
+# Sleep
+if access_config.get('local').get('biometric'):
+    if access_config.get('local').get('sleep'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Sleep")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+    # Heart
+    if access_config.get('local').get('heart'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Heart")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+
+    if access_config.get('local').get('weight'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Weight")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+
+    if access_config.get('local').get('hexoskin'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensors", "Hexoskin")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+
+    if access_config.get('local').get('reconjet'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensoers", "ReconJet")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+
+    if access_config.get('local').get('myo'):
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensors", "Myo")
+        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
+            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
+                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
