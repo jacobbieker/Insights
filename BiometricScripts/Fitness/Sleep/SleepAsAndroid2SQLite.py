@@ -33,16 +33,23 @@ else:
 rootdir = os.path.join(constants.get("dataDir"), "Biometric",
                        "Sleep as Android Spreadsheet - Sleep as Android Spreadsheet.csv")
 
+
 with open(rootdir, 'r') as source:
     reader = csv.DictReader(source)
+    other_reader = []
     for row in reader:
+        if row['Id'].isdigit():
+            other_reader.append(row)
+    for i, row in enumerate(other_reader):
+        print(repr(row['Id']))
         sleep_data = {'start_time': row['From'],
                       'end_time': row['To'],
-                      'duration': row['Hours'],
-                      'rating': row['Rating'],
+                      'duration': float(row['Hours'].strip()),
+                      'rating': float(row['Rating'].strip()),
                       'comments': row['Comment'],
-                      'cycles': row['Cycles'],
-                      'deep_sleep': row['DeepSleep'],
-                      'noise': row['Noise'],
+                      'cycles': int(row['Cycles'].strip()),
+                      'deep_sleep': float(row['DeepSleep'].strip()),
+                      'noise': float(row['Noise'].strip()),
+                      'application': 'Sleep As Android',
                       }
         Sleep.insert(sleep_data).execute()

@@ -107,39 +107,39 @@ exec(compile(open("databaseSetup.py", "rb").read(), "databaseSetup.py", 'exec'))
 if access_config.get('local').get('biometric'):
     if access_config.get('local').get('sleep'):
         Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Sleep")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
     # Heart
     if access_config.get('local').get('heart'):
         Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Heart")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
 
     if access_config.get('local').get('weight'):
         Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Fitness", "Weight")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
 
     if access_config.get('local').get('hexoskin'):
         Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensors", "Hexoskin")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
 
     if access_config.get('local').get('reconjet'):
-        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensoers", "ReconJet")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensors", "ReconJet")
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
 
     if access_config.get('local').get('myo'):
         Bio_PATH = os.path.join(BIOMETRIC_SCRIPTS, "Sensors", "Myo")
-        for executables in os.listdir(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH)):
-            exec(compile(open(os.path.join(BIOMETRIC_SCRIPTS, Bio_PATH), "rb").read(),
-                         os.path.join(BIOMETRIC_SCRIPTS, executables), 'exec'))
+        for executables in os.listdir(os.path.join(Bio_PATH)):
+            exec(compile(open(os.path.join(Bio_PATH, executables), "rb").read(),
+                         os.path.join(Bio_PATH, executables), 'exec'))
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
