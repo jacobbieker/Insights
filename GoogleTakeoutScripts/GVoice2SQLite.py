@@ -52,18 +52,18 @@ def insert_many_queries(call_queries, text_queries, voicemail_queries):
         Call.insert_many(call_queries).execute()
         # Remove all the stored ones
         del call_dict[:]
-        print("Inserted %d or more Calls", num_before_insert)
+        print("Inserted " + str(num_before_insert) + " or more Calls")
     if len(text_queries) >= num_before_insert:
         for text_message in text_queries:
             Message.insert(text_message).execute()
 
         # Message.insert_many(text_queries).execute()
         del text_dict[:]
-        print("Inserted %d or more Texts", num_before_insert)
+        print("Inserted " + str(num_before_insert) + " or more Texts")
     if len(voicemail_queries) >= num_before_insert:
         Voicemail.insert_many(voicemail_queries).execute()
         del voicemail_dict[:]
-        print("Inserted %d or more Voicemails", num_before_insert)
+        print("Inserted " + str(num_before_insert) + " or more Voicemails")
 
 
 def voicemail2SQLite(caller, number, time, message):
