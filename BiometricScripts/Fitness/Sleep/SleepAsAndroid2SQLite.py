@@ -41,7 +41,6 @@ with open(rootdir, 'r') as source:
         if row['Id'].isdigit():
             other_reader.append(row)
     for i, row in enumerate(other_reader):
-        print(repr(row['Id']))
         sleep_data = {'start_time': row['From'],
                       'end_time': row['To'],
                       'duration': float(row['Hours'].strip()),
