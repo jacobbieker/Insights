@@ -5,11 +5,25 @@
 
 Welcome to Insights's documentation!
 ====================================
-
+This project, designed and developed as a personal project by `Jacob Bieker <https://www.jacobbieker.com/>`_, was created
+to take personal data and add it from various sources into a single database for simpler use in analytics and data visualizations.
+Hopefully it helps, and any support is welcome!
 Contents:
 
 .. toctree::
    :maxdepth: 2
+
+   setup
+   getting-started
+   local-files
+   biometric-data
+   google-data
+   facebook
+   github
+   instagram
+   linkedin
+   flickr
+   twitter
 
 
 
