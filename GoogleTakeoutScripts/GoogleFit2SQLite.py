@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 '''
 __author__ = 'Jacob Bieker'
-import tcxparser
+#import tcxparser
 import os
 import yaml
 from glob import glob
@@ -34,25 +34,110 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Fit")
 tcx_files = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.tcx'))]
 aggregation_files = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.csv'))]
 
+"Simple parser for Garmin TCX files."
+
+import time
+from lxml import objectify
+
+namespace = 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2'
+
+class TCXParser:
+
+    def __init__(self, tcx_file):
+        tree = objectify.parse(tcx_file)
+        self.root = tree.getroot()
+        self.activity = self.root.Activities.Activity
+
+    def hr_values(self):
+        return [float(x.text) for x in self.root.xpath('//ns:HeartRateBpm/ns:Value', namespaces={'ns': namespace})]
+
+    def altitude_points(self):
+        return [float(x.text) for x in self.root.xpath('//ns:AltitudeMeters', namespaces={'ns': namespace})]
+
+    @property
+    def latitude(self):
+        return self.activity.Lap.Track.Trackpoint.Position.LatitudeDegrees.pyval
+
+    @property
+    def longitude(self):
+        return self.activity.Lap.Track.Trackpoint.Position.LongitudeDegrees.pyval
+
+    @property
+    def activity_type(self):
+        return self.activity.attrib['Sport'].lower()
+
+    @property
+    def completed_at(self):
+        return self.activity.Lap[-1].Track.Trackpoint[-1].Time.pyval
+
+    @property
+    def distance(self):
+        return self.activity.Lap[-1].Track.Trackpoint[-2].DistanceMeters.pyval
+
+    @property
+    def distance_units(self):
+        return 'meters'
+
+    @property
+    def duration(self):
+        """Returns duration of workout in seconds."""
+        return sum(lap.TotalTimeSeconds for lap in self.activity.Lap)
+
+    @property
+    def calories(self):
+        return sum(lap.Calories for lap in self.activity.Lap)
+
+    @property
+    def hr_avg(self):
+        """Average heart rate of the workout"""
+        hr_data = self.hr_values()
+        return sum(hr_data)/len(hr_data)
+
+    @property
+    def hr_max(self):
+        """Minimum heart rate of the workout"""
+        return max(self.hr_values())
+
+    @property
+    def hr_min(self):
+        """Minimum heart rate of the workout"""
+        return min(self.hr_values())
+
+    @property
+    def pace(self):
+        """Average pace (mm:ss/km for the workout"""
+        secs_per_km = self.duration/(self.distance/1000)
+        return time.strftime('%M:%S', time.gmtime(secs_per_km))
+
+    @property
+    def altitude_avg(self):
+        """Average altitude for the workout"""
+        altitude_data = self.altitude_points()
+        return sum(altitude_data)/len(altitude_data)
+
+
 for tcx_file in tcx_files:
     with open(os.path.join(rootdir, "Activities", tcx_file)) as activities:
-        parsed = tcxparser.TCXParser(activities)
-        Activity.create({'type': parsed.activity_type,
-                         'duration': parsed.duration,
-                         'end_time': parsed.completed_at,
-                         'calories': parsed.calories,
-                         'start_time': parsed.completed_at - parsed.duration,
-                         'application': 'Google Fit',
-                         'avg_altitude': parsed.altitude_avg,
-                         'max_altitude': max(parsed.altitude_points()),
-                         'min_altitude': min(parsed.altitude_points()),
-                         }).insert()
-        if parsed.hr_max != 0:
-            Heart.create({'application': "Google Fit",
+        parsed = TCXParser(activities)
+        if parsed.altitude_points() != []:
+            Activity.insert({'type': parsed.activity_type,
+                             'duration': parsed.duration,
+                             'end_time': parsed.completed_at,
+                             'calories': parsed.calories,
+                             'application': 'Google Fit',
+                             'avg_altitude': parsed.altitude_avg,
+                             }).execute()
+        else:
+            Activity.insert({'type': parsed.activity_type,
+                             'duration': parsed.duration,
+                             'end_time': parsed.completed_at,
+                             'calories': parsed.calories,
+                             'application': 'Google Fit',
+                             }).execute()
+        if parsed.hr_values() != []:
+            Heart.insert({'application': "Google Fit",
                           'duration': parsed.duration,
-                          'start_time': parsed.completed_at - parsed.duration,
                           'end_time': parsed.completed_at,
                           'lowest': parsed.hr_min,
                           'highest': parsed.hr_max,
-                          'average': parsed.hr_avg,
-                          'activity': Activity.get({'end_time': parsed.completed_at})}).insert()
+                          'average': parsed.hr_avg}).execute()
