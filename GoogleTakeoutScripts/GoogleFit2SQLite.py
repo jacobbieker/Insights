@@ -34,12 +34,21 @@ rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Fit")
 tcx_files = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.tcx'))]
 aggregation_files = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.csv'))]
 
+###############################################################################################
+#
+#
+#  This TCXParser taken from: https://github.com/vkurup/python-tcxparser
+#
+#
+#################################################################################################
 "Simple parser for Garmin TCX files."
 
 import time
 from lxml import objectify
 
+
 namespace = 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2'
+
 
 class TCXParser:
 
@@ -115,6 +124,11 @@ class TCXParser:
         altitude_data = self.altitude_points()
         return sum(altitude_data)/len(altitude_data)
 
+########################################################################################
+#
+# End of copied and slightly modified code
+#
+########################################################################################
 
 for tcx_file in tcx_files:
     with open(os.path.join(rootdir, "Activities", tcx_file)) as activities:
