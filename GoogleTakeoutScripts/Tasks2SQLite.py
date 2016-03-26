@@ -36,12 +36,14 @@ with open(rootdir, 'r') as source:
     data = json.load(source)
     task_lists = data.get("items")
     for task_list in task_lists:
-        for todo in task_list.get("items"):
-            if todo is not None:
-                task = todo.get("title")
-                updated = todo.get("updated")
-                due = todo.get("due")
-                completed = todo.get("completed")
-                status = todo.get("status")
-                Calendars.insert(is_task=True, name=task, start_date=updated, end_date=completed, type="task",
-                                 description=status).execute()
+        print(task_list)
+        if task_list.get("items") is not None:
+            for todo in task_list.get("items"):
+                if todo is not None:
+                    task = todo.get("title")
+                    updated = todo.get("updated")
+                    due = todo.get("due")
+                    completed = todo.get("completed")
+                    status = todo.get("status")
+                    Calendars.insert(is_task=True, name=task, start_date=updated, end_date=completed, type="task",
+                                     description=status).execute()
