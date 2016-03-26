@@ -204,6 +204,7 @@ if __name__ == "__main__":
         comments = TextField(null=True)
         deep_sleep = FloatField(null=True)
         noise = FloatField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
 
     class Activity(BaseModel):
@@ -220,6 +221,7 @@ if __name__ == "__main__":
         avg_altitude = DoubleField(null=True)
         max_altitude = DoubleField(null=True)
         min_altitude = DoubleField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
 
     class Heart(BaseModel):
@@ -232,6 +234,7 @@ if __name__ == "__main__":
         average = DoubleField(null=True)
         highest = DoubleField(null=True)
         activity = ForeignKeyField(Activity, null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
 
     Calendars.create_table(True)
@@ -423,6 +426,7 @@ class Sleep(BaseModel):
     comments = TextField(null=True)
     deep_sleep = FloatField(null=True)
     noise = FloatField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
 
 
 class Activity(BaseModel):
@@ -439,6 +443,7 @@ class Activity(BaseModel):
     avg_altitude = DoubleField(null=True)
     max_altitude = DoubleField(null=True)
     min_altitude = DoubleField(null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
 
 
 class Heart(BaseModel):
@@ -451,6 +456,7 @@ class Heart(BaseModel):
     average = DoubleField(null=True)
     highest = DoubleField(null=True)
     activity = ForeignKeyField(Activity, null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
 
 
 '''
