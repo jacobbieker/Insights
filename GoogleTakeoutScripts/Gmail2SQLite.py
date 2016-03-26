@@ -23,10 +23,10 @@ from databaseSetup import Message
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":
-    with open(os.path.join("../constants.yaml"), 'r') as ymlfile:
+    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
         constants = yaml.load(ymlfile)
 else:
-    with open("../constants.yaml", 'r') as ymlfile:
+    with open("constants.yaml", 'r') as ymlfile:
         constants = yaml.load(ymlfile)
 
 MBOX = os.path.join(constants.get('dataDir'), 'Takeout', 'Mail', 'All mail Including Spam and Trash.mbox')
@@ -38,13 +38,13 @@ def print_payload(message):
         for part in message.get_payload():
             print_payload(part)
     else:
-        i= 1
-        #print(message.get_payload(decode=True))
+        Message.insert({'date': message.get('date'),
+                        'type': 'email',
+                        'sender': message.get('from'),
+                        'reciever': message.get('to'),
+                        'message': message.get_payload()}).execute()
 
 mbox = mailbox.mbox(MBOX)
 for message in mbox:
-    print("From: " + message['from'])
-    print("To " + message['to'])
-    print("Subject" + message['subject'])
+    print(message['date'])
     print_payload(message)
-    #{'date': time, 'type': 'email', 'sender': sender, 'reciever': reciever, 'message': message}
