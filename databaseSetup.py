@@ -241,6 +241,7 @@ if __name__ == "__main__":
         date = DateTimeField(null=True)
         application = CharField(null=True)
         content = TextField(null=True)
+        title = TextField(null=True)
         length = IntegerField(null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
@@ -472,6 +473,7 @@ class Document(BaseModel):
     date = DateTimeField(null=True)
     application = CharField(null=True)
     content = TextField(null=True)
+    title = TextField(null=True)
     length = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
