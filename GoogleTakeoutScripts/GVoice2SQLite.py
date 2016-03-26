@@ -95,7 +95,7 @@ for file in os.listdir(rootdir):
         with open(os.path.join(rootdir, file), 'r', encoding='latin-1') as source:
             file_name = os.path.splitext(os.path.basename(file))
             yaml_file_name = file_name[0].split(" -")
-            html_file = BeautifulSoup(source.read())
+            html_file = BeautifulSoup(source.read(), "lxml")
             ###################################################################
             #
             #              Start of SMS to yaml script
