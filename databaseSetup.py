@@ -236,6 +236,13 @@ if __name__ == "__main__":
         activity = ForeignKeyField(Activity, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
 
+    class Document(BaseModel):
+        type = TextField(null=True)
+        date = DateTimeField(null=True)
+        application = CharField(null=True)
+        content = TextField(null=True)
+        length = IntegerField(null=True)
+        timestamp = DateTimeField(default=datetime.datetime.now())
 
     Calendars.create_table(True)
     Message.create_table(True)
@@ -250,6 +257,7 @@ if __name__ == "__main__":
     Sleep.create_table(True)
     Activity.create_table(True)
     Heart.create_table(True)
+    Document.create_table(True)
 
     database.close()
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
@@ -456,6 +464,15 @@ class Heart(BaseModel):
     average = DoubleField(null=True)
     highest = DoubleField(null=True)
     activity = ForeignKeyField(Activity, null=True)
+    timestamp = DateTimeField(default=datetime.datetime.now())
+
+
+class Document(BaseModel):
+    type = TextField(null=True)
+    date = DateTimeField(null=True)
+    application = CharField(null=True)
+    content = TextField(null=True)
+    length = IntegerField(null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
 
 
