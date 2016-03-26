@@ -182,9 +182,7 @@ if __name__ == "__main__":
 
     class Calendars(BaseModel):
         start_date = DateTimeField(null=True)
-        start_time = TimeField(null=True)
         end_date = DateTimeField(null=True)
-        end_time = TimeField(null=True)
         type = CharField(null=True)
         which_calender = CharField(null=True)
         description = TextField(null=True)
@@ -403,9 +401,7 @@ class Photos(BaseModel):
 
 class Calendars(BaseModel):
     start_date = DateTimeField(null=True)
-    start_time = TimeField(null=True)
     end_date = DateTimeField(null=True)
-    end_time = TimeField(null=True)
     type = CharField(null=True)
     which_calender = CharField(null=True)
     description = TextField(null=True)
