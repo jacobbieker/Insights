@@ -46,5 +46,4 @@ def print_payload(message):
 
 mbox = mailbox.mbox(MBOX)
 for message in mbox:
-    print(message['date'])
     print_payload(message)
