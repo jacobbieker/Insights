@@ -41,10 +41,19 @@ number_entries_before_action = 10
 # default, so that current_location_saver will work with google_location_parse
 number_entries_searched = number_entries_before_action * 2
 
+# Dictionary to hold the tuple of longitude and latitude so do not have to touch the database unless necessary
+location_dict = {}
+
 print("Starting Location Parsing")
+
+
 def address_to_parts(address):
     parts = str(address).split(", ")
     return parts
+
+
+def location_to_dict(longitude_query, latitude_query, type, response):
+    location_dict[(longitude_query, latitude_query, type)] = response
 
 
 '''
@@ -108,12 +117,12 @@ def get_locations_from_database(longitude_query, latitude_query):
                                   (Locations.time == time_stamp))
         return True
     except DoesNotExist:
-            try:
-                loc_model = Locations.get((
-                    (Locations.bound_north >= latitude_query >= Locations.bound_south) &
-                    (Locations.bound_east >= longitude_query >= Locations.bound_west)))
+        try:
+            loc_model = Locations.get((
+                (Locations.bound_north >= latitude_query >= Locations.bound_south) &
+                (Locations.bound_east >= longitude_query >= Locations.bound_west)))
 
-                '''
+            '''
                 Locations.insert({'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                                   'latitude': latitude_query,
                                   'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
@@ -123,20 +132,20 @@ def get_locations_from_database(longitude_query, latitude_query):
                                   'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
                                   'bound_west': loc_model.bound_west})
                 '''
-                location_bulk_insert_queries.append(
-                 {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
-                    'latitude': latitude_query,
-                    'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
-                    'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
-                    'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
-                    'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
-                    'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
-                    'bound_west': loc_model.bound_west})
-                insert_many_locations(location_bulk_insert_queries)
-                return True
-            except DoesNotExist:
-                print("Error: Does not Exist")
-                return False
+            location_bulk_insert_queries.append(
+                {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                 'latitude': latitude_query,
+                 'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                 'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                 'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                 'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                 'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                 'bound_west': loc_model.bound_west})
+            insert_many_locations(location_bulk_insert_queries)
+            return True
+        except DoesNotExist:
+            print("Error: Does not Exist")
+            return False
 
 
 '''
@@ -166,6 +175,8 @@ def nominatim_parser(nominatim_response, longitude, latitude):
     provider_type = "Nominatim"
     northeast = [latitude, longitude]
     southwest = [latitude, longitude]
+    location_to_dict(longitude_query=longitude, latitude_query=latitude, response=nominatim_response, type="Nominatim")
+
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
                              city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
@@ -199,6 +210,7 @@ def opencage_parser(opencage_response, longitude, latitude):
     bounds = opencage_response.get("bounds")
     northeast = [bounds.get("northeast").get("lat"), bounds.get("northeast").get("lng")]
     southwest = [bounds.get("southwest").get("lat"), bounds.get("southwest").get("lng")]
+    location_to_dict(longitude_query=longitude, latitude_query=latitude, response=opencage_response, type="OpenCage")
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
@@ -247,6 +259,7 @@ def googleV3_parser(google_response, longitude, latitude):
     bounds = google_response.get("geometry").get("viewport")
     northeast = [bounds.get("northeast").get("lat"), bounds.get("northeast").get("lng")]
     southwest = [bounds.get("southwest").get("lat"), bounds.get("southwest").get("lng")]
+    location_to_dict(longitude_query=longitude, latitude_query=latitude, response=google_response, type="Google")
 
     return [Locations.insert(date=converted_time_stamp, time=time_stamp, longitude=longitude, latitude=latitude,
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
@@ -287,6 +300,61 @@ def track_bounds(northeast, southwest, latitude, longitude):
     return (northern_most >= latitude >= southern_most) and (eastern_most >= longitude >= western_most)
 
 
+def location_from_dict(longitude_query, latitude_query, type_query):
+    """
+    Tries to get response from dictionary and inserts into database if necessary
+    :param longitude_query:
+    :param latitude_query:
+    :param type_query:
+    :return:
+    """
+    try:
+        location = location_dict.get((longitude_query, latitude_query, type_query))
+        if location:
+            if type_query == "Google":
+                print(location)
+                loc_model = googleV3_parser(location, longitude=longitude_query, latitude=latitude_query)
+                location_bulk_insert_queries.append(
+                    {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                     'latitude': latitude_query,
+                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                     'bound_west': loc_model.bound_west})
+                insert_many_locations(location_bulk_insert_queries)
+            elif type_query == "Nominatim":
+                loc_model = nominatim_parser(location, longitude=longitude_query, latitude=latitude_query)
+                location_bulk_insert_queries.append(
+                    {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                     'latitude': latitude_query,
+                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                     'bound_west': loc_model.bound_west})
+                insert_many_locations(location_bulk_insert_queries)
+            elif type_query == "OpenCage":
+                loc_model = opencage_parser(location, longitude=longitude_query, latitude=latitude_query)
+                location_bulk_insert_queries.append(
+                    {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                     'latitude': latitude_query,
+                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                     'bound_west': loc_model.bound_west})
+                insert_many_locations(location_bulk_insert_queries)
+            return True
+        else:
+            return False
+    except KeyError:
+        return False
+
+
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":
     with open(os.path.join("constants.yaml"), 'r') as ymlfile:
@@ -324,7 +392,13 @@ if can_load_last_position():
             point = Point(latitude=latitude, longitude=longitude)
             if (key % number_entries_before_action) == 0:
                 current_position_saver(key)
-            if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
+            if location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="Google"):
+                continue
+            elif location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="Nominatim"):
+                continue
+            elif location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="OpenCage"):
+                continue
+            elif get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
                 continue
             else:
                 # noinspection PyBroadException
@@ -384,7 +458,13 @@ else:
             point = Point(latitude=latitude, longitude=longitude)
             if (key % number_entries_before_action) == 0:
                 current_position_saver(key)
-            if get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
+            if location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="Google"):
+                continue
+            elif location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="Nominatim"):
+                continue
+            elif location_from_dict(longitude_query=longitude, latitude_query=latitude, type_query="OpenCage"):
+                continue
+            elif get_locations_from_database(longitude_query=longitude, latitude_query=latitude):
                 continue
             else:
                 # noinspection PyBroadException
