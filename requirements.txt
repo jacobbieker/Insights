@@ -9,4 +9,3 @@ python-instagram
 tweepy
 exifread
 rawkit
-python-tcxparser

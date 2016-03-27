@@ -133,7 +133,7 @@ class TCXParser:
 for tcx_file in tcx_files:
     with open(os.path.join(rootdir, "Activities", tcx_file)) as activities:
         parsed = TCXParser(activities)
-        if parsed.altitude_points() != []:
+        if parsed.altitude_points():
             Activity.insert({'type': parsed.activity_type,
                              'duration': parsed.duration,
                              'end_time': parsed.completed_at,
@@ -148,7 +148,7 @@ for tcx_file in tcx_files:
                              'calories': parsed.calories,
                              'application': 'Google Fit',
                              }).execute()
-        if parsed.hr_values() != []:
+        if parsed.hr_values():
             Heart.insert({'application': "Google Fit",
                           'duration': parsed.duration,
                           'end_time': parsed.completed_at,
