@@ -5,7 +5,6 @@ easy to access and manipulate.
 # Dependencies
 peewee >= 2.7.1, rawkit, readexif, python-instagram, tweepy, facebook, github3
 Only tested on Python 3.5
-https://github.com/jay0lee/got-your-back to access GMail data, at least until mbox can get made to work
 
 # Use
 To use these scripts, download your Facebook, LinkedIn, and Google Takeout archives, and unzip them to the data folder
