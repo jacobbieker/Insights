@@ -41,6 +41,8 @@ number_entries_before_action = 10
 # default, so that current_location_saver will work with google_location_parse
 number_entries_searched = number_entries_before_action * 2
 
+# List of previously used location entries, hopefully to speed up
+previous_location_list = []
 
 def address_to_parts(address):
     parts = str(address).split(", ")
@@ -335,6 +337,7 @@ if can_load_last_position():
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     with open("GoogleV3.json", "a") as output:
+                        output.write(",\n")
                         json.dump(address.raw, output, sort_keys=True, indent=4)
                     response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
@@ -348,6 +351,7 @@ if can_load_last_position():
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         with open("Nominatim.json", "a") as output:
+                            output.write(",\n")
                             json.dump(address.raw, output, sort_keys=True, indent=4)
                         response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
@@ -359,13 +363,14 @@ if can_load_last_position():
                             address = opencage_geolocator.reverse(point, exactly_one=True)
                             provider = "OpenCage"
                             with open("OpenCage.json", "a") as output:
+                                output.write(",\n")
                                 json.dump(address.raw, output, sort_keys=True, indent=4)
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
-        if (len(location_bulk_insert_queries) != 0):
+        if len(location_bulk_insert_queries) != 0:
             Locations.insert_many(location_bulk_insert_queries).execute()
             print("Inserted " + str(len(location_bulk_insert_queries)) + " Records")
 else:
@@ -392,6 +397,7 @@ else:
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     with open("GoogleV3.json", "a") as output:
+                        output.write(",\n")
                         json.dump(address.raw, output, sort_keys=True, indent=4)
                     response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
@@ -405,6 +411,7 @@ else:
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         with open("Nominatim.json", "a") as output:
+                            output.write(",\n")
                             json.dump(address.raw, output, sort_keys=True, indent=4)
                         response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
@@ -416,12 +423,13 @@ else:
                             address = opencage_geolocator.reverse(point, exactly_one=True)
                             provider = "OpenCage"
                             with open("OpenCage.json", "a") as output:
+                                output.write(",\n")
                                 json.dump(address.raw, output, sort_keys=True, indent=4)
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
                             print("Could not access geocoders for location: " + point_string)
                             break  # Skips if cannot find locat
-        if (len(location_bulk_insert_queries) != 0):
+        if len(location_bulk_insert_queries) != 0:
             Locations.insert_many(location_bulk_insert_queries).execute()
             print("Inserted " + str(len(location_bulk_insert_queries)) + " Records")
