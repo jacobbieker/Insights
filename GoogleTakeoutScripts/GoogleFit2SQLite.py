@@ -129,7 +129,7 @@ class TCXParser:
 # End of copied and slightly modified code
 #
 ########################################################################################
-
+print("Starting Google Fit Parsing")
 for tcx_file in tcx_files:
     with open(os.path.join(rootdir, "Activities", tcx_file)) as activities:
         parsed = TCXParser(activities)

@@ -31,6 +31,7 @@ else:
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Contacts")
 
+print("Starting Google Contact Parsing")
 with open(os.path.join(rootdir, "All Contacts.vcf"), 'rU', encoding='latin-1') as source:
     # Dictionary of values to insert later
     contact_data = []

@@ -427,6 +427,7 @@ else:
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
 outputdir = os.path.join(constants.get("outputDir"))
 
+print("Starting Google Hangout Parsing")
 conversations = parse_json_file(rootdir)
 message_list = []
 for conversation in conversations:

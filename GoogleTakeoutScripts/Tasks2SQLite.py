@@ -32,6 +32,7 @@ else:
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Tasks", "Tasks.json")
 
+print("Starting Google Tasks Parsing")
 with open(rootdir, 'r') as source:
     data = json.load(source)
     task_lists = data.get("items")

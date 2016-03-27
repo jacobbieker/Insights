@@ -41,9 +41,7 @@ number_entries_before_action = 10
 # default, so that current_location_saver will work with google_location_parse
 number_entries_searched = number_entries_before_action * 2
 
-# List of previously used location entries, hopefully to speed up
-previous_location_list = []
-
+print("Starting Location Parsing")
 def address_to_parts(address):
     parts = str(address).split(", ")
     return parts
@@ -337,8 +335,8 @@ if can_load_last_position():
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     with open("GoogleV3.json", "a") as output:
-                        output.write(",\n")
                         json.dump(address.raw, output, sort_keys=True, indent=4)
+                        output.write(",\n")
                     response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
                 except:
@@ -351,8 +349,8 @@ if can_load_last_position():
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         with open("Nominatim.json", "a") as output:
-                            output.write(",\n")
                             json.dump(address.raw, output, sort_keys=True, indent=4)
+                            output.write(",\n")
                         response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
                     except:
@@ -363,8 +361,8 @@ if can_load_last_position():
                             address = opencage_geolocator.reverse(point, exactly_one=True)
                             provider = "OpenCage"
                             with open("OpenCage.json", "a") as output:
-                                output.write(",\n")
                                 json.dump(address.raw, output, sort_keys=True, indent=4)
+                                output.write(",\n")
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
@@ -397,8 +395,8 @@ else:
                     address = google_geolocator.reverse(point, exactly_one=True)
                     provider = "Google"
                     with open("GoogleV3.json", "a") as output:
-                        output.write(",\n")
                         json.dump(address.raw, output, sort_keys=True, indent=4)
+                        output.write(",\n")
                     response = googleV3_parser(address.raw, longitude, latitude)
                     response[0].execute()
                 except:
@@ -411,8 +409,8 @@ else:
                         address = nominatim_geolocator.reverse(point, exactly_one=True)
                         provider = "Nominatim"
                         with open("Nominatim.json", "a") as output:
-                            output.write(",\n")
                             json.dump(address.raw, output, sort_keys=True, indent=4)
+                            output.write(",\n")
                         response = nominatim_parser(address.raw, longitude, latitude)
                         response[0].execute()
                     except:
@@ -423,8 +421,8 @@ else:
                             address = opencage_geolocator.reverse(point, exactly_one=True)
                             provider = "OpenCage"
                             with open("OpenCage.json", "a") as output:
-                                output.write(",\n")
                                 json.dump(address.raw, output, sort_keys=True, indent=4)
+                                output.write(",\n")
                             response = opencage_parser(address.raw, longitude, latitude)
                             response[0].execute()
                         except GeocoderQuotaExceeded or GeocoderTimedOut or GeocoderServiceError:
