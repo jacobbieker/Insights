@@ -31,7 +31,6 @@ else:
 
 MBOX = os.path.join(constants.get('dataDir'), 'Takeout', 'Mail', 'All mail Including Spam and Trash.mbox')
 
-
 def print_payload(message):
     # if the message is multipart, its payload is a list of messages
     if message.is_multipart():
@@ -44,6 +43,7 @@ def print_payload(message):
                         'reciever': message.get('to'),
                         'message': message.get_payload()}).execute()
 
+print("Starting Google Mail Parsing")
 mbox = mailbox.mbox(MBOX)
 for message in mbox:
     print_payload(message)

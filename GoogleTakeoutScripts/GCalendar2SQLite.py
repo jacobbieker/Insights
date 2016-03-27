@@ -31,7 +31,7 @@ else:
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
 calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
-
+print("Starting Google Calendar Parsing")
 for calendar in calendars:
     with open(calendar, "r", encoding="latin-1") as source:
         # Dictionary of values to insert later

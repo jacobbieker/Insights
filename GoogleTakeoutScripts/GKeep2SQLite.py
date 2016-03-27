@@ -35,6 +35,7 @@ else:
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Keep")
 keep_data = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.html'))]
 
+print("Starting Google Keep Parsing")
 for keep_file in keep_data:
     with open(os.path.join(rootdir, keep_file), "r") as source:
         html_file = BeautifulSoup(source.read(), "lxml")

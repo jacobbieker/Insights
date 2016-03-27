@@ -143,9 +143,18 @@ if access_config.get('local').get('biometric'):
 
 # execute the ones that work on Google Takeout data first
 if access_config.get('google').get('used'):
-    for executables in os.listdir(GOOGLE_SCRIPTS):
-        exec(compile(open(os.path.join(GOOGLE_SCRIPTS, executables), "rb").read(),
-                     os.path.join(GOOGLE_SCRIPTS, executables), 'exec'))
+    google_count = 0
+    if os.path.exists("progress.yaml"):
+        with open("progress.yaml", "r") as progress_source:
+            progress_dict = yaml.load(progress_source)
+            google_count = progress_dict.get('googleProgress')
+    for index, executables in enumerate(os.listdir(GOOGLE_SCRIPTS)):
+        if index >= google_count:
+            exec(compile(open(os.path.join(GOOGLE_SCRIPTS, executables), "rb").read(),
+                         os.path.join(GOOGLE_SCRIPTS, executables), 'exec'))
+            google_count += 1
+            with open("progress.yaml", "w") as progress:
+                yaml.dump({'googleProgress': google_count}, progress, default_flow_style=False)
 
 # Then on other zipped files
 if access_config.get('facebook').get('used'):

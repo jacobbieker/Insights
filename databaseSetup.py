@@ -22,6 +22,7 @@ import peewee
 import yaml
 from playhouse.migrate import *
 import phonenumbers
+from playhouse.apsw_ext import APSWDatabase
 
 if __name__ == "__main__":
     with open("dbconfig.yaml", 'r') as ymlfile:
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     DB_NAME = config.get('sqlite').get('name') + '.db'
     # remove old database if in the current directory
     if os.path.isfile(DB_NAME):
-        database = SqliteDatabase(DB_NAME)
+        database = APSWDatabase(DB_NAME)
         database.connect()
     else:
         # Check to see what type of database wanted, and creates the type specificed
@@ -43,7 +44,7 @@ if __name__ == "__main__":
 
             database = APSWDatabase(DB_NAME, threadlocals=True)
         else:
-            database = SqliteDatabase(DB_NAME, threadlocals=True)
+            database = APSWDatabase(DB_NAME, threadlocals=True)
 
     database.connect()
 

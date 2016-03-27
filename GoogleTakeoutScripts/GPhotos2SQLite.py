@@ -33,6 +33,7 @@ else:
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Google Photos")
 photo_data = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.json'))]
 
+print("Starting Google Photo Parsing")
 for json_file in photo_data:
     with open(json_file, 'r') as file:
         metadata = json.dump(file)
