@@ -20,6 +20,7 @@ import os
 import yaml
 from glob import glob
 from databaseSetup import Calendars
+from multiprocessing import Pool
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":
@@ -29,10 +30,8 @@ else:
     with open("constants.yaml", 'r') as ymlfile:
         constants = yaml.load(ymlfile)
 
-rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
-calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
-print("Starting Google Calendar Parsing")
-for calendar in calendars:
+
+def process_calendar(calendar):
     with open(calendar, "r", encoding="latin-1") as source:
         # Dictionary of values to insert later
         event_data = []
@@ -64,7 +63,6 @@ for calendar in calendars:
             elif type_of_data[0] == "END" and components[1] == "VEVENT":
                 all_event_data = {}
                 for item in event_data:
-                    print(item)
                     all_event_data.update(item)
                 # Insert Contact into database
                 Calendars.insert(is_task=all_event_data.get('is_task'),
@@ -78,3 +76,14 @@ for calendar in calendars:
                 print("Inserted Event")
                 # Reset data
                 del event_data[:]
+
+pool = Pool(processes=2)
+calendars_list = []
+rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
+calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
+print("Starting Google Calendar Parsing")
+for calendar in calendars:
+    calendars_list.append(calendar)
+    #process_calendar(calendar)
+
+pool.imap(process_calendar, calendars_list)

@@ -19,6 +19,7 @@ __author__ = 'Jacob Bieker'
 import os
 import mailbox
 import yaml
+from multiprocessing import Pool
 from databaseSetup import Message
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
@@ -30,6 +31,7 @@ else:
         constants = yaml.load(ymlfile)
 
 MBOX = os.path.join(constants.get('dataDir'), 'Takeout', 'Mail', 'All mail Including Spam and Trash.mbox')
+
 
 def print_payload(message):
     # if the message is multipart, its payload is a list of messages
@@ -45,5 +47,9 @@ def print_payload(message):
 
 print("Starting Google Mail Parsing")
 mbox = mailbox.mbox(MBOX)
+message_list = []
 for message in mbox:
-    print_payload(message)
+    message_list.append(message)
+
+pool = Pool(processes=4)
+pool.imap_unordered(print_payload, message_list)
