@@ -84,6 +84,6 @@ calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics
 print("Starting Google Calendar Parsing")
 for calendar in calendars:
     calendars_list.append(calendar)
-    #process_calendar(calendar)
+    process_calendar(calendar)
 
-pool.imap(process_calendar, calendars_list)
+#pool.imap_unordered(process_calendar, calendars_list)
