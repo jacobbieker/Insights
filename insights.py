@@ -62,10 +62,11 @@ with open('constants.yaml', 'w') as f:
 # Create output directory if necessary for output
 if not (os.path.exists("output")):
     os.makedirs("output")
+'''
 else:  # Clean up output file by deleting anything in the folder, if it exists
     for file in os.listdir(OUT_PATH):
         os.remove(os.path.join(OUT_PATH, file))
-
+'''
 # Check which services are used and only load those access token
 for service in access_config:
     print(access_config.get(service))
