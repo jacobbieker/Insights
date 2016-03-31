@@ -141,6 +141,15 @@ def get_locations_from_database(longitude_query, latitude_query):
                  'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
                  'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
                  'bound_west': loc_model.bound_west})
+            location_to_dict(longitude_query=longitude_query, latitude_query=latitude_query, type="Database",
+                             response={'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
+                              'latitude': latitude_query,
+                              'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
+                              'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
+                              'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
+                              'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
+                              'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
+                              'bound_west': loc_model.bound_west})
             insert_many_locations(location_bulk_insert_queries)
             return True
         except DoesNotExist:
@@ -362,10 +371,16 @@ def location_from_dict(longitude_query, latitude_query, type_query):
                      'bound_east': loc_model.get('bound_east'), 'bound_south': loc_model.get('bound_south'),
                      'bound_west': loc_model.get('bound_west')})
                 insert_many_locations(location_bulk_insert_queries)
+            elif type_query == "Database":
+                location_bulk_insert_queries.append(response)
+                insert_many_locations(location_bulk_insert_queries)
+            print("Found match in Dictionary")
             return True
         else:
+            print("Did not find match")
             return False
     except KeyError:
+        print("Key Error: Not found in Dictionary")
         return False
 
 
