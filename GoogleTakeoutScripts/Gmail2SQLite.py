@@ -50,6 +50,7 @@ mbox = mailbox.mbox(MBOX)
 message_list = []
 for message in mbox:
     message_list.append(message)
+    print_payload(message)
 
-pool = Pool(processes=4)
-pool.imap_unordered(print_payload, message_list)
+#pool = Pool(processes=1)
+#pool.imap_unordered(print_payload, message_list)

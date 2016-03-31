@@ -313,7 +313,7 @@ def location_from_dict(longitude_query, latitude_query, type_query):
         if location:
             if type_query == "Google":
                 print(location)
-                loc_model = googleV3_parser(location, longitude=longitude_query, latitude=latitude_query)
+                loc_model = googleV3_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
@@ -325,7 +325,7 @@ def location_from_dict(longitude_query, latitude_query, type_query):
                      'bound_west': loc_model.bound_west})
                 insert_many_locations(location_bulk_insert_queries)
             elif type_query == "Nominatim":
-                loc_model = nominatim_parser(location, longitude=longitude_query, latitude=latitude_query)
+                loc_model = nominatim_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
@@ -337,7 +337,7 @@ def location_from_dict(longitude_query, latitude_query, type_query):
                      'bound_west': loc_model.bound_west})
                 insert_many_locations(location_bulk_insert_queries)
             elif type_query == "OpenCage":
-                loc_model = opencage_parser(location, longitude=longitude_query, latitude=latitude_query)
+                loc_model = opencage_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
