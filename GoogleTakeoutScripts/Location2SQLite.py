@@ -377,7 +377,6 @@ def location_from_dict(longitude_query, latitude_query, type_query):
             print("Found match in Dictionary")
             return True
         else:
-            print("Did not find match")
             return False
     except KeyError:
         print("Key Error: Not found in Dictionary")
