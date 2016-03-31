@@ -31,7 +31,7 @@ if __name__ == "__main__":
     DB_NAME = config.get('sqlite').get('name') + '.db'
     # remove old database if in the current directory
     if os.path.isfile(DB_NAME):
-        database = APSWDatabase(DB_NAME)
+        database = APSWDatabase(DB_NAME, threadlocals=True)
         database.connect()
     else:
         # Check to see what type of database wanted, and creates the type specificed

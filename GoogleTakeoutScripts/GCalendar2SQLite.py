@@ -77,7 +77,7 @@ def process_calendar(calendar):
                 # Reset data
                 del event_data[:]
 
-pool = Pool(processes=2)
+#pool = Pool(processes=2)
 calendars_list = []
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Calendar")
 calendars = [y for x in os.walk(rootdir) for y in glob(os.path.join(x[0], '*.ics'))]
