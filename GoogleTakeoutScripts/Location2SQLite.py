@@ -181,7 +181,11 @@ def nominatim_parser(nominatim_response, longitude, latitude):
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
                              city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
                              bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
-            southwest]
+            southwest, {"date": converted_time_stamp, "time": time_stamp, "longitude": longitude, "latitude": latitude,
+                        "continent": continent, "country": country, "state": state, "zip": zipcode, "area": area,
+                        "county": county, "city": city, "street": street, "name": building, "provider": provider_type,
+                        "bound_north": northeast[0], "bound_east": northeast[1], "bound_south": southwest[0],
+                        "bound_west": southwest[1]}]
 
 
 def opencage_parser(opencage_response, longitude, latitude):
@@ -216,7 +220,11 @@ def opencage_parser(opencage_response, longitude, latitude):
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
                              city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
                              bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
-            southwest]
+            southwest, {"date": converted_time_stamp, "time": time_stamp, "longitude": longitude, "latitude": latitude,
+                        "continent": continent, "country": country, "state": state, "zip": zipcode, "area": area,
+                        "county": county, "city": city, "street": street, "name": building, "provider": provider_type,
+                        "bound_north": northeast[0], "bound_east": northeast[1], "bound_south": southwest[0],
+                        "bound_west": southwest[1]}]
 
 
 def googleV3_parser(google_response, longitude, latitude):
@@ -265,7 +273,11 @@ def googleV3_parser(google_response, longitude, latitude):
                              continent=continent, country=country, state=state, zip=zipcode, area=area, county=county,
                              city=city, street=street, name=building, provider=provider_type, bound_north=northeast[0],
                              bound_east=northeast[1], bound_south=southwest[0], bound_west=southwest[1]), northeast,
-            southwest]
+            southwest, {"date": converted_time_stamp, "time": time_stamp, "longitude": longitude, "latitude": latitude,
+                        "continent": continent, "country": country, "state": state, "zip": zipcode, "area": area,
+                        "county": county, "city": city, "street": street, "name": building, "provider": provider_type,
+                        "bound_north": northeast[0], "bound_east": northeast[1], "bound_south": southwest[0],
+                        "bound_west": southwest[1]}]
 
 
 # Find the continent based off the coordinates, more consistent than going off the name
@@ -312,41 +324,43 @@ def location_from_dict(longitude_query, latitude_query, type_query):
         location = location_dict.get((longitude_query, latitude_query, type_query))
         if location:
             if type_query == "Google":
-                print(location)
-                loc_model = googleV3_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
+                loc_model = googleV3_parser(location, longitude=longitude_query, latitude=latitude_query)[3]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
-                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
-                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
-                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
-                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
-                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
-                     'bound_west': loc_model.bound_west})
+                     'continent': loc_model.get('continent'), 'country': loc_model.get('country'),
+                     'state': loc_model.get('state'),
+                     'zip': loc_model.get('zip'), 'area': loc_model.get('area'), 'county': loc_model.get('county'),
+                     'city': loc_model.get('city'), 'street': loc_model.get('street'), 'name': loc_model.get('name'),
+                     'provider': loc_model.get('provider'), 'bound_north': loc_model.get('bound_north'),
+                     'bound_east': loc_model.get('bound_east'), 'bound_south': loc_model.get('bound_south'),
+                     'bound_west': loc_model.get('bound_west')})
                 insert_many_locations(location_bulk_insert_queries)
             elif type_query == "Nominatim":
-                loc_model = nominatim_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
+                loc_model = nominatim_parser(location, longitude=longitude_query, latitude=latitude_query)[3]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
-                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
-                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
-                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
-                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
-                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
-                     'bound_west': loc_model.bound_west})
+                     'continent': loc_model.get('continent'), 'country': loc_model.get('country'),
+                     'state': loc_model.get('state'),
+                     'zip': loc_model.get('zip'), 'area': loc_model.get('area'), 'county': loc_model.get('county'),
+                     'city': loc_model.get('city'), 'street': loc_model.get('street'), 'name': loc_model.get('name'),
+                     'provider': loc_model.get('provider'), 'bound_north': loc_model.get('bound_north'),
+                     'bound_east': loc_model.get('bound_east'), 'bound_south': loc_model.get('bound_south'),
+                     'bound_west': loc_model.get('bound_west')})
                 insert_many_locations(location_bulk_insert_queries)
             elif type_query == "OpenCage":
-                loc_model = opencage_parser(location, longitude=longitude_query, latitude=latitude_query)[0]
+                loc_model = opencage_parser(location, longitude=longitude_query, latitude=latitude_query)[3]
                 location_bulk_insert_queries.append(
                     {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                      'latitude': latitude_query,
-                     'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
-                     'zip': loc_model.zip, 'area': loc_model.area, 'county': loc_model.county,
-                     'city': loc_model.city, 'street': loc_model.street, 'name': loc_model.name,
-                     'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
-                     'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
-                     'bound_west': loc_model.bound_west})
+                     'continent': loc_model.get('continent'), 'country': loc_model.get('country'),
+                     'state': loc_model.get('state'),
+                     'zip': loc_model.get('zip'), 'area': loc_model.get('area'), 'county': loc_model.get('county'),
+                     'city': loc_model.get('city'), 'street': loc_model.get('street'), 'name': loc_model.get('name'),
+                     'provider': loc_model.get('provider'), 'bound_north': loc_model.get('bound_north'),
+                     'bound_east': loc_model.get('bound_east'), 'bound_south': loc_model.get('bound_south'),
+                     'bound_west': loc_model.get('bound_west')})
                 insert_many_locations(location_bulk_insert_queries)
             return True
         else:
