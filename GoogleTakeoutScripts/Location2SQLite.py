@@ -111,6 +111,8 @@ def get_locations_from_database(longitude_query, latitude_query):
     :param latitude_query:
     :return: Whether query already exists in database
     """
+    return False
+    '''
     try:
         # Try to location and getting same time, reduce duplicates
         loc_model = Locations.get(((Locations.latitude == latitude_query) & (Locations.longitude == longitude_query)) &
@@ -122,7 +124,7 @@ def get_locations_from_database(longitude_query, latitude_query):
                 (Locations.bound_north >= latitude_query >= Locations.bound_south) &
                 (Locations.bound_east >= longitude_query >= Locations.bound_west)))
 
-            '''
+            # Recomment out if removing larger comment
                 Locations.insert({'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                                   'latitude': latitude_query,
                                   'continent': loc_model.continent, 'country': loc_model.country, 'state': loc_model.state,
@@ -131,7 +133,7 @@ def get_locations_from_database(longitude_query, latitude_query):
                                   'provider': loc_model.provider, 'bound_north': loc_model.bound_north,
                                   'bound_east': loc_model.bound_east, 'bound_south': loc_model.bound_south,
                                   'bound_west': loc_model.bound_west})
-                '''
+            # Recomment out
             location_bulk_insert_queries.append(
                 {'date': converted_time_stamp, 'time': time_stamp, 'longitude': longitude_query,
                  'latitude': latitude_query,
@@ -155,6 +157,7 @@ def get_locations_from_database(longitude_query, latitude_query):
         except DoesNotExist:
             print("Error: Does not Exist")
             return False
+    '''
 
 
 '''
