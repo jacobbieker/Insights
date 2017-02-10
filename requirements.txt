@@ -5,8 +5,8 @@ github3.py
 bs4
 facebook
 geopy
-python-instagram
 tweepy
 exifread
-rawkit
+rawpy
 apsw
+requests
