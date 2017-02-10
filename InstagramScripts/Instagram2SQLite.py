@@ -20,8 +20,7 @@ __author__ = 'Jacob'
 import os
 import peewee
 import instagram
-from instagram.client import InstagramAPI
-from instagram.bind import InstagramAPIError
+import requests
 import yaml
 
 #Authentication with Instagram
@@ -42,11 +41,13 @@ scope = access_config.get('instagram').get('scope')
 if not scope or scope == [""]:
     scope = ["basic"]
 
+authorization_url = "https://api.instagram.com/oauth/authorize/"
+payload = {"client_id": client_id, "redirect_uri": redirect_uri, "response_type": "token", "scope": scope}
+api_auth = requests.get(authorization_url, params=payload)
 api = InstagramAPI(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri)
-redirect_uri = api.get_authorize_login_url(scope = scope)
 
 #TODO make it so do not have to go to site and then come back
-print ("Visit this page and authorize access in your browser: "+ redirect_uri)
+print ("Visit this page and authorize access in your browser: " + redirect_uri)
 code = (str(input("Paste in code in query string after redirect: ").strip()))
 
 access_token = api.exchange_code_for_access_token(code)
