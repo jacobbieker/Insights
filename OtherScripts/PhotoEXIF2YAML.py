@@ -56,7 +56,7 @@ for location in locations:
         with open(photo, 'rb') as image:
             #Return EXIF tags
             metadata = exifread.process_file(image)
-            with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
+            with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1] + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in metadata.keys():
@@ -78,7 +78,7 @@ for location in locations:
         file_name = os.path.splitext(os.path.basename(raw_file))
         with Raw(filename=raw_file) as raw:
             raw_output = Metadata
-            with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1]  + '.yml'),
+            with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1] + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
                 for tag in raw_output._fields:
@@ -88,3 +88,26 @@ for location in locations:
     #             end of .CR2 Processing
     #
     ###################################################################
+    ###################################################################
+    #
+    #             Start of .TIFF Processing
+    #
+    ###################################################################
+    tiff_files = [y for x in os.walk(location) for y in glob(os.path.join(x[0], '*.tif*'))]
+
+    for tiff_file in tiff_files:
+        file_name = os.path.splitext(os.path.basename(tiff_file))
+        with open(tiff_file, 'rb') as image:
+            #Return EXIF tags
+            metadata = exifread.process_file(image)
+            with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1] + '.yml'),
+                      'w') as yaml_output:
+                yaml_output.write("%s: %s" % ('Filename', file_name[0]))
+                for tag in metadata.keys():
+                    if tag not in ('JPEGThumbnail', 'TIFFThumbnail', 'EXIF MakerNote'):
+                        yaml_output.write("\n%s: %s" % (tag, metadata[tag]))
+    ############################################################################################
+    #
+    #             end of .TIFF Processing
+    #
+    ############################################################################################
