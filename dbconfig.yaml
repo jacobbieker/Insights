@@ -12,6 +12,7 @@ sqlite:
         reciever: char
         message: string
         length: int
+        include_media: boolean
     word:
         word: char
         length: int
@@ -94,5 +95,40 @@ sqlite:
         duration: double
         isTask: boolean
     sleep:
+        start_time: time
+        end_time: time
+        location: string
+        duration: double
+        application: char
+        cycles: int
+        rating: double
+        comments: string
+        deep_sleep: float
+        noise: float
+        timestamp: date
     heart:
+        start_time: time
+        end_time: time
+        location: string
+        duration: double
+        application: char
+        lowest: double
+        average: double
+        highest: double
+        activity: string
+        timestamp: date
     activity:
+        date: date
+        start_time: time
+        end_time: time
+        location: string
+        duration: double
+        application: char
+        rating: double
+        comments: string
+        type: char
+        calories: double
+        avg_altitude: double
+        max_altitude: double
+        min_altitude: double
+        timestamp: date

@@ -77,12 +77,16 @@ if __name__ == "__main__":
 
 
     class Message(BaseModel):
+        """
+        Used for everything from Texts to Faebook Wall Posts, to other things
+        """
         type = TextField(null=True)
         date = DateTimeField(null=True)
         time = TimeField(null=True)
         sender = CharField(null=True)
         reciever = CharField(null=True)
         message = TextField(null=True)
+        include_media = BooleanField(null=True)
         length = IntegerField(null=True)
         contact = ForeignKeyField(Contacts, null=True)
         timestamp = DateTimeField(default=datetime.datetime.now())
@@ -163,7 +167,7 @@ if __name__ == "__main__":
         name = CharField(null=True)
         date = DateTimeField(null=True)
         time = TimeField(null=True)
-        location = TextField(null=True)
+        location = ForeignKeyField(Locations, null=True)
         shutter = TextField(null=True)
         iso = IntegerField(null=True)
         shot_format = TextField(null=True)
@@ -309,12 +313,16 @@ class Contacts(BaseModel):
 
 
 class Message(BaseModel):
+    """
+    Used for everything from Texts to Faebook Wall Posts, to other things
+    """
     type = TextField(null=True)
     date = DateTimeField(null=True)
     time = TimeField(null=True)
     sender = CharField(null=True)
     reciever = CharField(null=True)
     message = TextField(null=True)
+    include_media = BooleanField(null=True)
     length = IntegerField(null=True)
     contact = ForeignKeyField(Contacts, null=True)
     timestamp = DateTimeField(default=datetime.datetime.now())
@@ -395,7 +403,7 @@ class Photos(BaseModel):
     name = CharField(null=True)
     date = DateTimeField(null=True)
     time = TimeField(null=True)
-    location = TextField(null=True)
+    location = ForeignKeyField(Locations, null=True)
     shutter = TextField(null=True)
     iso = IntegerField(null=True)
     shot_format = TextField(null=True)
