@@ -21,6 +21,7 @@ import yaml
 import os
 from databaseSetup import Photos
 from glob import glob
+import exifread
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":

@@ -12,3 +12,4 @@ rawpy
 apsw
 requests
 yaml
+exifread

@@ -19,12 +19,10 @@ __author__ = 'Jacob Bieker'
 import exifread
 from exifread import *
 import os
+from databaseSetup import Photos, Locations
 import json
 import yaml
 from glob import glob
-from rawkit.raw import Raw
-from rawkit.metadata import Metadata
-import libraw
 
 #TODO Check for filename conflicts and rename if necessary
 
@@ -76,8 +74,8 @@ for location in locations:
 
     for raw_file in canon_raws:
         file_name = os.path.splitext(os.path.basename(raw_file))
-        with Raw(filename=raw_file) as raw:
-            raw_output = Metadata
+        with open(raw_file, 'r') as raw:
+            raw_output = exifread.process_file(raw)
             with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1] + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
