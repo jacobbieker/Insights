@@ -171,7 +171,7 @@ def thread2JSON(output_name, thread):
     with open(os.path.join(constants.get('outputDir'), 'facebook.messaging.' + str(output_name) + '.yaml'),
               'a') as json_output:
         messages = thread.find_all("div", {"class": "message"})
-        # Get all <p> tags, which include the actual content, to iterate throug hand match up with each
+        # Get all <p> tags, which include the actual content, to iterate through hand match up with each
         # message
         message_content = thread.find_all("p")
         # TODO Get the list of all paricipants in a thread from the <thread> tag
@@ -189,7 +189,7 @@ def thread2JSON(output_name, thread):
 
             # The actual message
             text = message_content[index].text
-            if (output_name != 1):
+            if output_name != 1:
                 json_output.write(",\n")
             json_data = {'type': 'facebook message',
                          'time': date_string,

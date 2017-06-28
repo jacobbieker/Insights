@@ -111,6 +111,9 @@ def get_locations_from_database(longitude_query, latitude_query):
     :param latitude_query:
     :return: Whether query already exists in database
     """
+
+    # Currently doesn't work in that once the database is large enough, peewee times out on the SQL search, stopping the
+    # program
     return False
     '''
     try:
