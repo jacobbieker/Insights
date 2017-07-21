@@ -44,6 +44,9 @@ instagram:
     token: NULL
     redirect: <redirect URI>
     scope: basic
+hexoskin:
+    secret: <key>
+    clientId: <clienId>
 local:
     photos: no
     photoLocations:
