@@ -79,7 +79,7 @@ for location in locations:
             with open(os.path.join(constants.get('outputDir'), 'photo.exif.' + file_name[0] + file_name[1] + '.yml'),
                       'w') as yaml_output:
                 yaml_output.write("%s: %s" % ('Filename', file_name[0]))
-                for tag in raw_output._fields:
+                for tag in raw_output.keys():
                     print(tag)
     ###################################################################
     #
