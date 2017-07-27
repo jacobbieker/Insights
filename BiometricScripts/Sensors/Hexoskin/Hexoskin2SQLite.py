@@ -22,8 +22,7 @@ import peewee
 import requests
 import yaml
 import sys
-import HxApi2_0
-
+import BiometricScripts.Sensors.Hexoskin.HxApi2_0 as hexoskin
 
 #Authentication with Hexoskin
 #  Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
@@ -48,11 +47,11 @@ client_id = access_config.get('hexoskin')['clientId']
 rootdir = os.path.join(constants.get('dataDir'), "Hexoskin")
 
 
-auth = HxApi2_0.SessionInfo(secret=secret, clientId=client_id)
+auth = hexoskin.SessionInfo(username='jacob.bieker@gmail.com', password='0dUuSxY7Ll5i')
 
 #TODO: List all records, download those that are not already downloaded
 
-#TODO List all records and make into list
+records = hexoskin.getRecordList(auth, limit="0")
 
 for record_uri in records:
-    records_request = requests.get(record_uri, headers={"content-type": "octect"})
+    records_request = hexoskin.getRecordData(auth, record_uri, downloadRaw=True)
