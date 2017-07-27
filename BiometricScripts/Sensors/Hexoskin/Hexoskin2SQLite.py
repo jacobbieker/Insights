@@ -26,6 +26,7 @@ import BiometricScripts.Sensors.Hexoskin.HxApi2_0 as hexoskin
 
 #Authentication with Hexoskin
 #  Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+'''
 if __name__ != "__main__":
     with open(os.path.join("access.yaml"), 'r') as access:
         access_config = yaml.load(access)
@@ -45,13 +46,16 @@ secret = access_config.get('hexoskin')['secret']
 client_id = access_config.get('hexoskin')['clientId']
 
 rootdir = os.path.join(constants.get('dataDir'), "Hexoskin")
+'''
 
-
-auth = hexoskin.SessionInfo(username='jacob.bieker@gmail.com', password='***REMOVED***')
+auth = hexoskin.SessionInfo()
 
 #TODO: List all records, download those that are not already downloaded
 
 records = hexoskin.getRecordList(auth, limit="0")
+print(records)
 
 for record_uri in records:
-    records_request = hexoskin.getRecordData(auth, record_uri, downloadRaw=True)
+    print(record_uri.get('id'))
+    records_request = hexoskin.getRecordData(auth, recordID=record_uri.get('id'), downloadRaw=True)
+    print(records_request)
