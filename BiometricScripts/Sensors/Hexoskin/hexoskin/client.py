@@ -5,6 +5,7 @@ from hashlib import sha1
 from urlparse import parse_qsl, urlparse
 from hexoskin.errors import *
 
+from BiometricScripts.Sensors.Hexoskin.hexoskin.errors import ApiError
 
 CACHED_API_RESOURCE_LIST = '.api_stash'
 
@@ -198,7 +199,7 @@ class ApiResourceList(ApiResultList):
                 self.extendleft(self._make_list(response))
             else:
                 self.extend(self._make_list(response))
-        except KeyError, e:
+        except KeyError as e:
             raise ApiError('Cannot parse results, unexpected content received! %s \nFirst 64 chars of content: %s' % (e, response.body[:64]))
 
 
@@ -360,8 +361,8 @@ class ApiHelper(object):
                 try:
                     with open(self._resource_cache, 'w+') as f:
                         cPickle.dump(self.resource_conf, f)
-                except IOError, e:
-                    print "Couldn't write to stash file: %s" % e
+                except IOError as e:
+                    print("Couldn't write to stash file: %s" % e)
         else:
             self._fetch_resource_list()
 

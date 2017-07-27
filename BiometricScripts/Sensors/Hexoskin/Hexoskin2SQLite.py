@@ -21,12 +21,38 @@ import os
 import peewee
 import requests
 import yaml
+import sys
+import HxApi2_0
 
-#Authentication with Instagram
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
+
+#Authentication with Hexoskin
+#  Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ != "__main__":
     with open(os.path.join("access.yaml"), 'r') as access:
         access_config = yaml.load(access)
 else:
     with open(os.path.join("access.yaml"), 'r') as access:
         access_config = yaml.load(access)
+
+if __name__ == "__main__":
+    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+else:
+    with open("constants.yaml", 'r') as ymlfile:
+        constants = yaml.load(ymlfile)
+
+# Set up auth and data locations
+secret = access_config.get('hexoskin')['secret']
+client_id = access_config.get('hexoskin')['clientId']
+
+rootdir = os.path.join(constants.get('dataDir'), "Hexoskin")
+
+
+auth = HxApi2_0.SessionInfo(secret=secret, clientId=client_id)
+
+#TODO: List all records, download those that are not already downloaded
+
+#TODO List all records and make into list
+
+for record_uri in records:
+    records_request = requests.get(record_uri, headers={"content-type": "octect"})
