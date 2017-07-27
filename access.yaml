@@ -45,6 +45,7 @@ instagram:
     redirect: <redirect URI>
     scope: basic
 hexoskin:
+    used: yes
     secret: <key>
     clientId: <clienId>
 local:
@@ -57,6 +58,6 @@ local:
     hexoskin: no
     myo: no
     weight: no
-    sleep: yes
+    sleep: no
     heart: no
     activity: no
