@@ -300,12 +300,12 @@ class ApiHelper(object):
     def build_resources(self):
         if self._resource_cache is not None:
             try:
-                with open(self._resource_cache, 'r') as f:
+                with open(self._resource_cache, 'rb') as f:
                     self.resource_conf = cPickle.load(f)
-            except IOError:
+            except IOError or FileNotFoundError:
                 self._fetch_resource_list()
                 try:
-                    with open(self._resource_cache, 'w+') as f:
+                    with open(self._resource_cache, 'wb+') as f:
                         cPickle.dump(self.resource_conf, f)
                 except IOError as e:
                     print("Couldn't write to stash file: %s" % e)
@@ -326,7 +326,7 @@ class ApiHelper(object):
 
     def _fetch_resource_list(self):
         resource_list = self.get('/api/').result
-        for n, r in resource_list.iteritems():
+        for n, r in resource_list.items():
             if n == 'import':
                 continue
             self.resource_conf[n] = self.get(r['schema']).result
@@ -504,7 +504,10 @@ class HexoAuth(requests.auth.HTTPBasicAuth):
     def __call__(self, request):
         request = super(HexoAuth, self).__call__(request)
         ts = int(time.time())
-        digest = hashlib.sha1('%s%s%s' % (self.api_secret, ts, request.url)).hexdigest()
+        print(self.api_secret)
+        print(ts)
+        print(request.url)
+        digest = hashlib.sha1((self.api_secret + str(ts) + request.url).encode('utf8')).hexdigest()
         request.headers['X-HEXOTIMESTAMP'] = ts
         request.headers['X-HEXOAPIKEY'] = self.api_key
         request.headers['X-HEXOAPISIGNATURE'] = digest
@@ -627,9 +630,8 @@ class OAuth2Token(object):
 class HexoApi(ApiHelper):
     def __init__(self, api_key, api_secret, api_version='', auth=None, base_url=None):
         if base_url is None:
-            base_url = 'https://api.hexoskin.com'
-        return super(HexoApi, self).__init__(api_key, api_secret, api_version, auth, base_url)
-
+            self.base_url = 'https://api.hexoskin.com'
+        super().__init__(api_key, api_secret, api_version, auth, base_url)
 
 class ApiResponse(object):
     """
@@ -667,7 +669,7 @@ class ApiObjectCache(object):
         self.api = api
         self.ttl = ttl
         self._objects = {}
-        self._keys = self._objects.viewkeys()
+        self._keys = self._objects.keys()
 
     def get(self, uri):
         uri = self._strip_host(uri)

@@ -142,6 +142,9 @@ def getRecordData(auth, recordID, downloadRaw=True):
     returns a dictionary containing all datatypes in separate entries
     """
     record = auth.api.record.get(recordID)
+    print(record.user)
+    print(record.start)
+    print(record.end)
     final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadRaw=downloadRaw)
     final_dat['annotations'] = getRangeList(auth, limit="50", user=record.user.id, start=record.start, end=record.end)
     final_dat['track'] = getTrackPoints(auth, record.user.id, final_dat['annotations'])
@@ -196,10 +199,12 @@ def getUnsubsampledData(auth, userID, start, end, dataID):
         b = min(end, a + sampPerIter)
         while a < end:
             dat = auth.api.data.list(start=a, end=b, user=userID, datatype=dataID)
-            if len(dat.response.result[0]['data'].values()[0]) > 0:
-                ts = zip(*dat.response.result[0][u'data'].values()[0])[0]
-                data = [zip(*dat.response.result[0][u'data'][str(v)])[1] for v in dataID]
-                out.extend(zip(ts, *data))
+            print(dat.response.result)
+            if dat.response.result != []:
+                if len(dat.response.result[0]['data'].values()[0]) > 0:
+                    ts = zip(*dat.response.result[0]['data'].values()[0])[0]
+                    data = [zip(*dat.response.result[0]['data'][str(v)])[1] for v in dataID]
+                    out.extend(zip(ts, *data))
             a = min(a + sampPerIter, end)
             b = min(b + sampPerIter, end)
             time.sleep(0.2)  # Rate limiting to stay below 5 requests per second
