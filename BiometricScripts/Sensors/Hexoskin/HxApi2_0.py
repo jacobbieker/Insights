@@ -21,25 +21,24 @@ TIMESTAMP_FORMAT = '%Y:%m:%d\t%H:%M:%S:%f'
 
 # Datatypes definitions
 if MODEL == 'Hexoskin':
-    raw_datatypes = {'Acceleration': [4145, 4146, 4147],
-                     'ECG': [4113],
-                     'Respiration': [4129, 4130]}
-    datatypes = {'Activity': [49],
-                 'Cadence': [53],
-                 'Heart Rate': [19],
-                 'Minute Ventilation': [36],
+    raw_datatypes = {'acceleration': [4145, 4146, 4147],
+                     'ecg': [4113],
+                     'respiration': [4129, 4130]}
+    datatypes = {'activity': [49],
+                 'cadence': [53],
+                 'heart_rate': [19],
+                 'minute_ventilation': [36],
                  'vt': [37],
-                 'Breathing Rate': [33],
+                 'breathing_rate': [33],
                  'hr_quality': [1000],
                  'br_quality': [1001],
-                 'Inspiration': [34],
-                 'Expiration': [35],
-                 'Batt': [247],
-                 'Step': [52],
-                 'Rrinterval': [18],
-                 'QRS': [22],
-                 'RRInterval': [18],
-                 'NNInterval': [318],
+                 'inspiration': [34],
+                 'expiration': [35],
+                 'batt': [247],
+                 'step': [52],
+                 'rrinterval': [18],
+                 'qrs': [22],
+                 'nninterval': [318],
 
                  }
 
