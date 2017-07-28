@@ -147,7 +147,7 @@ def getRecordData(auth, recordID, downloadRaw=True):
     #print(record.user)
     #print(record.start)
     #print(record.end)
-    final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadRaw=downloadRaw)
+    final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadProcessed=downloadRaw)
     final_dat['annotations'] = getRangeList(auth, limit="50", user=record.user.id, start=record.start, end=record.end)
     final_dat['track'] = getTrackPoints(auth, record.user.id, final_dat['annotations'])
     final_dat['info'] = record.fields
@@ -171,20 +171,21 @@ def getTrackPoints(auth, userID, ranges):
     return trackpointLines
 
 
-def getData(auth, user, start, end, downloadRaw=True):
+def getData(auth, user, start, end, downloadProcessed=True):
     """
     This function fetches the specified data range. Called by getRangeData and getRecordData
     """
     final_dat = {}
-    if downloadRaw is True:
+    if downloadProcessed is True:
+        for dataID in datatypes:
+            print("Downloading " + dataID)
+            data = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=datatypes[dataID])
+            final_dat[dataID] = data
+    else:
         for rawID in raw_datatypes:
             print("Downloading" + rawID)
             raw_dat = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=raw_datatypes[rawID])
             final_dat[rawID] = raw_dat
-    for dataID in datatypes:
-        print("Downloading " + dataID)
-        data = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=datatypes[dataID])
-        final_dat[dataID] = data
     return final_dat
 
 
