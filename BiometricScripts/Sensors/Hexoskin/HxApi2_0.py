@@ -21,23 +21,26 @@ TIMESTAMP_FORMAT = '%Y:%m:%d\t%H:%M:%S:%f'
 
 # Datatypes definitions
 if MODEL == 'Hexoskin':
-    raw_datatypes = {'acc': [4145, 4146, 4147],
-                     'ecg': [4113],
-                     'resp': [4129, 4130]}
-    datatypes = {'activity': [49],
-                 'cadence': [53],
-                 'heartrate': [19],
-                 'minuteventilation': [36],
+    raw_datatypes = {'Acceleration': [4145, 4146, 4147],
+                     'ECG': [4113],
+                     'Respiration': [4129, 4130]}
+    datatypes = {'Activity': [49],
+                 'Cadence': [53],
+                 'Heart Rate': [19],
+                 'Minute Ventilation': [36],
                  'vt': [37],
-                 'breathingrate': [33],
+                 'Breathing Rate': [33],
                  'hr_quality': [1000],
                  'br_quality': [1001],
-                 'inspiration': [34],
-                 'expiration': [35],
-                 'batt': [247],
-                 'step': [52],
-                 'rrinterval': [18],
-                 'qrs': [22],
+                 'Inspiration': [34],
+                 'Expiration': [35],
+                 'Batt': [247],
+                 'Step': [52],
+                 'Rrinterval': [18],
+                 'QRS': [22],
+                 'RRInterval': [18],
+                 'NNInterval': [318],
+
                  }
 
 elif MODEL == 'CHA3000':
@@ -142,9 +145,9 @@ def getRecordData(auth, recordID, downloadRaw=True):
     returns a dictionary containing all datatypes in separate entries
     """
     record = auth.api.record.get(recordID)
-    print(record.user)
-    print(record.start)
-    print(record.end)
+    #print(record.user)
+    #print(record.start)
+    #print(record.end)
     final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadRaw=downloadRaw)
     final_dat['annotations'] = getRangeList(auth, limit="50", user=record.user.id, start=record.start, end=record.end)
     final_dat['track'] = getTrackPoints(auth, record.user.id, final_dat['annotations'])
@@ -199,11 +202,11 @@ def getUnsubsampledData(auth, userID, start, end, dataID):
         b = min(end, a + sampPerIter)
         while a < end:
             dat = auth.api.data.list(start=a, end=b, user=userID, datatype=dataID)
-            print(dat.response.result)
+            #print(dat.response.result)
             if dat.response.result != []:
-                if len(dat.response.result[0]['data'].values()[0]) > 0:
-                    ts = zip(*dat.response.result[0]['data'].values()[0])[0]
-                    data = [zip(*dat.response.result[0]['data'][str(v)])[1] for v in dataID]
+                if len(list(dat.response.result[0]['data'].values())[0]) > 0:
+                    ts = list(zip(*list(dat.response.result[0]['data'].values())[0]))[0]
+                    data = [list(zip(*dat.response.result[0]['data'][str(v)]))[1] for v in dataID]
                     out.extend(zip(ts, *data))
             a = min(a + sampPerIter, end)
             b = min(b + sampPerIter, end)
