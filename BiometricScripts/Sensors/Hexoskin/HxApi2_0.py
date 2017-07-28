@@ -138,16 +138,13 @@ class SessionInfo:
             raise ValueError
 
 
-def getRecordData(auth, recordID, downloadRaw=True):
+def getRecordData(auth, recordID, downloadProcessed=False):
     """
     This function allows you to specify a record, and it will manage the download of the different datatypes by itself
     returns a dictionary containing all datatypes in separate entries
     """
     record = auth.api.record.get(recordID)
-    #print(record.user)
-    #print(record.start)
-    #print(record.end)
-    final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadProcessed=downloadRaw)
+    final_dat = getData(auth=auth, user=record.user, start=record.start, end=record.end, downloadProcessed=downloadProcessed)
     final_dat['annotations'] = getRangeList(auth, limit="50", user=record.user.id, start=record.start, end=record.end)
     final_dat['track'] = getTrackPoints(auth, record.user.id, final_dat['annotations'])
     final_dat['info'] = record.fields
