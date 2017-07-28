@@ -1,6 +1,6 @@
 import binascii, base64, csv, hashlib, hmac, json, os, random, re, struct, time, urllib
 import requests
-import _pickle as cPickle
+import pickle as cPickle
 from collections import deque
 from hashlib import sha1
 from urllib.parse import parse_qsl, urlparse
@@ -504,9 +504,9 @@ class HexoAuth(requests.auth.HTTPBasicAuth):
     def __call__(self, request):
         request = super(HexoAuth, self).__call__(request)
         ts = int(time.time())
-        print(self.api_secret)
-        print(ts)
-        print(request.url)
+        #print(self.api_secret)
+        #print(ts)
+        #print(request.url)
         digest = hashlib.sha1((self.api_secret + str(ts) + request.url).encode('utf8')).hexdigest()
         request.headers['X-HEXOTIMESTAMP'] = ts
         request.headers['X-HEXOAPIKEY'] = self.api_key
