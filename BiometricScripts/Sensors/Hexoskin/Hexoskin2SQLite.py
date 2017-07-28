@@ -76,7 +76,7 @@ for record_uri in records:
     print(record_uri.get('id'))
     if str(record_uri.get('id')) not in downloaded_ones:
         #print(record_uri.get('id'))
-        records_request = hexoskin.getRecordData(auth, recordID=record_uri.get('id'), downloadRaw=True)
+        records_request = hexoskin.getRecordData(auth, recordID=record_uri.get('id'), downloadRaw=False)
         pprint(records_request.keys())
         path = Path(os.path.join(rootdir, str(record_uri.get('id'))+".txt"))
         pprint(records_request['info'], open(path, "w+"))
