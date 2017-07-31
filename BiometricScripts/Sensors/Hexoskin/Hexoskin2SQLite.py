@@ -38,6 +38,8 @@ if __name__ != "__main__":
 else:
     with open(os.path.join("..", "..", "..", "access.yaml"), 'r') as access:
         access_config = yaml.load(access)
+    with open(os.path.join("..", "..", "..", "keys"), 'r') as ymlfile:
+        hexoskin_access = yaml.load(ymlfile)
 
 if __name__ == "__main__":
     with open(os.path.join("..", "..", "..", "constants.yaml"), 'r') as ymlfile:
@@ -56,7 +58,10 @@ client_id = access_config.get('hexoskin')['clientId']
 rootdir = os.path.join(constants.get('dataDir'), "Hexoskin")
 
 
-auth = hexoskin.SessionInfo(publicKey='7QDNqb4m9FD6wWaaCmZbLJbeAGc9dT', privateKey='xvV7FYlb9wdMLiyz1jLJMqyB5IHk38', username='jacob.bieker@gmail.com', password='0dUuSxY7Ll5i')
+auth = hexoskin.SessionInfo(publicKey=str(hexoskin_access.get('hexoskin').get('clientId')),
+                            privateKey=str(hexoskin_access.get('hexoskin').get('secret')),
+                            username=str(hexoskin_access.get('hexoskin').get('email')),
+                            password=str(hexoskin_access.get('hexoskin').get('password')))
 
 #TODO: List all records, download those that are not already downloaded
 

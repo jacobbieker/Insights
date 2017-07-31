@@ -270,7 +270,7 @@ if __name__ == "__main__":
 if __name__ != "__main__":
     print(__name__)
     if __name__ == "databaseSetup":
-        with open("constants.yaml", 'r') as ymlfile:
+        with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
             config = yaml.load(ymlfile)
     else:
         with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
