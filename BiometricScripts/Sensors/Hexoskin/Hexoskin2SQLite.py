@@ -65,7 +65,6 @@ records = hexoskin.getRecordList(auth, limit="0")
 
 downloaded_ones = []
 for index, thing in enumerate(os.walk(rootdir)):
-    print(thing[1])
     if index == 0:
         downloaded_ones = thing[1]
 
@@ -76,14 +75,14 @@ for record_uri in records:
     print(record_uri.get('id'))
     if str(record_uri.get('id')) not in downloaded_ones:
         #print(record_uri.get('id'))
-        records_request = hexoskin.getRecordData(auth, recordID=record_uri.get('id'), downloadProcessed=False)
+        records_request = hexoskin.getRecordData(auth, recordID=record_uri.get('id'), downloadProcessed=True)
         pprint(records_request.keys())
         path = Path(os.path.join(rootdir, str(record_uri.get('id'))+".txt"))
         pprint(records_request['info'], open(path, "w+"))
         path = Path(os.path.join(rootdir, str(record_uri.get('id'))+"_print.txt"))
         output_file = open(path, "w+")
         pprint(records_request['annotations'], output_file)
-        database['hexoskin'].insert(records_request)
+        print(isinstance(records_request, dict))
         for key, value in records_request.items():
             if value:
                 path = Path(os.path.join(rootdir, str(record_uri.get('id')), str(record_uri.get('id')) + "_" + str(key)))
@@ -94,6 +93,7 @@ for record_uri in records:
                         json.dump(value, fp=fp, indent=4)
                 except TypeError as e:
                     print("Type Error, need to fix: ")
+                    print(value)
                     print(str(e))
                     continue
     else:
