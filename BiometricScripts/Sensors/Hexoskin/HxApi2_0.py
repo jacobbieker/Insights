@@ -178,12 +178,12 @@ def getData(auth, user, start, end, downloadProcessed=True):
             data = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=datatypes[dataID])
             final_dat[dataID] = data
         for rawID in raw_datatypes:
-            print("Downloading" + rawID)
+            print("Downloading " + rawID)
             raw_dat = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=raw_datatypes[rawID])
             final_dat[rawID] = raw_dat
     else:
         for rawID in raw_datatypes:
-            print("Downloading" + rawID)
+            print("Downloading " + rawID)
             raw_dat = getUnsubsampledData(auth=auth, userID=user, start=start, end=end, dataID=raw_datatypes[rawID])
             final_dat[rawID] = raw_dat
     return final_dat

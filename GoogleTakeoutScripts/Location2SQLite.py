@@ -391,10 +391,10 @@ def location_from_dict(longitude_query, latitude_query, type_query):
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":
-    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
         constants = yaml.load(ymlfile)
         # Open continents.yaml to get location data
-    with open(os.path.join("countries.yaml"), 'r') as loc_data:
+    with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
         location_data = yaml.load(loc_data)
 else:
     with open("constants.yaml", 'r') as ymlfile:
@@ -403,7 +403,7 @@ else:
         location_data = yaml.load(loc_data)
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
-opencage_geolocator = OpenCage(api_key="***REMOVED***")
+opencage_geolocator = OpenCage(api_key="d1e2dc9584fd84b683ac13c5cf12cc98")
 google_geolocator = GoogleV3()
 nominatim_geolocator = Nominatim()
 
@@ -480,7 +480,7 @@ if can_load_last_position():
             Locations.insert_many(location_bulk_insert_queries).execute()
             print("Inserted " + str(len(location_bulk_insert_queries)) + " Records")
 else:
-    with open(os.path.join(rootdir, "LocationHistory.json"), 'r') as source:
+    with open(os.path.join(rootdir, "Location History.json"), 'r') as source:
         data = json.load(source)
         locations = data.get('locations')
         for key, location in enumerate(locations):
