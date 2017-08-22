@@ -30,7 +30,7 @@ except ImportError:
 
 # Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 if __name__ == "__main__":
-    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
+    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
         constants = yaml.load(ymlfile)
 else:
     with open("constants.yaml", 'r') as ymlfile:
