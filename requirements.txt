@@ -6,7 +6,7 @@ github3.py==0.9.6
 bs4==0.0.1
 facebook
 geopy==1.11.0
-tweepy
+tweepy==3.5.0
 exifread
 rawpy
 apsw
