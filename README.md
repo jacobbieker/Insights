@@ -3,7 +3,7 @@ A set of Python and R scripts to organize and analyze data from various sources 
 easy to access and manipulate.
 
 [![Updates](https://pyup.io/repos/github/jacobbieker/Insights/shield.svg)](https://pyup.io/repos/github/jacobbieker/Insights/)
-[![Python 3](https://pyup.io/repos/github/jacobbieker/Insights/python-3-shield.svg)](https://pyup.io/repos/github/jacobbieker/Insights/)
+[![Build Status](https://travis-ci.org/jacobbieker/Insights.svg?branch=master)](https://travis-ci.org/jacobbieker/Insights)
 
 
 # Dependencies
