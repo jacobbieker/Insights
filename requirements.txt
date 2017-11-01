@@ -4,7 +4,7 @@ phonenumbers==8.8.5
 flickrapi==2.3
 github3.py==0.9.6
 bs4==0.0.1
-facebook
+facebook-sdk
 geopy==1.11.0
 tweepy==3.5.0
 exifread==2.1.2
