@@ -7,9 +7,9 @@ bs4==0.0.1
 facebook
 geopy==1.11.0
 tweepy==3.5.0
-exifread
+exifread==2.1.2
 rawpy
 apsw
 requests
 yaml
-exifread
+exifread==2.1.2
