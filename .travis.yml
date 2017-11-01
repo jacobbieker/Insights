@@ -16,7 +16,7 @@ before_install:
   - export PATH=/home/travis/miniconda/bin:$PATH
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib pip peewee 
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy matplotlib pip
   - pip install -r requirements.txt
 
 script:
