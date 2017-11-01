@@ -2,6 +2,10 @@
 A set of Python and R scripts to organize and analyze data from various sources and formats and make that data
 easy to access and manipulate.
 
+[![Updates](https://pyup.io/repos/github/jacobbieker/Insights/shield.svg)](https://pyup.io/repos/github/jacobbieker/Insights/)
+[![Python 3](https://pyup.io/repos/github/jacobbieker/Insights/python-3-shield.svg)](https://pyup.io/repos/github/jacobbieker/Insights/)
+
+
 # Dependencies
 peewee >= 2.7.1, rawkit, readexif, python-instagram, tweepy, facebook, github3
 Only tested on Python 3.5
