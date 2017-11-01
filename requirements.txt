@@ -1,5 +1,5 @@
 lxml==4.1.0
-peewee
+peewee==2.10.2
 phonenumbers
 flickrapi
 github3.py
