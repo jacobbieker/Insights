@@ -26,13 +26,14 @@ import json
 import yaml
 
 #Authentication with Twitter
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ == "__main__":
-    with open(os.path.join("access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
+from io import config
+
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["access.yaml"])
+    access_config = configuration_files[0]
 else:
-    with open(os.path.join("access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
+    configuration_files = config.import_yaml_files("..", ["access.yaml"])
+    access_config = configuration_files[0]
 
 
 auth = tweepy.OAuthHandler(access_config.get('twitter').get('key'), access_config.get('twitter').get('secret'))

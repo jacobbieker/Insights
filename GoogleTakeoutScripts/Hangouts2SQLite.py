@@ -27,10 +27,12 @@ import datetime
 The article included in this repository is licensed under a Attribution-NonCommercial-ShareAlike 3.0 license, meaning that you are free to copy, distribute, transmit and adapt this work for non-commercial use, but that you must credit Fabian Mueller as the original author of the piece, and provide a link to the source: https://bitbucket.org/dotcs/hangouts-log-reader/
 '''
 
+
 class Participant(object):
     """
     Participant class.
     """
+
     def __init__(self, gaia_id, chat_id, name, phone):
         """
         Constructor
@@ -55,6 +57,7 @@ class Participant(object):
         @return phone of the participant (may be None)
         """
         return self.phone
+
     def get_name(self):
         """
         Getter for the name of a participant.
@@ -73,13 +76,15 @@ class Participant(object):
             else:
                 return self.get_phone()
         else:
-            #return "%s <%s>" % (self.get_name(), self.get_id())
+            # return "%s <%s>" % (self.get_name(), self.get_id())
             return self.get_name()
+
 
 class ParticipantList(object):
     """
     List class for participants.
     """
+
     def __init__(self):
         """
         Constructor
@@ -122,7 +127,7 @@ class ParticipantList(object):
 
     def __iter__(self):
         self.current_iter = 0
-        self.max_iter = len(self.p_list)-1
+        self.max_iter = len(self.p_list) - 1
         return self
 
     def __next__(self):
@@ -130,7 +135,7 @@ class ParticipantList(object):
             raise StopIteration
         else:
             self.current_iter += 1
-            return self.p_list.values()[self.current_iter-1]
+            return self.p_list.values()[self.current_iter - 1]
 
     def __str__(self):
         """
@@ -141,10 +146,12 @@ class ParticipantList(object):
             string += str(p) + ", "
         return string[:-2]
 
+
 class Event(object):
     """
     Event class.
     """
+
     def __init__(self, event_id, sender_id, timestamp, message, event_type):
         """
         Constructor
@@ -214,10 +221,12 @@ class Event(object):
             string += str(m) + " "
         return string[:-1]
 
+
 class EventList(object):
     """
     Event list class
     """
+
     def __init__(self):
         """
         Constructor
@@ -248,7 +257,7 @@ class EventList(object):
 
     def __iter__(self):
         self.current_iter = 0
-        self.max_iter = len(self.event_list)-1
+        self.max_iter = len(self.event_list) - 1
         return self
 
     def __next__(self):
@@ -256,12 +265,14 @@ class EventList(object):
             raise StopIteration
         else:
             self.current_iter += 1
-            return list(self.event_list.values())[self.current_iter-1]
+            return list(self.event_list.values())[self.current_iter - 1]
+
 
 class Conversation(object):
     """
     Conversation class
     """
+
     def __init__(self, conversation_id, timestamp, participants, events):
         """
         Constructor
@@ -339,6 +350,7 @@ def parse_json_file(filename):
 
     return conversation_list
 
+
 def extract_conversation_data(conversation):
     """
     Extracts the data that belongs to a single conversation.
@@ -363,14 +375,14 @@ def extract_conversation_data(conversation):
                 phone = participant["phone_number"]["e164"]
             except KeyError:
                 phone = None
-            p = Participant(gaia_id,chat_id,name,phone)
+            p = Participant(gaia_id, chat_id, name, phone)
             participant_list.add(p)
 
         event_list = EventList()
 
         for event in conversation["conversation_state"]["event"]:
             event_id = event["event_id"]
-            sender_id = event["sender_id"] # has dict values "gaia_id" and "chat_id"
+            sender_id = event["sender_id"]  # has dict values "gaia_id" and "chat_id"
             timestamp = event["timestamp"]
             event_type = event["event_type"]
             text = list()
@@ -381,21 +393,22 @@ def extract_conversation_data(conversation):
                         if segment["type"].lower() in ("TEXT".lower(), "LINK".lower()):
                             text.append(segment["text"])
                 except KeyError:
-                    pass # may happen when there is no (compatible) attachment
+                    pass  # may happen when there is no (compatible) attachment
                 try:
                     for attachment in message_content["attachment"]:
                         # if there is a Google+ photo attachment we append the URL
                         if attachment["embed_item"]["type"][0].lower() == "PLUS_PHOTO".lower():
                             text.append(attachment["embed_item"]["embeds.PlusPhoto.plus_photo"]["url"])
                 except KeyError:
-                    pass # may happen when there is no (compatible) attachment
+                    pass  # may happen when there is no (compatible) attachment
             except KeyError:
-                continue # that's okay
+                continue  # that's okay
             # finally add the event to the event list
             event_list.add(Event(event_id, sender_id["gaia_id"], timestamp, text, event_type))
     except KeyError:
         raise RuntimeError("The conversation data could not be extracted.")
     return Conversation(conversation_id, initial_timestamp, participant_list, event_list)
+
 
 def print_conversation(conversation):
     """
@@ -410,19 +423,21 @@ def print_conversation(conversation):
         if author_id:
             author = author_id.get_name()
         print("%(timestamp)s: <%(author)s> %(message)s" % \
-                    {
-                        "timestamp": event.get_timestamp(),
-                        "author": author,
-                        "message": event.get_formatted_message(),
-                    })
+              {
+                  "timestamp": event.get_timestamp(),
+                  "author": author,
+                  "message": event.get_formatted_message(),
+              })
 
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ == "__main__":
-    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+
+from io import config
+
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["constants"])
+    constants = configuration_files[0]
 else:
-    with open("constants.yaml", 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+    configuration_files = config.import_yaml_files("..", ["constants"])
+    constants = configuration_files[0]
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Hangouts", "Hangouts.json")
 outputdir = os.path.join(constants.get("outputDir"))
@@ -431,9 +446,9 @@ print("Starting Google Hangout Parsing")
 conversations = parse_json_file(rootdir)
 message_list = []
 for conversation in conversations:
-    #print(conversation.get_timestamp())
+    # print(conversation.get_timestamp())
     print("conversation id: %s, participants: %s" % (conversation.get_id(), str(conversation.get_participants())))
-    #print_conversation(conversation)
+    # print_conversation(conversation)
     # Need to save to the database
     for event in conversation.get_events():
         participants = conversation.get_participants()
@@ -448,17 +463,14 @@ for conversation in conversations:
                               'message': message}).execute()
         elif str(event_type) == "SMS":
             Message.insert({'date': event.get_timestamp(), 'type': 'sms',
-                        'sender': sender_name, 'reciever': list_of_recievers,
-                        'message': message}).execute()
+                            'sender': sender_name, 'reciever': list_of_recievers,
+                            'message': message}).execute()
         elif str(event_type) == "REGULAR_CHAT_MESSAGE":
             Message.insert({'date': event.get_timestamp(), 'type': 'hangouts',
                             'sender': sender_name, 'reciever': list_of_recievers,
                             'message': message}).execute()
         else:
             print("Event Type not Recognized: " + str(event_type))
-
-
-
 
 
 def get_particpant(participant):

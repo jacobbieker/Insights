@@ -389,20 +389,18 @@ def location_from_dict(longitude_query, latitude_query, type_query):
         return False
 
 
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ == "__main__":
-    with open(os.path.join("..", "constants.yaml"), 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
-    with open(os.path.join("..", "keys"), 'r') as ymlfile:
-        key_file = yaml.load(ymlfile)
-        # Open continents.yaml to get location data
-    with open(os.path.join("..", "countries.yaml"), 'r') as loc_data:
-        location_data = yaml.load(loc_data)
+from io import config
+
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["constants", "keys", "countries.yaml"])
+    constants = configuration_files[0]
+    key_file = configuration_files[1]
+    location_data = configuration_files[2]
 else:
-    with open("constants.yaml", 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
-    with open(os.path.join("countries.yaml"), 'r') as loc_data:
-        location_data = yaml.load(loc_data)
+    configuration_files = config.import_yaml_files("..", ["constants", "keys", "countries.yaml"])
+    constants = configuration_files[0]
+    key_file = configuration_files[1]
+    location_data = configuration_files[2]
 
 rootdir = os.path.join(constants.get('dataDir'), "Takeout", "Location History")
 opencage_geolocator = OpenCage(api_key=str(key_file.get('opencage').get('key')))

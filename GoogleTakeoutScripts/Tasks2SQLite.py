@@ -22,13 +22,14 @@ import yaml
 from peewee import *
 from databaseSetup import Calendars
 
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ == "__main__":
-    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+from io import config
+
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["constants"])
+    constants = configuration_files[0]
 else:
-    with open("constants.yaml", 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+    configuration_files = config.import_yaml_files("..", ["constants"])
+    constants = configuration_files[0]
 
 rootdir = os.path.join(constants.get("dataDir"), "Takeout", "Tasks", "Tasks.json")
 

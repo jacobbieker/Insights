@@ -27,26 +27,22 @@ import BiometricScripts.Sensors.Hexoskin.HxApi2_0 as hexoskin
 from pathlib import Path
 from pprint import pprint
 from playhouse.dataset import DataSet
-
+from io import config
 
 #Authentication with Hexoskin
 #  Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
 
 if __name__ != "__main__":
-    with open(os.path.join("access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
-else:
-    with open(os.path.join("..", "..", "..", "access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
-    with open(os.path.join("..", "..", "..", "keys"), 'r') as ymlfile:
-        hexoskin_access = yaml.load(ymlfile)
+    configuration_files = config.import_yaml_files(".", ["access.yaml", "keys", "constants"])
+    access_config = configuration_files[0]
+    hexoskin_access = configuration_files[1]
+    constants = configuration_files[2]
 
-if __name__ == "__main__":
-    with open(os.path.join("..", "..", "..", "constants.yaml"), 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
 else:
-    with open("constants.yaml", 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+    configuration_files = config.import_yaml_files(os.path.join("..", "..", ".."), ["access.yaml", "keys", "constants"])
+    access_config = configuration_files[0]
+    hexoskin_access = configuration_files[1]
+    constants = configuration_files[2]
 
 # Open connection to database with Dataset, probably future way of connecting to database for this, easy import of
 # JSON data

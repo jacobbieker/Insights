@@ -24,17 +24,22 @@ import glob
 import zipfile
 import yaml
 
-# read config data on database
-with open("dbconfig.yaml", 'r') as ymlfile:
-    config = yaml.load(ymlfile)
-with open("access.yaml", 'r') as access:
-    access_config = yaml.load(access)
+from io import config
+
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["dbconfig.yaml", "access.yaml"])
+    dbconfig = configuration_files[0]
+    access_config = configuration_files[1]
+else:
+    configuration_files = config.import_yaml_files("..", ["dbconfig.yaml", "access.yaml"])
+    dbconfig = configuration_files[0]
+    access_config = configuration_files[1]
 
 # Constant current directory used by rest of the scripts:
 PATH = os.path.abspath("./")
 OUT_PATH = os.path.join(PATH, "output")
 DATA_PATH = os.path.join(PATH, "data")
-DB_NAME = config.get('sqlite').get('name') + '.db'
+DB_NAME = dbconfig.get('sqlite').get('name') + '.db'
 GOOGLE_SCRIPTS = os.path.join(PATH, "GoogleTakeoutScripts")
 FACEBOOK_SCRIPTS = os.path.join(PATH, "FacebookScripts")
 TWITTER_SCRIPTS = os.path.join(PATH, "TwitterScripts")

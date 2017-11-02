@@ -26,18 +26,16 @@ from glob import glob
 
 #TODO Check for filename conflicts and rename if necessary
 
-# Have to do this because when the command is called from the import in any subfolder it cannot find the dbconfig
-if __name__ == "__main__":
-    with open(os.path.join("constants.yaml"), 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
+from io import config
 
-    with open(os.path.join("access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
+if __name__ != "__main__":
+    configuration_files = config.import_yaml_files(".", ["constants", "access.yaml"])
+    constants = configuration_files[0]
+    access_config = configuration_files[1]
 else:
-    with open("constants.yaml", 'r') as ymlfile:
-        constants = yaml.load(ymlfile)
-    with open(os.path.join("access.yaml"), 'r') as access:
-        access_config = yaml.load(access)
+    configuration_files = config.import_yaml_files("..", ["constants", "access.yaml"])
+    constants = configuration_files[0]
+    access_config = configuration_files[1]
 
 locations = access_config.get('local').get('photoLocations')
 #Go through each location:
