@@ -2,7 +2,7 @@
 Test the configuration files
 """
 
-from io import config
+from insights.io import config
 
 
 def test_load_files():
