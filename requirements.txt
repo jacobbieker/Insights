@@ -5,7 +5,7 @@ phonenumbers==8.8.11
 github3.py==0.9.6
 bs4==0.0.1
 facebook-sdk==2.0.0
-geopy==1.11.0
+geopy==1.14.0
 tweepy==3.5.0
 exifread==2.1.2
 rawpy==0.10.1
