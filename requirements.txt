@@ -1,6 +1,6 @@
 lxml==4.1.1
 flickrapi==2.4.0
-peewee==3.0.15
+peewee==3.5.0
 phonenumbers==8.8.11
 github3.py==0.9.6
 bs4==0.0.1
