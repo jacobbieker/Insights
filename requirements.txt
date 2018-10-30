@@ -1,4 +1,4 @@
-lxml==4.1.1
+lxml==4.2.1
 flickrapi==2.4.0
 github3.py==1.1.0
 peewee==3.5.0
