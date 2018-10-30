@@ -10,6 +10,6 @@ tweepy==3.6.0
 exifread==2.1.2
 rawpy==0.10.1
 apsw==3.9.2-r1
-requests==2.18.4
+requests==2.19.1
 pyaml==17.12.1
 exifread==2.1.2
