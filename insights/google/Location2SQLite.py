@@ -25,7 +25,7 @@ from insights.config import databaseSetup
 from peewee import DoesNotExist
 import yaml
 import json
-from geopy.geocoders import Nominatim, GoogleV3, OpenCage, Bing, GeoNames, YahooPlaceFinder
+from geopy.geocoders import Nominatim, GoogleV3, OpenCage, Bing, GeoNames
 from geopy.point import Point
 from geopy.exc import *
 

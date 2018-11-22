@@ -24,7 +24,7 @@ from pprint import pprint
 
 from playhouse.dataset import DataSet
 
-import insights.biometric.Sensors.Hexoskin.HxApi2_0 as hexoskin
+import insightsv2.sources.biometric.hexoskin.HxApi2_0 as hexoskin
 from insights.io import config
 
 #Authentication with Hexoskin

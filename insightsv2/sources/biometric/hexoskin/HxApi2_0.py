@@ -6,7 +6,7 @@ import time
 
 import requests
 
-import insights.biometric.Sensors.Hexoskin.hexoskin.client as client
+import insightsv2.sources.biometric.hexoskin.hexoskin.client as client
 
 requests.packages.urllib3.disable_warnings()
 

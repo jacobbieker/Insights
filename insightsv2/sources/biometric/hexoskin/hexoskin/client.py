@@ -18,7 +18,7 @@ from urllib.parse import parse_qsl, urlparse
 import requests
 from requests.compat import basestring
 
-from insights.biometric.Sensors.Hexoskin.hexoskin import HttpError, HttpNotImplemented, HttpNotFound, \
+from insightsv2.sources.biometric.hexoskin.hexoskin import HttpError, HttpNotImplemented, HttpNotFound, \
     HttpForbidden, HttpUnauthorized, HttpBadRequest, HttpMethodNotAllowed, HttpInternalServerError, MethodNotAllowed
 
 CACHED_API_RESOURCE_LIST = '.api_stash'
